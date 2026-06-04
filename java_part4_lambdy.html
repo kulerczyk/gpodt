@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>java part4 lambdy</title>
+  <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #24292e;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 48px;
+  }
+  h1 { font-size: 2em; border-bottom: 2px solid #e1e4e8; padding-bottom: 10px; margin: 24px 0 16px; color: #1a1a2e; }
+  h2 { font-size: 1.5em; border-bottom: 1px solid #e1e4e8; padding-bottom: 6px; margin: 28px 0 12px; color: #2d4a7a; }
+  h3 { font-size: 1.2em; margin: 20px 0 8px; color: #3d6b9e; }
+  h4 { font-size: 1em; margin: 16px 0 6px; color: #555; font-weight: 600; }
+  p { margin: 8px 0; }
+  code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 12.5px;
+    background: #f0f3f6;
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: #c7254e;
+  }
+  pre {
+    background: #1e1e2e;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 14px 0;
+    border-left: 4px solid #7c3aed;
+  }
+  pre code {
+    background: none;
+    color: #cdd6f4;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+  th {
+    background: #7c3aed;
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #e1e4e8;
+  }
+  tr:nth-child(even) td { background: #f8f9ff; }
+  ul, ol { padding-left: 24px; margin: 8px 0; }
+  li { margin: 4px 0; }
+  hr { border: none; border-top: 2px solid #e1e4e8; margin: 28px 0; }
+  blockquote {
+    border-left: 4px solid #7c3aed;
+    background: #f5f0ff;
+    padding: 10px 16px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+    color: #4a3080;
+  }
+  strong { color: #1a1a2e; }
+  @media print {
+    body { padding: 20px 28px; font-size: 12px; }
+    pre { page-break-inside: avoid; }
+    h2, h3 { page-break-after: avoid; }
+    table { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<h1>Przewodnik egzaminacyjny Java — Część 4: Wyrażenia Lambda i Interfejsy Funkcyjne</h1>
+<h2>(pytania 101–140)</h2>
+
+<hr>
+
+<h2>1. Składnia wyrażeń lambda</h2>
+
+<h3>Pytanie 101 — czym jest wyrażenie lambda?</h3>
+
+<p>
+Wyrażenie lambda to <strong>zwięzła forma anonimowej funkcji</strong> — implementacja interfejsu funkcyjnego bez tworzenia pełnej klasy. Wprowadzone w Java 8.
+</p>
+
+<strong>Składnia pełna:</strong>
+<pre><code class="language-">(parametry) -&gt; { ciało }
+</code></pre>
+
+<strong>Warianty składniowe:</strong>
+
+<pre><code class="language-java">// 1. Brak parametrów — puste nawiasy obowiązkowe
+Runnable r = () -&gt; System.out.println("Hello");
+
+// 2. Jeden parametr — nawiasy opcjonalne (bez deklaracji typu)
+Consumer&lt;String&gt; printer = s -&gt; System.out.println(s);
+Consumer&lt;String&gt; printerWithParens = (s) -&gt; System.out.println(s); // też OK
+
+// 3. Wiele parametrów — nawiasy obowiązkowe
+BiFunction&lt;Integer, Integer, Integer&gt; add = (a, b) -&gt; a + b;
+
+// 4. Z deklaracją typów — nawiasy obowiązkowe
+BiFunction&lt;Integer, Integer, Integer&gt; addTyped = (Integer a, Integer b) -&gt; a + b;
+
+// 5. Jedno wyrażenie — brak { } i return
+Function&lt;String, Integer&gt; length = s -&gt; s.length(); // return jest niejawny
+
+// 6. Blok — { } i explicit return
+Function&lt;String, Integer&gt; lengthBlock = s -&gt; {
+    System.out.println("Computing length of: " + s);
+    return s.length(); // MUSI być return!
+};
+
+// 7. Zwracanie void — brak return
+Consumer&lt;String&gt; log = s -&gt; {
+    System.out.println("[LOG] " + s);
+    // brak return — void
+};
+</code></pre>
+
+<strong>KLUCZOWE różnice składniowe:</strong>
+
+<table>
+<tr><th>Forma</th><th>Kiedy</th><th>Przykład</th></tr>
+<tr><td><code>() -&gt; expr</code></td><td>Brak parametrów, jedno wyrażenie</td><td><code>() -&gt; 42</code></td></tr>
+<tr><td><code>x -&gt; expr</code></td><td>Jeden parametr bez nawiasów</td><td><code>x -&gt; x * 2</code></td></tr>
+<tr><td><code>(x) -&gt; expr</code></td><td>Jeden parametr z nawiasami</td><td><code>(x) -&gt; x * 2</code></td></tr>
+<tr><td><code>(x, y) -&gt; expr</code></td><td>Wiele parametrów</td><td><code>(a, b) -&gt; a + b</code></td></tr>
+<tr><td><code>(Type x) -&gt; expr</code></td><td>Z typem jawnym (wtedy nawiasy wymagane)</td><td><code>(String s) -&gt; s.length()</code></td></tr>
+<tr><td><code>(x, y) -&gt; { ... }</code></td><td>Blok kodu (wymagany <code>return</code>)</td><td><code>(a, b) -&gt; { return a + b; }</code></td></tr>
+</table>
+
+<hr>
+
+<h2>2. Interfejsy funkcyjne — java.util.function</h2>
+
+<h3>Pytanie 102 — pakiet java.util.function — przegląd</h3>
+
+<p>
+Java 8 wprowadził bogaty zestaw gotowych interfejsów funkcyjnych w pakiecie <code>java.util.function</code>:
+</p>
+
+<pre><code class="language-">Podstawowe:
+├── Function&lt;T, R&gt;         — T → R (przekształcenie)
+├── Predicate&lt;T&gt;           — T → boolean (test/filtrowanie)
+├── Consumer&lt;T&gt;            — T → void (konsumpcja/side effect)
+└── Supplier&lt;T&gt;            — () → T (produkcja/dostarczanie)
+
+Dwuargumentowe:
+├── BiFunction&lt;T, U, R&gt;    — (T, U) → R
+├── BiPredicate&lt;T, U&gt;      — (T, U) → boolean
+└── BiConsumer&lt;T, U&gt;       — (T, U) → void
+
+Specjalizowane (UnaryOperator/BinaryOperator):
+├── UnaryOperator&lt;T&gt;       — T → T (extends Function&lt;T,T&gt;)
+└── BinaryOperator&lt;T&gt;      — (T, T) → T (extends BiFunction&lt;T,T,T&gt;)
+
+Prymitywne (wydajne, bez autoboxingu):
+├── IntFunction&lt;R&gt;         — int → R
+├── ToIntFunction&lt;T&gt;       — T → int
+├── IntUnaryOperator       — int → int
+├── IntBinaryOperator      — (int, int) → int
+└── ... (analogicznie dla long, double)
+</code></pre>
+
+<hr>
+
+<h2>3. Function<T, R></h2>
+
+<h3>Pytanie 103 — Function — transformacja wartości</h3>
+
+<pre><code class="language-java">import java.util.function.Function;
+
+// Function&lt;T, R&gt;: przyjmuje T, zwraca R
+Function&lt;String, Integer&gt; stringToLength = s -&gt; s.length();
+Function&lt;String, String&gt; toUpper = String::toUpperCase; // method reference
+
+// Wywołanie:
+Integer len = stringToLength.apply("Hello"); // 5
+
+// Chaining — andThen() i compose():
+Function&lt;Integer, Integer&gt; doubleIt = x -&gt; x * 2;
+Function&lt;Integer, Integer&gt; addThree = x -&gt; x + 3;
+
+// andThen: najpierw doubleIt, potem addThree
+Function&lt;Integer, Integer&gt; doubleAndAdd = doubleIt.andThen(addThree);
+doubleAndAdd.apply(5); // (5*2) + 3 = 13
+
+// compose: najpierw addThree, potem doubleIt (odwrotna kolejność!)
+Function&lt;Integer, Integer&gt; addAndDouble = doubleIt.compose(addThree);
+addAndDouble.apply(5); // (5+3) * 2 = 16
+</code></pre>
+
+<strong>WAŻNE — różnica andThen vs compose:</strong>
+
+<pre><code class="language-java">// Niech f = doubleIt, g = addThree
+// f.andThen(g) = g(f(x)) — najpierw f, potem g
+// f.compose(g) = f(g(x)) — najpierw g, potem f (matematyczna kompozycja)
+
+Function&lt;Integer, Integer&gt; f = x -&gt; x * 2;   // podwój
+Function&lt;Integer, Integer&gt; g = x -&gt; x + 10;  // dodaj 10
+
+System.out.println(f.andThen(g).apply(5)); // (5*2)+10 = 20
+System.out.println(f.compose(g).apply(5)); // (5+10)*2 = 30
+</code></pre>
+
+<hr>
+
+<h2>4. Predicate<T></h2>
+
+<h3>Pytanie 104 — Predicate — testowanie warunków</h3>
+
+<pre><code class="language-java">import java.util.function.Predicate;
+
+Predicate&lt;String&gt; isLong = s -&gt; s.length() &gt; 5;
+Predicate&lt;String&gt; startsWithA = s -&gt; s.startsWith("A");
+Predicate&lt;Integer&gt; isEven = n -&gt; n % 2 == 0;
+
+// Wywołanie:
+boolean result = isLong.test("Hello World"); // true
+
+// Kompozycja:
+// and() — oba muszą być true
+Predicate&lt;String&gt; isLongAndStartsWithA = isLong.and(startsWithA);
+isLongAndStartsWithA.test("Algorithm"); // true (długość &gt; 5 AND startuje z A)
+
+// or() — przynajmniej jeden true
+Predicate&lt;String&gt; isLongOrStartsWithA = isLong.or(startsWithA);
+isLongOrStartsWithA.test("Art"); // true (nie jest długie, ALE startuje z A)
+
+// negate() — negacja
+Predicate&lt;String&gt; isShort = isLong.negate();
+isShort.test("Hi"); // true
+
+// Predicate.not() — statyczna metoda (Java 11+)
+Predicate&lt;String&gt; notEmpty = Predicate.not(String::isEmpty);
+
+// Predicate.isEqual() — tworzy Predicate sprawdzający równość
+Predicate&lt;String&gt; isHello = Predicate.isEqual("Hello");
+isHello.test("Hello"); // true
+isHello.test("World"); // false
+
+// Użycie w Stream:
+List&lt;String&gt; names = List.of("Alice", "Bob", "Anna", "Charlie");
+names.stream()
+     .filter(isLong.and(startsWithA))
+     .forEach(System.out::println); // Alice, Anna? sprawdź: Alice.length()=5 (nie&gt;5)
+                                     // Anna.length()=4 → żadna nie przejdzie!
+</code></pre>
+
+<hr>
+
+<h2>5. Consumer<T></h2>
+
+<h3>Pytanie 105 — Consumer — efekty uboczne</h3>
+
+<pre><code class="language-java">import java.util.function.Consumer;
+
+// Consumer&lt;T&gt;: przyjmuje T, zwraca void (efekt uboczny)
+Consumer&lt;String&gt; printer = System.out::println;
+Consumer&lt;String&gt; logger = s -&gt; System.out.println("[LOG] " + s);
+
+// Wywołanie:
+printer.accept("Hello"); // Hello
+
+// andThen() — łańcuchowanie Consumerów:
+Consumer&lt;String&gt; logThenPrint = logger.andThen(printer);
+logThenPrint.accept("Message");
+// Wynik:
+// [LOG] Message
+// Message
+
+// BiConsumer&lt;T, U&gt;: przyjmuje dwa argumenty, zwraca void
+BiConsumer&lt;String, Integer&gt; printWithIndex = (s, i) -&gt; 
+    System.out.println(i + ": " + s);
+printWithIndex.accept("Alice", 1); // "1: Alice"
+
+// Typowe użycie — forEach w List i Map:
+List&lt;String&gt; items = List.of("a", "b", "c");
+items.forEach(printer); // odpowiednik: for (String s : items) printer.accept(s);
+
+Map&lt;String, Integer&gt; scores = Map.of("Alice", 90, "Bob", 85);
+scores.forEach((name, score) -&gt; System.out.println(name + ": " + score));
+// BiConsumer w Map.forEach!
+</code></pre>
+
+<hr>
+
+<h2>6. Supplier<T></h2>
+
+<h3>Pytanie 106 — Supplier — leniwe dostarczanie wartości</h3>
+
+<pre><code class="language-java">import java.util.function.Supplier;
+
+// Supplier&lt;T&gt;: brak argumentów, zwraca T
+Supplier&lt;String&gt; greeting = () -&gt; "Hello, World!";
+Supplier&lt;List&lt;String&gt;&gt; listFactory = ArrayList::new; // constructor reference
+
+// Wywołanie:
+String msg = greeting.get(); // "Hello, World!"
+List&lt;String&gt; list = listFactory.get(); // nowa, pusta ArrayList
+
+// Supplier do leniwego obliczania wartości:
+Supplier&lt;Double&gt; expensiveComputation = () -&gt; {
+    System.out.println("Computing...");
+    return Math.PI * 1000; // przykład długiego obliczenia
+};
+
+// Wartość NIE jest obliczana do momentu wywołania get():
+// expensiveComputation — nic nie wypisuje
+Double value = expensiveComputation.get(); // dopiero teraz: "Computing..."
+
+// Optional.orElseGet() — Supplier do leniwego fallback:
+Optional&lt;String&gt; opt = Optional.empty();
+// ❌ ZŁE — eager: wartość obliczana zawsze, nawet gdy Optional nie jest pusty
+String badFallback = opt.orElse(createExpensiveDefault()); // createExpensiveDefault() wywołana zawsze
+
+// ✅ DOBRE — lazy: Supplier wywoływany tylko gdy Optional pusty
+String goodFallback = opt.orElseGet(() -&gt; createExpensiveDefault()); // lazy!
+</code></pre>
+
+<hr>
+
+<h2>7. BiFunction, BiPredicate, BiConsumer</h2>
+
+<h3>Pytanie 107 — warianty dwuargumentowe</h3>
+
+<pre><code class="language-java">// BiFunction&lt;T, U, R&gt;: (T, U) -&gt; R
+BiFunction&lt;String, Integer, String&gt; repeat = (s, n) -&gt; s.repeat(n);
+repeat.apply("abc", 3); // "abcabcabc"
+
+// andThen() dla BiFunction:
+BiFunction&lt;Integer, Integer, Integer&gt; sum = (a, b) -&gt; a + b;
+Function&lt;Integer, String&gt; intToStr = i -&gt; "Result: " + i;
+BiFunction&lt;Integer, Integer, String&gt; sumAndFormat = sum.andThen(intToStr);
+sumAndFormat.apply(3, 4); // "Result: 7"
+
+// BiPredicate&lt;T, U&gt;: (T, U) -&gt; boolean
+BiPredicate&lt;String, Integer&gt; longerThan = (s, n) -&gt; s.length() &gt; n;
+longerThan.test("Hello", 3); // true
+
+// and(), or(), negate() działają tak samo jak w Predicate:
+BiPredicate&lt;Integer, Integer&gt; bothPositive = (a, b) -&gt; a &gt; 0 &amp;&amp; b &gt; 0;
+BiPredicate&lt;Integer, Integer&gt; eitherNegative = bothPositive.negate();
+
+// BiConsumer&lt;T, U&gt;: (T, U) -&gt; void
+BiConsumer&lt;String, String&gt; fullName = (first, last) -&gt; 
+    System.out.println("Name: " + first + " " + last);
+fullName.accept("John", "Doe"); // "Name: John Doe"
+
+// andThen() dla BiConsumer:
+BiConsumer&lt;String, String&gt; logAndPrint = 
+    ((BiConsumer&lt;String, String&gt;) (f, l) -&gt; System.out.println("[LOG] " + f + " " + l))
+    .andThen(fullName);
+</code></pre>
+
+<hr>
+
+<h2>8. UnaryOperator i BinaryOperator</h2>
+
+<h3>Pytanie 108 — operatory jako specjalizacje Function</h3>
+
+<pre><code class="language-java">import java.util.function.UnaryOperator;
+import java.util.function.BinaryOperator;
+
+// UnaryOperator&lt;T&gt; extends Function&lt;T, T&gt;: T -&gt; T (ten sam typ in i out)
+UnaryOperator&lt;String&gt; toUpper = String::toUpperCase;
+UnaryOperator&lt;Integer&gt; square = x -&gt; x * x;
+UnaryOperator&lt;List&lt;String&gt;&gt; sort = list -&gt; { 
+    List&lt;String&gt; sorted = new ArrayList&lt;&gt;(list);
+    Collections.sort(sorted);
+    return sorted;
+};
+
+toUpper.apply("hello"); // "HELLO"
+square.apply(5);        // 25
+
+// BinaryOperator&lt;T&gt; extends BiFunction&lt;T, T, T&gt;: (T, T) -&gt; T
+BinaryOperator&lt;Integer&gt; max = (a, b) -&gt; a &gt; b ? a : b;
+BinaryOperator&lt;String&gt; concat = (a, b) -&gt; a + b;
+BinaryOperator&lt;Integer&gt; add = Integer::sum; // method reference
+
+max.apply(3, 7);    // 7
+concat.apply("Hello ", "World"); // "Hello World"
+
+// Specjalne metody statyczne:
+BinaryOperator&lt;Integer&gt; maxByCmp = BinaryOperator.maxBy(Integer::compare);
+BinaryOperator&lt;Integer&gt; minByCmp = BinaryOperator.minBy(Integer::compare);
+maxByCmp.apply(10, 20); // 20
+minByCmp.apply(10, 20); // 10
+
+// UnaryOperator.identity() — returns its input unchanged:
+UnaryOperator&lt;String&gt; identity = UnaryOperator.identity();
+identity.apply("anything"); // "anything"
+</code></pre>
+
+<hr>
+
+<h2>9. Method References (referencje do metod)</h2>
+
+<h3>Pytanie 109 — cztery rodzaje referencji do metod</h3>
+
+<p>
+Referencje do metod (<code>::</code>) to skrócony zapis lambdy, gdy lambda tylko wywołuje istniejącą metodę:
+</p>
+
+<pre><code class="language-java">// Składnia: ClassName::methodName lub instance::methodName
+
+// 1. STATYCZNA metoda: ClassName::staticMethod
+// Odpowiednik: (args) -&gt; ClassName.staticMethod(args)
+Function&lt;String, Integer&gt; parseInt = Integer::parseInt;   // s -&gt; Integer.parseInt(s)
+BiFunction&lt;Integer, Integer, Integer&gt; sum = Integer::sum; // (a, b) -&gt; Integer.sum(a, b)
+Consumer&lt;String&gt; print = System.out::println;             // s -&gt; System.out.println(s)
+
+parseInt.apply("42"); // 42
+
+// 2. INSTANCYJNA metoda konkretnego obiektu: instance::method
+String prefix = "Hello, ";
+Function&lt;String, String&gt; greet = prefix::concat; // s -&gt; prefix.concat(s)
+greet.apply("World"); // "Hello, World"
+
+// 3. INSTANCYJNA metoda dowolnego obiektu (przez typ): ClassName::instanceMethod
+// Pierwszy parametr lambdy staje się "this"
+Function&lt;String, String&gt; toUpper = String::toUpperCase; // s -&gt; s.toUpperCase()
+Function&lt;String, Integer&gt; length = String::length;       // s -&gt; s.length()
+BiPredicate&lt;String, String&gt; startsWith = String::startsWith; // (s, prefix) -&gt; s.startsWith(prefix)
+
+toUpper.apply("hello"); // "HELLO"
+startsWith.test("Hello", "He"); // true
+
+// 4. KONSTRUKTOR: ClassName::new
+Supplier&lt;ArrayList&lt;String&gt;&gt; listMaker = ArrayList::new;    // () -&gt; new ArrayList&lt;&gt;()
+Function&lt;String, StringBuilder&gt; sbMaker = StringBuilder::new; // s -&gt; new StringBuilder(s)
+BiFunction&lt;String, Integer, String&gt; repeatMaker = String::new; // skomplikowane — rzadkie
+
+ArrayList&lt;String&gt; list = listMaker.get();
+StringBuilder sb = sbMaker.apply("hello");
+</code></pre>
+
+<strong>Kiedy można użyć method reference:</strong>
+
+<pre><code class="language-java">// ✅ lambda wywołuje tylko jedną metodę — można użyć ::
+list.stream().map(s -&gt; s.toUpperCase())  // można zamienić na:
+list.stream().map(String::toUpperCase);
+
+list.stream().filter(s -&gt; s.isEmpty())   // można zamienić na:
+list.stream().filter(String::isEmpty);
+
+// ✅ lambda wywołuje metodę z jednym parametrem (który jest samym obiektem)
+list.forEach(s -&gt; System.out.println(s)); // można zamienić na:
+list.forEach(System.out::println);
+
+// ❌ NIE można użyć :: gdy lambda robi więcej:
+list.stream().map(s -&gt; s.toUpperCase() + "!"); // nie można uproscić
+list.stream().filter(s -&gt; s.length() &gt; 5);     // nie można uprościć (to predicate na dwóch args)
+</code></pre>
+
+<hr>
+
+<h2>10. Effectively final — zamknięcia (closures)</h2>
+
+<h3>Pytanie 110 — co oznacza "effectively final"?</h3>
+
+<p>
+Lambda może używać zmiennych z otaczającego zakresu, ale tylko jeśli są <strong>effectively final</strong> — nie zmieniane po inicjalizacji (nawet bez słowa <code>final</code>):
+</p>
+
+<pre><code class="language-java">int threshold = 10; // effectively final — nigdy nie zmieniana po inicjalizacji
+
+Predicate&lt;Integer&gt; isAbove = n -&gt; n &gt; threshold; // ✅ OK — threshold jest effectively final
+
+// ❌ BŁĄD — threshold nie jest effectively final (jest modyfikowana):
+int counter = 0;
+Runnable incrementer = () -&gt; counter++; // ❌ BŁĄD KOMPILACJI
+// "Variable used in lambda expression should be final or effectively final"
+
+// Obejście: użyj AtomicInteger lub tablicy jednoelementowej:
+int[] counterArr = {0};
+Runnable incrementer2 = () -&gt; counterArr[0]++; // ✅ OK — referencja do tablicy jest final, jej zawartość nie
+
+java.util.concurrent.atomic.AtomicInteger atomicCounter = new java.util.concurrent.atomic.AtomicInteger(0);
+Runnable incrementer3 = () -&gt; atomicCounter.incrementAndGet(); // ✅ OK
+
+// Pola instancji klasy NIE muszą być effectively final:
+class Counter {
+    private int count = 0;
+
+    Runnable createIncrementer() {
+        return () -&gt; count++; // ✅ OK — count to pole, nie zmienna lokalna
+    }
+}
+</code></pre>
+
+<strong>Dlaczego to ograniczenie istnieje?</strong>
+
+<p>
+Lambda może "żyć" dłużej niż metoda, w której została stworzona. Gdy metoda się zakończy, jej zmienne lokalne znikają ze stosu. Lambda musi trzymać <strong>kopię</strong> wartości zmiennej — dlatego wartość musi być stała (effectively final). Gdyby wartość mogła się zmienić po stworzeniu lambdy, kopia byłaby nieaktualna (race condition).
+</p>
+
+<hr>
+
+<h2>11. Chaining — łączenie funkcji</h2>
+
+<h3>Pytanie 111 — metody kompozycji interfejsów funkcyjnych</h3>
+
+<pre><code class="language-java">// Function.andThen() i compose() — już omówione w pyt. 103
+// Predicate.and(), or(), negate() — już omówione w pyt. 104
+// Consumer.andThen() — już omówione w pyt. 105
+
+// ŁAŃCUCH FUNCTION:
+Function&lt;String, String&gt; step1 = String::trim;
+Function&lt;String, String&gt; step2 = String::toUpperCase;
+Function&lt;String, String&gt; step3 = s -&gt; "[" + s + "]";
+Function&lt;String, Integer&gt; step4 = String::length;
+
+// andThen tworzy nową funkcję:
+Function&lt;String, Integer&gt; pipeline = step1.andThen(step2).andThen(step3).andThen(step4);
+pipeline.apply("  hello  "); // trim → "hello" → "HELLO" → "[HELLO]" → 7
+
+// ŁAŃCUCH PREDICATE — złożone warunki:
+Predicate&lt;String&gt; notNull = s -&gt; s != null;
+Predicate&lt;String&gt; notEmpty = s -&gt; !s.isEmpty();
+Predicate&lt;String&gt; longEnough = s -&gt; s.length() &gt;= 3;
+Predicate&lt;String&gt; noSpaces = s -&gt; !s.contains(" ");
+
+Predicate&lt;String&gt; validUsername = notNull
+    .and(notEmpty)
+    .and(longEnough)
+    .and(noSpaces);
+
+validUsername.test("alice");     // true
+validUsername.test("a b");       // false (zawiera spację)
+validUsername.test("");          // false (pusta)
+validUsername.test(null);        // false (null)
+
+// ŁAŃCUCH CONSUMER — sekwencja operacji:
+Consumer&lt;String&gt; validate = s -&gt; System.out.println("Validating: " + s);
+Consumer&lt;String&gt; process = s -&gt; System.out.println("Processing: " + s);
+Consumer&lt;String&gt; audit = s -&gt; System.out.println("Auditing: " + s);
+
+Consumer&lt;String&gt; pipeline2 = validate.andThen(process).andThen(audit);
+pipeline2.accept("data"); // wykona trzy operacje po kolei
+</code></pre>
+
+<hr>
+
+<h2>12. Obsługa wyjątków w lambdach</h2>
+
+<h3>Pytanie 112 — checked exceptions w lambdach</h3>
+
+<p>
+Standardowe interfejsy funkcyjne <code>java.util.function.*</code> <strong>nie deklarują</strong> checked exceptions. To problem gdy próbujemy użyć metody rzucającej checked exception w lambdzie:
+</p>
+
+<pre><code class="language-java">// ❌ PROBLEM — Files.readString rzuca IOException (checked)
+List&lt;Path&gt; paths = List.of(Path.of("a.txt"), Path.of("b.txt"));
+// paths.stream().map(p -&gt; Files.readString(p)); // ❌ BŁĄD KOMPILACJI
+
+// ✅ ROZWIĄZANIE 1 — try-catch wewnątrz lambdy:
+paths.stream().map(p -&gt; {
+    try {
+        return Files.readString(p);
+    } catch (IOException e) {
+        throw new RuntimeException(e); // zawiń w unchecked
+    }
+}).forEach(System.out::println);
+
+// ✅ ROZWIĄZANIE 2 — własny interfejs funkcyjny z checked exception:
+@FunctionalInterface
+interface ThrowingFunction&lt;T, R&gt; {
+    R apply(T t) throws Exception;
+}
+
+// Metoda wrappująca:
+static &lt;T, R&gt; Function&lt;T, R&gt; wrap(ThrowingFunction&lt;T, R&gt; f) {
+    return t -&gt; {
+        try {
+            return f.apply(t);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    };
+}
+
+// Użycie:
+paths.stream()
+     .map(wrap(p -&gt; Files.readString(p)))
+     .forEach(System.out::println);
+
+// ✅ ROZWIĄZANIE 3 — biblioteka Vavr lub podobna (funkcyjne try):
+// Try.of(() -&gt; Files.readString(path)).getOrElse("error")
+</code></pre>
+
+<hr>
+
+<h2>13. Interfejsy funkcyjne w Collections</h2>
+
+<h3>Pytanie 113 — lambdy z metodami Collection</h3>
+
+<pre><code class="language-java">List&lt;String&gt; names = new ArrayList&lt;&gt;(List.of("Charlie", "Alice", "Bob", "David"));
+
+// 1. sort() z Comparator — BiFunction-like interface
+names.sort((a, b) -&gt; a.compareTo(b));               // String::compareTo — method reference
+names.sort(Comparator.naturalOrder());              // equivalent
+names.sort(Comparator.comparing(String::length));  // sortuj po długości
+names.sort(Comparator.comparing(String::length).reversed()); // malejąco
+
+// 2. forEach() z Consumer
+names.forEach(System.out::println);                 // Consumer&lt;String&gt;
+names.forEach(name -&gt; System.out.println("Hi, " + name));
+
+// 3. removeIf() z Predicate
+names.removeIf(s -&gt; s.startsWith("A"));            // usuń zaczynające się na A
+names.removeIf(String::isEmpty);                   // usuń puste
+
+// 4. replaceAll() z UnaryOperator
+names.replaceAll(String::toUpperCase);             // zamień każdy element na uppercase
+names.replaceAll(s -&gt; s + "!");                   // dodaj ! do każdego
+
+// Map operations:
+Map&lt;String, Integer&gt; scores = new HashMap&lt;&gt;();
+scores.put("Alice", 90);
+scores.put("Bob", 85);
+
+// 5. Map.forEach() z BiConsumer
+scores.forEach((name, score) -&gt; System.out.println(name + ": " + score));
+
+// 6. Map.replaceAll() z BiFunction
+scores.replaceAll((name, score) -&gt; score + 10); // dodaj 10 do każdego wyniku
+
+// 7. Map.compute() z BiFunction
+scores.compute("Alice", (key, val) -&gt; val == null ? 100 : val + 5);
+
+// 8. Map.computeIfAbsent() z Function
+scores.computeIfAbsent("Charlie", key -&gt; 75); // dodaj Charlie ze wynikiem 75
+
+// 9. Map.merge() z BiFunction
+scores.merge("Alice", 5, Integer::sum); // dodaj 5 do Alice (lub wstaw 5 jeśli brak)
+</code></pre>
+
+<hr>
+
+<h2>14. Currying i partial application</h2>
+
+<h3>Pytanie 114 — currying z lambdami</h3>
+
+<strong>Currying</strong> to przekształcenie funkcji wielu argumentów w łańcuch funkcji jednoargumentowych:
+
+<pre><code class="language-java">// Normalna funkcja (3 argumenty):
+// add(a, b, c) = a + b + c
+
+// Curried version w Javie:
+Function&lt;Integer, Function&lt;Integer, Function&lt;Integer, Integer&gt;&gt;&gt; curriedAdd =
+    a -&gt; b -&gt; c -&gt; a + b + c;
+
+// Użycie:
+int result = curriedAdd.apply(1).apply(2).apply(3); // 6
+
+// Partial application — "zamrożenie" jednego argumentu:
+Function&lt;Integer, Function&lt;Integer, Integer&gt;&gt; add1 = curriedAdd.apply(1); // a=1 "zamrożone"
+Function&lt;Integer, Integer&gt; add1and2 = add1.apply(2); // a=1, b=2 "zamrożone"
+int final2 = add1and2.apply(3); // 6
+
+// Praktyczny przykład — tworzenie validatorów przez currying:
+Function&lt;Integer, Function&lt;Integer, Boolean&gt;&gt; between =
+    min -&gt; max -&gt; value -&gt; value &gt;= min &amp;&amp; value &lt;= max;
+
+Function&lt;Integer, Boolean&gt; validAge = between.apply(0).apply(120);
+Function&lt;Integer, Boolean&gt; validScore = between.apply(0).apply(100);
+
+validAge.apply(25);   // true
+validAge.apply(-5);   // false
+validScore.apply(85); // true
+validScore.apply(150);// false
+
+// BiFunction do Function&lt;Function&gt; — klasyczny currying pattern:
+BiFunction&lt;String, Integer, String&gt; repeat = (s, n) -&gt; s.repeat(n);
+
+// Zcurrowany:
+Function&lt;String, Function&lt;Integer, String&gt;&gt; curriedRepeat =
+    s -&gt; n -&gt; s.repeat(n);
+
+Function&lt;Integer, String&gt; repeatHello = curriedRepeat.apply("Hello");
+repeatHello.apply(3); // "HelloHelloHello"
+</code></pre>
+
+<hr>
+
+<h2>15. Lambda vs klasa anonimowa — kluczowe różnice</h2>
+
+<h3>Pytanie 115 — kiedy lambda, kiedy klasa anonimowa?</h3>
+
+<pre><code class="language-java">// KLASA ANONIMOWA — stary styl (przed Java 8):
+Runnable runnableAnon = new Runnable() {
+    @Override
+    public void run() {
+        System.out.println("Running (anonymous)");
+    }
+};
+
+// LAMBDA — nowy styl (Java 8+):
+Runnable runnableLambda = () -&gt; System.out.println("Running (lambda)");
+</code></pre>
+
+<strong>Kluczowe różnice:</strong>
+
+<table>
+<tr><th>Aspekt</th><th>Klasa anonimowa</th><th>Lambda</th></tr>
+<tr><td>Typ (<code>this</code>)</td><td><code>this</code> = instancja klasy anonimowej</td><td><code>this</code> = otaczająca klasa</td></tr>
+<tr><td>Własny stan</td><td>✅ Może mieć pola</td><td>❌ Brak</td></tr>
+<tr><td>Implementacja interfejsów</td><td>Dowolny interfejs (też wielometodowy)</td><td>Tylko interfejsy funkcyjne (SAM)</td></tr>
+<tr><td>Rozszerzanie klas</td><td>✅ Może rozszerzać klasy</td><td>❌ Nie może</td></tr>
+<tr><td>Serializacja</td><td>Możliwa (z ograniczeniami)</td><td>Technicznie możliwa, ale niezalecana</td></tr>
+<tr><td>Kompilacja</td><td>Osobny plik <code>.class</code></td><td>Dynamiczne wywołanie (<code>invokedynamic</code>)</td></tr>
+<tr><td>Shadow outer vars</td><td>✅ Może deklarować zmienną o tej samej nazwie</td><td>❌ Nie może (jest w tym samym scope)</td></tr>
+</table>
+
+<pre><code class="language-java">// RÓŻNICA this — ważne na egzaminie!
+class OuterClass {
+    private String name = "Outer";
+
+    void demonstrate() {
+        // Klasa anonimowa — this to instancja klasy anonimowej:
+        Runnable anon = new Runnable() {
+            private String name = "Anonymous";
+            @Override
+            public void run() {
+                System.out.println(this.name);        // "Anonymous"
+                System.out.println(OuterClass.this.name); // "Outer"
+            }
+        };
+
+        // Lambda — this to OuterClass:
+        Runnable lambda = () -&gt; {
+            System.out.println(this.name); // "Outer" — this = OuterClass
+            // Lambda nie ma własnego 'this'
+        };
+    }
+}
+
+// RÓŻNICA shadow variables:
+String x = "outer";
+
+// Klasa anonimowa MOŻE zadeklarować x — shadow:
+Runnable anon = new Runnable() {
+    String x = "inner"; // ✅ OK — shadow
+    @Override public void run() { System.out.println(x); } // "inner"
+};
+
+// Lambda NIE MOŻE — ten sam scope:
+// Runnable lambda = () -&gt; { String x = "inner"; }; // ❌ BŁĄD — x już istnieje
+</code></pre>
+
+<hr>
+
+<h2>16. Interfejsy funkcyjne — Comparator</h2>
+
+<h3>Pytanie 116 — Comparator jako interfejs funkcyjny</h3>
+
+<pre><code class="language-java">// Comparator&lt;T&gt; jest interfejsem funkcyjnym (ma jedną metodę compare())
+// Posiada też wiele metod default i static:
+
+// Tworzenie przez lambdę:
+Comparator&lt;String&gt; byLength = (s1, s2) -&gt; s1.length() - s2.length();
+// Lepiej (unika overflow z Integer):
+Comparator&lt;String&gt; byLengthSafe = Comparator.comparingInt(String::length);
+
+// Chaining comparatorów:
+Comparator&lt;String&gt; byLengthThenAlpha = Comparator
+    .comparingInt(String::length)       // najpierw po długości
+    .thenComparing(Comparator.naturalOrder()); // potem alfabetycznie
+
+// reversed():
+Comparator&lt;String&gt; byLengthDesc = Comparator
+    .comparingInt(String::length)
+    .reversed();
+
+// Null-safe:
+Comparator&lt;String&gt; nullSafe = Comparator.nullsFirst(Comparator.naturalOrder());
+Comparator&lt;String&gt; nullsLast = Comparator.nullsLast(Comparator.naturalOrder());
+
+// Przykład użycia:
+List&lt;String&gt; words = new ArrayList&lt;&gt;(List.of("banana", "apple", "cherry", "date"));
+words.sort(byLengthThenAlpha);
+System.out.println(words); // [date, apple, banana, cherry]
+
+// Sortowanie obiektów złożonych:
+record Person(String name, int age) {}
+
+List&lt;Person&gt; people = List.of(
+    new Person("Alice", 30),
+    new Person("Bob", 25),
+    new Person("Charlie", 30)
+);
+
+people.stream()
+    .sorted(Comparator.comparingInt(Person::age)
+                      .thenComparing(Person::name))
+    .forEach(p -&gt; System.out.println(p.name() + ": " + p.age()));
+// Bob: 25, Alice: 30, Charlie: 30
+</code></pre>
+
+<hr>
+
+<h2>17. Primitive functional interfaces</h2>
+
+<h3>Pytanie 117 — interfejsy dla typów prymitywnych</h3>
+
+<p>
+Java dostarcza wyspecjalizowane interfejsy dla <code>int</code>, <code>long</code>, <code>double</code> — unikają autoboxingu/unboxingu:
+</p>
+
+<pre><code class="language-java">// ZAMIAST Function&lt;Integer, Integer&gt; (autoboxing!):
+java.util.function.IntUnaryOperator squareInt = x -&gt; x * x;
+squareInt.applyAsInt(5); // 25 — bez autoboxingu!
+
+// IntFunction&lt;R&gt;: int -&gt; R
+java.util.function.IntFunction&lt;String&gt; intToStr = i -&gt; "Number: " + i;
+intToStr.apply(42); // "Number: 42"
+
+// ToIntFunction&lt;T&gt;: T -&gt; int
+java.util.function.ToIntFunction&lt;String&gt; strToLen = String::length;
+strToLen.applyAsInt("Hello"); // 5
+
+// IntPredicate: int -&gt; boolean
+java.util.function.IntPredicate isPositive = n -&gt; n &gt; 0;
+isPositive.test(5); // true
+
+// IntConsumer: int -&gt; void
+java.util.function.IntConsumer printInt = n -&gt; System.out.println("int: " + n);
+
+// IntSupplier: () -&gt; int
+java.util.function.IntSupplier randomInt = () -&gt; (int)(Math.random() * 100);
+
+// IntBinaryOperator: (int, int) -&gt; int
+java.util.function.IntBinaryOperator maxInt = Math::max;
+maxInt.applyAsInt(3, 7); // 7
+
+// Analogicznie: LongUnaryOperator, DoubleUnaryOperator, etc.
+
+// Konwersje między nimi:
+IntUnaryOperator doubleIt = x -&gt; x * 2;
+// Konwersja na Function&lt;Integer, Integer&gt;:
+Function&lt;Integer, Integer&gt; asFunction = doubleIt::applyAsInt; // autoboxing w metodzie
+</code></pre>
+
+<hr>
+
+<h2>18. Lambdy a serializacja</h2>
+
+<h3>Pytanie 118 — czy lambdy można serializować?</h3>
+
+<pre><code class="language-java">// Lambda może implementować Serializable:
+import java.io.Serializable;
+import java.util.function.Function;
+
+// Rzutowanie na dwa interfejsy jednocześnie (intersection type):
+Function&lt;String, String&gt; serializableLambda = 
+    (Function&lt;String, String&gt; &amp; Serializable) String::toUpperCase;
+
+// Problem: serializacja lambd jest skomplikowana i zależy od JVM.
+// Klasa, w której lambda jest zdefiniowana, musi być dostępna po deserializacji.
+// Ogólnie: lambdy NIE są zaprojektowane do serializacji.
+// Zamiast tego: użyj serializowalnej klasy anonimowej lub innego mechanizmu.
+
+// Praktyczna zasada: unikaj serializacji lambd w kodzie produkcyjnym.
+</code></pre>
+
+<hr>
+
+<h2>19. Interfejsy funkcyjne — zaawansowane kompozycje</h2>
+
+<h3>Pytanie 119 — tworzenie pipeline'ów transformacji</h3>
+
+<pre><code class="language-java">// Wzorzec pipeline z Function:
+class DataPipeline&lt;T&gt; {
+    private final Function&lt;T, T&gt; pipeline;
+
+    DataPipeline(Function&lt;T, T&gt; initialStep) {
+        this.pipeline = initialStep;
+    }
+
+    DataPipeline&lt;T&gt; then(Function&lt;T, T&gt; nextStep) {
+        return new DataPipeline&lt;&gt;(pipeline.andThen(nextStep));
+    }
+
+    T execute(T input) {
+        return pipeline.apply(input);
+    }
+}
+
+// Użycie:
+DataPipeline&lt;String&gt; processor = new DataPipeline&lt;&gt;(String::trim)
+    .then(String::toUpperCase)
+    .then(s -&gt; s.replace(" ", "_"))
+    .then(s -&gt; "[" + s + "]");
+
+processor.execute("  hello world  "); // "[HELLO_WORLD]"
+
+// Bardziej funkcyjny styl — reduce z Function:
+List&lt;Function&lt;Integer, Integer&gt;&gt; transforms = List.of(
+    x -&gt; x + 1,
+    x -&gt; x * 2,
+    x -&gt; x - 3
+);
+
+Function&lt;Integer, Integer&gt; combined = transforms.stream()
+    .reduce(Function.identity(), Function::andThen);
+combined.apply(5); // (5+1)*2-3 = 9
+</code></pre>
+
+<hr>
+
+<h2>20. Interfejsy funkcyjne w praktyce — wzorce projektowe</h2>
+
+<h3>Pytanie 120 — Strategy Pattern z lambdami</h3>
+
+<pre><code class="language-java">// Wzorzec Strategy zastąpiony lambdami:
+// STARY STYL — hierarchia klas:
+interface SortStrategy { List&lt;Integer&gt; sort(List&lt;Integer&gt; list); }
+class BubbleSort implements SortStrategy { ... }
+class QuickSort implements SortStrategy { ... }
+
+// NOWY STYL — lambda jako strategia:
+@FunctionalInterface
+interface SortStrategy {
+    List&lt;Integer&gt; sort(List&lt;Integer&gt; list);
+}
+
+class Sorter {
+    private SortStrategy strategy;
+    
+    Sorter(SortStrategy strategy) { this.strategy = strategy; }
+    
+    List&lt;Integer&gt; sort(List&lt;Integer&gt; list) { return strategy.sort(list); }
+}
+
+// Używamy lambd jako strategii:
+Sorter ascendingSorter = new Sorter(list -&gt; {
+    List&lt;Integer&gt; sorted = new ArrayList&lt;&gt;(list);
+    Collections.sort(sorted);
+    return sorted;
+});
+
+Sorter reverseSorter = new Sorter(list -&gt; {
+    List&lt;Integer&gt; sorted = new ArrayList&lt;&gt;(list);
+    sorted.sort(Comparator.reverseOrder());
+    return sorted;
+});
+
+// Command Pattern z lambdami:
+interface Command { void execute(); }
+
+class CommandProcessor {
+    private final List&lt;Command&gt; commands = new ArrayList&lt;&gt;();
+    
+    void addCommand(Command command) { commands.add(command); }
+    void executeAll() { commands.forEach(Command::execute); }
+}
+
+CommandProcessor processor = new CommandProcessor();
+processor.addCommand(() -&gt; System.out.println("Command 1"));
+processor.addCommand(() -&gt; System.out.println("Command 2"));
+processor.executeAll();
+</code></pre>
+
+<hr>
+
+<h2>21. Interfejsy funkcyjne — Runnable i Callable</h2>
+
+<h3>Pytanie 121 — Runnable vs Callable</h3>
+
+<pre><code class="language-java">// Runnable: () -&gt; void (nie zwraca wartości, nie rzuca checked exceptions)
+@FunctionalInterface
+public interface Runnable {
+    void run();
+}
+
+// Callable&lt;V&gt;: () -&gt; V (zwraca wartość, może rzucać checked exceptions)
+@FunctionalInterface
+public interface Callable&lt;V&gt; {
+    V call() throws Exception;
+}
+
+// Użycie z ExecutorService:
+ExecutorService executor = Executors.newFixedThreadPool(2);
+
+// Runnable — nie mamy dostępu do wyniku:
+executor.submit(() -&gt; System.out.println("Running task"));
+
+// Callable — Future do pobrania wyniku:
+Future&lt;Integer&gt; future = executor.submit(() -&gt; {
+    Thread.sleep(1000); // może rzucić InterruptedException (checked)
+    return 42;
+});
+
+Integer result = future.get(); // blokuje do ukończenia
+System.out.println(result); // 42
+
+executor.shutdown();
+</code></pre>
+
+<hr>
+
+<h2>22. Interfejsy funkcyjne — zaawansowane wzorce</h2>
+
+<h3>Pytanie 122 — memoizacja z lambdami</h3>
+
+<pre><code class="language-java">// Memoizacja — cachowanie wyników funkcji:
+static &lt;T, R&gt; Function&lt;T, R&gt; memoize(Function&lt;T, R&gt; function) {
+    Map&lt;T, R&gt; cache = new HashMap&lt;&gt;();
+    return input -&gt; cache.computeIfAbsent(input, function);
+}
+
+// Użycie:
+Function&lt;Integer, Long&gt; fibonacci = memoize(n -&gt; {
+    if (n &lt;= 1) return (long) n;
+    // UWAGA: rekurencja z memoizacją wymaga triku z tablicą/mapą zewnętrzną
+    return fibonacci.apply(n - 1) + fibonacci.apply(n - 2);
+});
+
+// Prostsza memoizacja:
+Map&lt;Integer, Long&gt; fibCache = new HashMap&lt;&gt;();
+Function&lt;Integer, Long&gt; fib = n -&gt; fibCache.computeIfAbsent(n, k -&gt; {
+    if (k &lt;= 1) return (long) k;
+    return fibCache.get(k - 1) + fibCache.get(k - 2); // zakłada że mniejsze już w cache
+});
+</code></pre>
+
+<hr>
+
+<h2>23. Interfejsy funkcyjne — kompozycja Predicate</h2>
+
+<h3>Pytanie 123 — zaawansowane łączenie Predicate</h3>
+
+<pre><code class="language-java">// Budowanie złożonych warunków z małych Predicate:
+record Product(String name, double price, String category, int stock) {}
+
+Predicate&lt;Product&gt; inStock = p -&gt; p.stock() &gt; 0;
+Predicate&lt;Product&gt; affordable = p -&gt; p.price() &lt; 100.0;
+Predicate&lt;Product&gt; isElectronics = p -&gt; "Electronics".equals(p.category());
+Predicate&lt;Product&gt; highValue = p -&gt; p.price() &gt; 500.0;
+
+// Złożone warunki:
+Predicate&lt;Product&gt; bargain = inStock.and(affordable);
+Predicate&lt;Product&gt; expensiveOrElec = highValue.or(isElectronics);
+Predicate&lt;Product&gt; notOutOfStock = inStock.negate();
+
+// Dynamiczne budowanie Predicate:
+List&lt;Predicate&lt;Product&gt;&gt; filters = new ArrayList&lt;&gt;();
+filters.add(inStock);
+filters.add(affordable);
+
+// Wszystkie warunki muszą być spełnione:
+Predicate&lt;Product&gt; combined = filters.stream()
+    .reduce(p -&gt; true, Predicate::and);
+
+// Przynajmniej jeden warunek musi być spełniony:
+Predicate&lt;Product&gt; anyMatch = filters.stream()
+    .reduce(p -&gt; false, Predicate::or);
+
+List&lt;Product&gt; products = List.of(
+    new Product("Laptop", 999.99, "Electronics", 5),
+    new Product("Mouse", 29.99, "Electronics", 0),
+    new Product("Desk", 49.99, "Furniture", 3)
+);
+
+products.stream()
+    .filter(combined)
+    .forEach(p -&gt; System.out.println(p.name())); // "Desk" (in stock AND affordable)
+</code></pre>
+
+<hr>
+
+<h2>24. Interfejsy funkcyjne — wydajność</h2>
+
+<h3>Pytanie 124 — lambdy a wydajność w porównaniu z pętlami</h3>
+
+<pre><code class="language-java">// Lambdy/streamy kontra pętle — kiedy co?
+int[] numbers = IntStream.rangeClosed(1, 1_000_000).toArray();
+
+// ✅ Pętla for — najwydajniejsza dla prostych operacji na prymitywach:
+long sumLoop = 0;
+for (int n : numbers) {
+    sumLoop += n;
+}
+
+// ✅ IntStream.sum() — porównywalna wydajność bo unika boxingu:
+long sumStream = IntStream.of(numbers).sum();
+
+// ⚠️ Potencjalnie wolniejsze — Stream&lt;Integer&gt; z autoboxingiem:
+// long sumBoxed = Arrays.stream(numbers).boxed().reduce(0, Integer::sum);
+// LEPIEJ użyć Arrays.stream(numbers).sum() — primitive stream
+
+// Kiedy lambda/stream jest dobra:
+// 1. Czytelność &gt; wydajność (drobne różnice w większości przypadków)
+// 2. Parallel streams dla naprawdę dużych danych
+// 3. Kompozycja i reużywalność logiki
+
+// Parallel stream — kiedy warto?
+long sumParallel = IntStream.of(numbers).parallel().sum(); // wiele CPU
+// Uwaga: parallel ma overhead — używaj tylko dla dużych zbiorów i kosztownych operacji
+</code></pre>
+
+<hr>
+
+<h2>25. Method references — szczegółowe przypadki</h2>
+
+<h3>Pytanie 125 — niuanse referencji do metod</h3>
+
+<pre><code class="language-java">// Przypadek specjalny: metoda instancyjna z dodatkowym parametrem
+class StringHelper {
+    public boolean startsWithPrefix(String prefix) {
+        return "Hello".startsWith(prefix);
+    }
+}
+
+StringHelper helper = new StringHelper();
+// instance::method — helper jako "this":
+Predicate&lt;String&gt; startsWithFn = helper::startsWithPrefix;
+// lambdą: prefix -&gt; helper.startsWithPrefix(prefix)
+
+// ClassName::instanceMethod — pierwszy argument staje się "this":
+// String::startsWith — (s, prefix) -&gt; s.startsWith(prefix)
+BiPredicate&lt;String, String&gt; biStartsWith = String::startsWith;
+biStartsWith.test("Hello", "He"); // true
+
+// Konstruktor tablicy:
+java.util.function.IntFunction&lt;String[]&gt; arrayMaker = String[]::new;
+String[] arr = arrayMaker.apply(5); // new String[5]
+
+// Konstruktor z parametrami — dopasowanie do sygnatury:
+// Person(String name, int age) → BiFunction&lt;String, Integer, Person&gt;
+BiFunction&lt;String, Integer, Person&gt; personMaker = Person::new;
+Person p = personMaker.apply("Alice", 30);
+
+// Referencja do metody statycznej z Object:
+// Objects::requireNonNull — Function&lt;T, T&gt;
+Function&lt;String, String&gt; requireNonNull = java.util.Objects::requireNonNull;
+String result = requireNonNull.apply("hello"); // "hello" (lub NullPointerException)
+</code></pre>
+
+<hr>
+
+<h2>26. Interfejsy funkcyjne — operatory na kolekcjach</h2>
+
+<h3>Pytanie 126 — funkcje wyższego rzędu</h3>
+
+<pre><code class="language-java">// Funkcja przyjmująca funkcję jako argument — HOF (Higher-Order Function):
+static &lt;T, R&gt; List&lt;R&gt; transform(List&lt;T&gt; list, Function&lt;T, R&gt; mapper) {
+    return list.stream().map(mapper).collect(Collectors.toList());
+}
+
+static &lt;T&gt; List&lt;T&gt; filterList(List&lt;T&gt; list, Predicate&lt;T&gt; predicate) {
+    return list.stream().filter(predicate).collect(Collectors.toList());
+}
+
+// Funkcja zwracająca funkcję:
+static Function&lt;Integer, Integer&gt; multiplierBy(int factor) {
+    return n -&gt; n * factor; // closure — factor jest captured
+}
+
+Function&lt;Integer, Integer&gt; triple = multiplierBy(3);
+Function&lt;Integer, Integer&gt; quadruple = multiplierBy(4);
+triple.apply(5);   // 15
+quadruple.apply(5); // 20
+
+// Użycie:
+List&lt;String&gt; names = List.of("alice", "bob", "charlie");
+List&lt;String&gt; upperNames = transform(names, String::toUpperCase);
+List&lt;String&gt; longNames = filterList(names, s -&gt; s.length() &gt; 4);
+</code></pre>
+
+<hr>
+
+<h2>27. Interfejsy funkcyjne — edge cases egzaminacyjne</h2>
+
+<h3>Pytanie 127 — co się kompiluje?</h3>
+
+<pre><code class="language-java">// Sprawdzenie co jest interfejsem funkcyjnym:
+
+// ✅ Jest — jedna metoda abstrakcyjna:
+@FunctionalInterface
+interface F1 { void go(); }
+
+// ✅ Jest — metody default i static nie liczą się:
+@FunctionalInterface
+interface F2 {
+    void go();
+    default void extra() {}
+    static void helper() {}
+}
+
+// ✅ Jest — metody z Object nie liczą się:
+@FunctionalInterface
+interface F3 {
+    void go();
+    String toString(); // z Object — nie liczy się
+    boolean equals(Object o); // z Object — nie liczy się
+}
+
+// ✅ Jest — dziedziczy jedna metoda abstrakcyjna:
+interface Parent { void go(); }
+@FunctionalInterface
+interface F4 extends Parent { } // dziedziczy go() z Parent — jedna metoda abstrakcyjna
+
+// ❌ NIE jest — dwie metody abstrakcyjne:
+// @FunctionalInterface — BŁĄD KOMPILACJI
+interface NotFunctional {
+    void method1();
+    void method2(); // dwie abstrakcyjne = nie jest SAM
+}
+
+// ❌ NIE jest — interfejs pusty (zero metod abstrakcyjnych):
+// @FunctionalInterface — BŁĄD KOMPILACJI
+interface AlsoNotFunctional { } // zero metod abstrakcyjnych
+</code></pre>
+
+<hr>
+
+<h2>28. Lambdy a typy docelowe (target types)</h2>
+
+<h3>Pytanie 128 — inferencja typów lambda</h3>
+
+<pre><code class="language-java">// Java inferuje typ lambdy z kontekstu (target type):
+
+// 1. Deklaracja zmiennej:
+Runnable r = () -&gt; System.out.println("Hello"); // target type = Runnable
+
+// 2. Argument metody:
+void execute(Runnable r) { r.run(); }
+execute(() -&gt; System.out.println("Hello")); // target type = Runnable
+
+// 3. Zwracana wartość:
+Runnable create() { return () -&gt; System.out.println("Hello"); } // target type = Runnable
+
+// 4. Rzutowanie (casting):
+Object obj = (Runnable) () -&gt; System.out.println("Hello"); // target type = Runnable
+
+// Problem z niejednoznacznym kontekstem:
+void overloaded(Runnable r) { r.run(); }
+void overloaded(Callable&lt;Integer&gt; c) throws Exception { c.call(); }
+
+// ❌ BŁĄD — kompilator nie wie który overload:
+// overloaded(() -&gt; System.out.println("Hello")); // niejednoznaczne!
+
+// ✅ Jawne rzutowanie:
+overloaded((Runnable) () -&gt; System.out.println("Hello"));
+overloaded((Callable&lt;Integer&gt;) () -&gt; { System.out.println("Hello"); return 0; });
+</code></pre>
+
+<hr>
+
+<h2>29. Interfejsy funkcyjne — Function.identity()</h2>
+
+<h3>Pytanie 129 — Function.identity() i zastosowania</h3>
+
+<pre><code class="language-java">// Function.identity() zwraca funkcję, która zwraca swój argument bez zmian
+Function&lt;String, String&gt; identity = Function.identity();
+identity.apply("hello"); // "hello"
+
+// Zastosowanie w Collectors.toMap():
+List&lt;String&gt; words = List.of("apple", "banana", "cherry");
+
+// Mapa słowo -&gt; słowo (identity jako value mapper):
+Map&lt;String, String&gt; wordMap = words.stream()
+    .collect(Collectors.toMap(Function.identity(), Function.identity()));
+// {apple=apple, banana=banana, cherry=cherry}
+
+// Mapa słowo -&gt; długość:
+Map&lt;String, Integer&gt; lengthMap = words.stream()
+    .collect(Collectors.toMap(Function.identity(), String::length));
+// {apple=5, banana=6, cherry=6}
+
+// W reduce():
+List&lt;Function&lt;Integer, Integer&gt;&gt; transforms = List.of(
+    x -&gt; x + 1,
+    x -&gt; x * 2
+);
+Function&lt;Integer, Integer&gt; composed = transforms.stream()
+    .reduce(Function.identity(), Function::andThen);
+composed.apply(5); // (5+1)*2 = 12
+</code></pre>
+
+<hr>
+
+<h2>30. Interfejsy funkcyjne — podsumowanie egzaminacyjne</h2>
+
+<h3>Pytanie 130–140 — kluczowe fakty do zapamiętania</h3>
+
+<pre><code class="language-java">// Podsumowanie wszystkich standardowych interfejsów funkcyjnych:
+
+// java.lang (od zawsze):
+// Runnable: () -&gt; void
+// Comparable&lt;T&gt;: compareTo(T o) -&gt; int
+
+// java.util.function (Java 8+):
+// Function&lt;T,R&gt;: apply(T) -&gt; R | andThen, compose, identity
+// Predicate&lt;T&gt;: test(T) -&gt; boolean | and, or, negate, not, isEqual
+// Consumer&lt;T&gt;: accept(T) -&gt; void | andThen
+// Supplier&lt;T&gt;: get() -&gt; T
+// BiFunction&lt;T,U,R&gt;: apply(T,U) -&gt; R | andThen
+// BiPredicate&lt;T,U&gt;: test(T,U) -&gt; boolean | and, or, negate
+// BiConsumer&lt;T,U&gt;: accept(T,U) -&gt; void | andThen
+// UnaryOperator&lt;T&gt; extends Function&lt;T,T&gt;: apply(T) -&gt; T | identity
+// BinaryOperator&lt;T&gt; extends BiFunction&lt;T,T,T&gt;: apply(T,T) -&gt; T | maxBy, minBy
+
+// Prymitywne (przykłady):
+// IntFunction&lt;R&gt;: apply(int) -&gt; R
+// ToIntFunction&lt;T&gt;: applyAsInt(T) -&gt; int
+// IntUnaryOperator: applyAsInt(int) -&gt; int
+// IntBinaryOperator: applyAsInt(int,int) -&gt; int
+// IntPredicate: test(int) -&gt; boolean
+// IntConsumer: accept(int) -&gt; void
+// IntSupplier: getAsInt() -&gt; int
+// (analogicznie Long*, Double*)
+
+// Specjalne Operator odwołania:
+// ObjIntConsumer&lt;T&gt;: accept(T, int) -&gt; void
+// ToIntBiFunction&lt;T,U&gt;: applyAsInt(T,U) -&gt; int
+</code></pre>
+
+<strong>Zasady egzaminacyjne:</strong>
+
+<ol>
+<li><strong>Lambdy są effectively final</strong> — przechwycone zmienne lokalne nie mogą być modyfikowane.</li>
+<li><strong><code>this</code> w lambdzie</strong> = otaczająca klasa (nie lambda). W klasie anonimowej = sama klasa anonimowa.</li>
+<li><strong>Method reference</strong> <code>ClassName::instanceMethod</code> — pierwszy argument staje się <code>this</code>.</li>
+<li><strong>Konflikt overload</strong> z lambdami — użyj jawnego rzutowania.</li>
+<li><strong><code>andThen</code> vs <code>compose</code></strong>: <code>f.andThen(g)(x)</code> = <code>g(f(x))</code>, <code>f.compose(g)(x)</code> = <code>f(g(x))</code>.</li>
+<li><strong>Predicate.and/or</strong> — short-circuit (leniwe): <code>and</code> zatrzymuje się przy <code>false</code>, <code>or</code> przy <code>true</code>.</li>
+<li><strong>@FunctionalInterface</strong> — opcjonalna adnotacja, ale wymusza weryfikację przez kompilator.</li>
+<li><strong>Checked exceptions</strong> w lambdach — muszą być obsłużone (try-catch) lub użyj własnego interfejsu.</li>
+</ol>
+
+</body>
+</html>

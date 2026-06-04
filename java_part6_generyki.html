@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>java part6 generyki</title>
+  <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #24292e;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 48px;
+  }
+  h1 { font-size: 2em; border-bottom: 2px solid #e1e4e8; padding-bottom: 10px; margin: 24px 0 16px; color: #1a1a2e; }
+  h2 { font-size: 1.5em; border-bottom: 1px solid #e1e4e8; padding-bottom: 6px; margin: 28px 0 12px; color: #2d4a7a; }
+  h3 { font-size: 1.2em; margin: 20px 0 8px; color: #3d6b9e; }
+  h4 { font-size: 1em; margin: 16px 0 6px; color: #555; font-weight: 600; }
+  p { margin: 8px 0; }
+  code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 12.5px;
+    background: #f0f3f6;
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: #c7254e;
+  }
+  pre {
+    background: #1e1e2e;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 14px 0;
+    border-left: 4px solid #7c3aed;
+  }
+  pre code {
+    background: none;
+    color: #cdd6f4;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+  th {
+    background: #7c3aed;
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #e1e4e8;
+  }
+  tr:nth-child(even) td { background: #f8f9ff; }
+  ul, ol { padding-left: 24px; margin: 8px 0; }
+  li { margin: 4px 0; }
+  hr { border: none; border-top: 2px solid #e1e4e8; margin: 28px 0; }
+  blockquote {
+    border-left: 4px solid #7c3aed;
+    background: #f5f0ff;
+    padding: 10px 16px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+    color: #4a3080;
+  }
+  strong { color: #1a1a2e; }
+  @media print {
+    body { padding: 20px 28px; font-size: 12px; }
+    pre { page-break-inside: avoid; }
+    h2, h3 { page-break-after: avoid; }
+    table { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<h1>Przewodnik egzaminacyjny Java — Część 6: Typy Generyczne</h1>
+<h2>(pytania 161–199)</h2>
+
+<hr>
+
+<h2>1. Wprowadzenie do generyków</h2>
+
+<h3>Pytanie 161 — czym są generyki i dlaczego istnieją?</h3>
+
+<p>
+Generyki (Generics) zostały wprowadzone w Java 5, aby zapewnić <strong>bezpieczeństwo typów w czasie kompilacji</strong> bez potrzeby rzutowania. Przed generykami kod był pełen niebezpiecznych rzutowań:
+</p>
+
+<pre><code class="language-java">// PRZED generykami (Java 1.4 i wcześniej):
+List list = new ArrayList();        // raw type — brak bezpieczeństwa typów
+list.add("Hello");
+list.add(42);                       // kompilator tego nie zatrzyma!
+String s = (String) list.get(0);   // musimy rzutować
+Integer i = (Integer) list.get(0); // ❌ ClassCastException w runtime!
+
+// PO wprowadzeniu generyków (Java 5+):
+List&lt;String&gt; typedList = new ArrayList&lt;&gt;();
+typedList.add("Hello");
+// typedList.add(42);               // ❌ BŁĄD KOMPILACJI — bezpiecznie!
+String s2 = typedList.get(0);      // brak rzutowania — automatyczne!
+</code></pre>
+
+<strong>Korzyści generyków:</strong>
+<ol>
+<li><strong>Bezpieczeństwo typów</strong> — błędy wykrywane w czasie kompilacji, nie w runtime.</li>
+<li><strong>Eliminacja rzutowania</strong> — kod jest czytelniejszy.</li>
+<li><strong>Reużywalność</strong> — jedna implementacja dla wielu typów.</li>
+<li><strong>Dokumentacja</strong> — typy parametrów wyjaśniają intencję.</li>
+</ol>
+
+<hr>
+
+<h2>2. Parametry typów — konwencje nazewnictwa</h2>
+
+<h3>Pytanie 162 — standardowe nazwy parametrów typów</h3>
+
+<p>
+Java ma utrwalone konwencje dla nazw parametrów typów (jednoliterowe wielkie litery):
+</p>
+
+<table>
+<tr><th>Litera</th><th>Konwencja użycia</th><th>Przykład</th></tr>
+<tr><td><code>T</code></td><td>Type — ogólny typ</td><td><code>class Box&lt;T&gt;</code></td></tr>
+<tr><td><code>E</code></td><td>Element — elementy kolekcji</td><td><code>interface List&lt;E&gt;</code></td></tr>
+<tr><td><code>K</code></td><td>Key — klucz mapy</td><td><code>interface Map&lt;K, V&gt;</code></td></tr>
+<tr><td><code>V</code></td><td>Value — wartość mapy</td><td><code>interface Map&lt;K, V&gt;</code></td></tr>
+<tr><td><code>N</code></td><td>Number — typ liczbowy</td><td><code>class Counter&lt;N extends Number&gt;</code></td></tr>
+<tr><td><code>R</code></td><td>Return type — typ zwracany</td><td><code>Function&lt;T, R&gt;</code></td></tr>
+<tr><td><code>S</code>, <code>U</code>, <code>W</code></td><td>Drugi, trzeci, czwarty typ</td><td><code>BiFunction&lt;T, U, R&gt;</code></td></tr>
+</table>
+
+<pre><code class="language-java">// Klasa generyczna:
+public class Pair&lt;A, B&gt; {
+    private final A first;
+    private final B second;
+
+    public Pair(A first, B second) {
+        this.first = first;
+        this.second = second;
+    }
+
+    public A getFirst() { return first; }
+    public B getSecond() { return second; }
+
+    @Override
+    public String toString() {
+        return "(" + first + ", " + second + ")";
+    }
+}
+
+// Użycie:
+Pair&lt;String, Integer&gt; pair = new Pair&lt;&gt;("Alice", 30);
+String name = pair.getFirst();  // String — bez rzutowania
+Integer age = pair.getSecond(); // Integer — bez rzutowania
+
+// Zagnieżdżona para:
+Pair&lt;Pair&lt;String, Integer&gt;, Boolean&gt; nested = 
+    new Pair&lt;&gt;(new Pair&lt;&gt;("Alice", 30), true);
+</code></pre>
+
+<hr>
+
+<h2>3. Bounded Wildcards — granice dzikich kart</h2>
+
+<h3>Pytanie 163 — unbounded wildcard <code>&lt;?&gt;</code></h3>
+
+<pre><code class="language-java">// Unbounded wildcard — akceptuje każdy typ parametryczny:
+static void printList(List&lt;?&gt; list) {
+    for (Object elem : list) {
+        System.out.println(elem); // możemy tylko czytać jako Object
+    }
+}
+
+// Użycie:
+List&lt;Integer&gt; ints = List.of(1, 2, 3);
+List&lt;String&gt; strings = List.of("a", "b", "c");
+List&lt;Double&gt; doubles = List.of(1.1, 2.2);
+
+printList(ints);     // ✅ OK
+printList(strings);  // ✅ OK
+printList(doubles);  // ✅ OK
+
+// OGRANICZENIE unbounded wildcard:
+static void tryModify(List&lt;?&gt; list) {
+    // list.add("something"); // ❌ BŁĄD — nie wiadomo jakiego typu jest lista!
+    // list.add(null);        // ✅ null jest jedynym dozwolonym elementem
+    Object obj = list.get(0); // ✅ OK — zawsze możemy odczytać jako Object
+}
+</code></pre>
+
+<hr>
+
+<h3>Pytanie 164 — upper bounded wildcard <code>&lt;? extends T&gt;</code></h3>
+
+<pre><code class="language-java">// Upper bounded wildcard — akceptuje T i wszystkie podtypy T:
+static double sumList(List&lt;? extends Number&gt; list) {
+    double sum = 0;
+    for (Number n : list) {
+        sum += n.doubleValue(); // Number ma doubleValue()
+    }
+    return sum;
+}
+
+// Użycie — wszystkie podtypy Number:
+List&lt;Integer&gt; ints = List.of(1, 2, 3);
+List&lt;Double&gt; doubles = List.of(1.5, 2.5);
+List&lt;Long&gt; longs = List.of(100L, 200L);
+
+sumList(ints);    // ✅ Integer extends Number
+sumList(doubles); // ✅ Double extends Number
+sumList(longs);   // ✅ Long extends Number
+
+// OGRANICZENIE — nie możemy dodawać elementów:
+static void tryAdd(List&lt;? extends Number&gt; list) {
+    // list.add(3.14);     // ❌ BŁĄD — nie wiemy czy to List&lt;Integer&gt;, List&lt;Double&gt;...
+    // list.add(new Integer(5)); // ❌ BŁĄD
+    Number n = list.get(0);   // ✅ OK — zawsze możemy czytać jako Number
+}
+</code></pre>
+
+<hr>
+
+<h3>Pytanie 165 — lower bounded wildcard <code>&lt;? super T&gt;</code></h3>
+
+<pre><code class="language-java">// Lower bounded wildcard — akceptuje T i wszystkie nadtypy T:
+static void addNumbers(List&lt;? super Integer&gt; list) {
+    // Możemy DODAWAĆ Integer i podtypy Integer:
+    list.add(1);
+    list.add(2);
+    list.add(3);
+    // Nie możemy bezpiecznie CZYTAĆ (tylko jako Object):
+    Object obj = list.get(0); // ✅ OK — ale tylko jako Object
+    // Integer n = list.get(0); // ❌ BŁĄD — mogłaby to być List&lt;Number&gt;
+}
+
+// Użycie:
+List&lt;Integer&gt; intList = new ArrayList&lt;&gt;();
+List&lt;Number&gt; numList = new ArrayList&lt;&gt;();
+List&lt;Object&gt; objList = new ArrayList&lt;&gt;();
+
+addNumbers(intList);  // ✅ List&lt;Integer&gt; — Integer super Integer
+addNumbers(numList);  // ✅ List&lt;Number&gt; — Number super Integer
+addNumbers(objList);  // ✅ List&lt;Object&gt; — Object super Integer
+
+// List&lt;Double&gt; doubleList = new ArrayList&lt;&gt;();
+// addNumbers(doubleList); // ❌ BŁĄD — Double nie jest nadtypem Integer
+</code></pre>
+
+<hr>
+
+<h2>4. PECS — Producer Extends, Consumer Super</h2>
+
+<h3>Pytanie 166 — zasada PECS</h3>
+
+<p>
+PECS to mnemonika pomagająca zapamiętać kiedy używać <code>extends</code> a kiedy <code>super</code>:
+</p>
+
+<blockquote><strong>P</strong>roducer <strong>E</strong>xtends, <strong>C</strong>onsumer <strong>S</strong>uper</blockquote>
+
+<pre><code class="language-java">// PRODUCER (produkuje/dostarcza dane do nas) — używaj ? extends:
+static &lt;T&gt; void copy(List&lt;? extends T&gt; source, List&lt;? super T&gt; destination) {
+    //                ^^^^^^^^^^^^^^^^^^^              ^^^^^^^^^^^^^^^^
+    //                source = producer               destination = consumer
+    //                (skąd bierzemy dane)            (gdzie wkładamy dane)
+
+    for (T item : source) {      // czytamy z source — producer extends
+        destination.add(item);   // zapisujemy do destination — consumer super
+    }
+}
+
+// Konkretny przykład:
+static double sumNumbers(List&lt;? extends Number&gt; numbers) {  // PRODUCER — extends
+    return numbers.stream()
+                  .mapToDouble(Number::doubleValue)
+                  .sum();
+}
+
+static void fillWithDefaults(List&lt;? super Integer&gt; list, int count) { // CONSUMER — super
+    for (int i = 0; i &lt; count; i++) {
+        list.add(0); // dodajemy Integer do listy (consumer)
+    }
+}
+
+// Zapamiętaj:
+// - get() z listy → ? extends (odczyt → Producer Extends)
+// - add() do listy → ? super (zapis → Consumer Super)
+// - oba get() i add() → T (konkretny typ)
+// - tylko get() jako Object → ? (unbounded wildcard)
+</code></pre>
+
+<hr>
+
+<h2>5. Type Erasure — wymazywanie typów</h2>
+
+<h3>Pytanie 167 — co się dzieje z generykami w runtime?</h3>
+
+<strong>Type erasure</strong> to mechanizm, przez który Java usuwa informacje o parametrach typów podczas kompilacji. Wszystkie typy generyczne są "wymazywane" do ich granic (lub <code>Object</code> jeśli brak granicy):
+
+<pre><code class="language-java">// Kod który piszemy:
+public class Box&lt;T&gt; {
+    private T value;
+    public void set(T value) { this.value = value; }
+    public T get() { return value; }
+}
+
+// Co kompilator generuje po type erasure (przybliżone):
+public class Box {                      // T jest wymazane
+    private Object value;               // T → Object (brak granicy)
+    public void set(Object value) { this.value = value; }
+    public Object get() { return value; } // + niejawne rzutowanie przy wywołaniu
+}
+
+// Z ograniczeniem:
+public class NumberBox&lt;T extends Number&gt; {
+    private T value;
+    public T get() { return value; }
+}
+// Po erasure:
+public class NumberBox {
+    private Number value;               // T → Number (upper bound)
+    public Number get() { return value; }
+}
+</code></pre>
+
+<strong>Konsekwencje type erasure:</strong>
+
+<pre><code class="language-java">// 1. instanceof nie działa z parametrami typów:
+List&lt;String&gt; list = new ArrayList&lt;&gt;();
+// if (list instanceof List&lt;String&gt;) { }   // ❌ BŁĄD KOMPILACJI
+if (list instanceof List&lt;?&gt;) { }            // ✅ OK — unbounded wildcard
+if (list instanceof List) { }               // ✅ OK — raw type
+
+// 2. Nie można tworzyć instancji parametru typów:
+class Box&lt;T&gt; {
+    // T obj = new T(); // ❌ BŁĄD — nie wiadomo jakiego typu T w runtime
+    // T[] arr = new T[10]; // ❌ BŁĄD — nie można tworzyć tablic generyków
+
+    // Obejście 1: przez refleksję
+    T createByReflection(Class&lt;T&gt; clazz) throws Exception {
+        return clazz.getDeclaredConstructor().newInstance();
+    }
+
+    // Obejście 2: przez Supplier
+    T createBySupplier(java.util.function.Supplier&lt;T&gt; factory) {
+        return factory.get();
+    }
+}
+
+// 3. Metody generyczne mogą mieć te same sygnatury po erasure → błąd:
+class Ambiguous {
+    // void process(List&lt;String&gt; list) { }
+    // void process(List&lt;Integer&gt; list) { } // ❌ BŁĄD — po erasure obie to List
+}
+
+// 4. Statyczne pola nie mogą być parametrami typów:
+class Bad&lt;T&gt; {
+    // static T instance; // ❌ BŁĄD — T jest per-instancja, static jest per-klasa
+}
+</code></pre>
+
+<hr>
+
+<h2>6. Generic Methods vs Generic Classes</h2>
+
+<h3>Pytanie 168 — metody generyczne</h3>
+
+<p>
+Metody generyczne mają własne parametry typów, niezależne od klasy:
+</p>
+
+<pre><code class="language-java">// Metoda generyczna — parametr &lt;T&gt; przed typem zwracanym:
+public class Utils {
+    // &lt;T&gt; to parametr typów METODY (nie klasy):
+    public static &lt;T&gt; T firstElement(List&lt;T&gt; list) {
+        if (list.isEmpty()) throw new NoSuchElementException();
+        return list.get(0);
+    }
+
+    // Wiele parametrów typów:
+    public static &lt;K, V&gt; Map&lt;V, K&gt; invertMap(Map&lt;K, V&gt; map) {
+        Map&lt;V, K&gt; result = new HashMap&lt;&gt;();
+        map.forEach((k, v) -&gt; result.put(v, k));
+        return result;
+    }
+
+    // Z ograniczeniami:
+    public static &lt;T extends Comparable&lt;T&gt;&gt; T max(T a, T b) {
+        return a.compareTo(b) &gt;= 0 ? a : b;
+    }
+
+    // Bounded — T musi implementować interfejsy:
+    public static &lt;T extends Comparable&lt;T&gt; &amp; java.io.Serializable&gt; T clampedMax(T a, T b) {
+        return max(a, b); // T jest i Comparable i Serializable
+    }
+}
+
+// Wywołanie — inferencja typów (nie trzeba podawać explicite):
+String first = Utils.firstElement(List.of("a", "b", "c")); // T inferowane jako String
+Integer max = Utils.max(3, 7);                              // T inferowane jako Integer
+
+// Explicite podanie typu (rzadko potrzebne):
+String firstExplicit = Utils.&lt;String&gt;firstElement(List.of("x", "y"));
+</code></pre>
+
+<hr>
+
+<h2>7. Wildcard Capture</h2>
+
+<h3>Pytanie 169 — przechwytywanie wieloznacznika</h3>
+
+<p>
+Kompilator czasem musi "przechwycić" typ wieloznacznikowy, by móc pracować z konkretnym typem:
+</p>
+
+<pre><code class="language-java">// Problem — ten kod nie skompiluje się:
+static void swap(List&lt;?&gt; list, int i, int j) {
+    // Object temp = list.get(i);
+    // list.set(i, list.get(j)); // ❌ BŁĄD — nie możemy add/set do List&lt;?&gt;
+    // list.set(j, temp);        // ❌ BŁĄD
+}
+
+// Rozwiązanie — helper method z przechwytywaniem:
+static void swap(List&lt;?&gt; list, int i, int j) {
+    swapHelper(list, i, j); // delegacja do metody z konkretnym T
+}
+
+// Kompilator "chwyta" ? i nadaje mu konkretny typ T
+private static &lt;T&gt; void swapHelper(List&lt;T&gt; list, int i, int j) {
+    T temp = list.get(i);
+    list.set(i, list.get(j));
+    list.set(j, temp);
+}
+
+// Inny przykład — odwracanie listy:
+static void reverse(List&lt;?&gt; list) {
+    reverseHelper(list);
+}
+
+private static &lt;T&gt; void reverseHelper(List&lt;T&gt; list) {
+    for (int i = 0, j = list.size() - 1; i &lt; j; i++, j--) {
+        T temp = list.get(i);
+        list.set(i, list.get(j));
+        list.set(j, temp);
+    }
+}
+</code></pre>
+
+<hr>
+
+<h2>8. Raw Types i Unchecked Warnings</h2>
+
+<h3>Pytanie 170 — surowe typy (raw types)</h3>
+
+<strong>Raw type</strong> to użycie klasy/interfejsu generycznego bez parametrów typów. Zachowane dla kompatybilności wstecznej z kodem sprzed Java 5:
+
+<pre><code class="language-java">// ❌ Raw type — stary styl, UNIKAJ:
+List rawList = new ArrayList();
+rawList.add("Hello");
+rawList.add(42);       // kompilator pozwala — brak bezpieczeństwa typów!
+String s = (String) rawList.get(0); // ryzyko ClassCastException
+
+// Unchecked warning:
+List&lt;String&gt; typed = rawList; // ⚠️ unchecked conversion warning!
+rawList.add(123);              // może dodać do typed jako Integer!
+
+// @SuppressWarnings("unchecked") — wyciszanie ostrzeżeń (ostrożnie!):
+@SuppressWarnings("unchecked")
+List&lt;String&gt; suppressedList = rawList; // bez ostrzeżenia
+
+// Raw type vs wildcard:
+void processRaw(List list) {   // raw type — niebezpieczny, NIE zalecany
+    list.add("anything");      // kompilator nie sprawdza typów
+}
+
+void processWildcard(List&lt;?&gt; list) { // wildcard — bezpieczny
+    // list.add("anything");         // ❌ BŁĄD — kompilator chroni
+    Object obj = list.get(0);        // ✅ OK — tylko jako Object
+}
+</code></pre>
+
+<strong>Dlaczego unikać raw types:</strong>
+
+<ol>
+<li>Utrata bezpieczeństwa typów — błędy w runtime zamiast kompilacji.</li>
+<li>Generuje ostrzeżenia kompilatora.</li>
+<li>Niemożliwe do użycia z nowymi feature'ami (pattern matching, sealed classes).</li>
+<li>Zaciemnia intencję kodu.</li>
+</ol>
+
+<hr>
+
+<h2>9. Reifiable vs Non-Reifiable Types</h2>
+
+<h3>Pytanie 171 — typy reifikowalne i niereifikowalne</h3>
+
+<strong>Reifiable type</strong> — typ, o którym pełne informacje są dostępne w runtime (po type erasure).
+
+<pre><code class="language-java">// Reifiable types (informacje dostępne w runtime):
+int, double, String, List, List&lt;?&gt;, List&lt;? extends Object&gt;
+// Wszystkie raw types, prymitywy i ich tablice, nieograniczone wieloznaczniki
+
+// Non-reifiable types (częściowo "wymazane" przez erasure):
+List&lt;String&gt;, List&lt;Integer&gt;, Map&lt;String, Integer&gt;
+// Wszelkie parametryzowane typy z konkretnymi argumentami
+
+// Praktyczne implikacje:
+Object[] objectArray = new String[10]; // ✅ OK — tablice są reifiable (covariant)
+// List&lt;Object&gt;[] arrayOfList = new List&lt;String&gt;[10]; // ❌ BŁĄD — non-reifiable
+
+// Varargs z generykami (heap pollution warning):
+@SafeVarargs // eliminuje ostrzeżenie gdy metoda jest bezpieczna
+static &lt;T&gt; List&lt;T&gt; createList(T... elements) {
+    // UWAGA: T... jest wewnętrznie tablicą T — ryzyko heap pollution
+    return Arrays.asList(elements);
+}
+
+// Heap pollution — gdy zmienna List&lt;String&gt; wskazuje na List&lt;Integer&gt;:
+List&lt;String&gt;[] arr = (List&lt;String&gt;[]) new List[2]; // raw type cast
+arr[0] = new ArrayList&lt;String&gt;();
+Object[] objArr = arr; // OK — tablice są covariant
+objArr[1] = new ArrayList&lt;Integer&gt;(); // heap pollution!
+String s = arr[1].get(0); // ❌ ClassCastException w runtime!
+</code></pre>
+
+<hr>
+
+<h2>10. Generyki i tablice — dlaczego nie można tworzyć?</h2>
+
+<h3>Pytanie 172 — zakaz tworzenia tablic generyków</h3>
+
+<pre><code class="language-java">// ❌ NIEMOŻLIWE — tworzenie tablic z parametrami typów:
+// List&lt;String&gt;[] array = new List&lt;String&gt;[10]; // BŁĄD KOMPILACJI
+// T[] arr = new T[10];                         // BŁĄD (w metodzie/klasie generycznej)
+
+// Powód — spójrzmy na problem:
+// Gdyby to było możliwe:
+List&lt;String&gt;[] stringLists = new List&lt;String&gt;[1]; // (hipotetycznie)
+Object[] objects = stringLists;      // tablice są covariant — OK
+objects[0] = new ArrayList&lt;Integer&gt;(); // po erasure List&lt;Integer&gt; = List — OK w runtime!
+String s = stringLists[0].get(0);     // ❌ ClassCastException — ale gdzie ostrzeżenie?
+
+// Java chroni nas przed tym przez zakaz tworzenia tablic generyków.
+
+// Alternatywy:
+// 1. Użyj List&lt;List&lt;String&gt;&gt; zamiast List&lt;String&gt;[]:
+List&lt;List&lt;String&gt;&gt; listOfLists = new ArrayList&lt;&gt;();
+
+// 2. Raw type + rzutowanie (unchecked, ale czasem konieczne):
+@SuppressWarnings("unchecked")
+List&lt;String&gt;[] rawArray = new List[10]; // raw type array — OK z ostrzeżeniem
+
+// 3. Użyj Object[] i rzutuj:
+Object[] arr = new Object[10];
+arr[0] = new ArrayList&lt;String&gt;();
+
+// 4. Reflection (gdy naprawdę potrzebna tablica T[]):
+@SuppressWarnings("unchecked")
+static &lt;T&gt; T[] createArray(Class&lt;T&gt; type, int size) {
+    return (T[]) java.lang.reflect.Array.newInstance(type, size);
+}
+String[] strings = createArray(String.class, 10);
+</code></pre>
+
+<hr>
+
+<h2>11. Covariance i Contravariance</h2>
+
+<h3>Pytanie 173 — wariantność w Javie</h3>
+
+<pre><code class="language-java">// COVARIANCE — "większy" typ akceptuje mniejszy (subtype relationship):
+// W Javie: tablice są covariant, generyki NIE są (domyślnie), wildcard extends jest covariant
+
+// Tablice — COVARIANT (niebezpieczne!):
+String[] strings = new String[3];
+Object[] objects = strings;           // ✅ OK — String[] IS-A Object[]
+objects[0] = "Hello";                 // ✅ OK
+// objects[0] = 42;                   // ❌ ArrayStoreException w runtime!
+
+// Generyki — INVARIANT (domyślnie):
+List&lt;String&gt; stringList = new ArrayList&lt;&gt;();
+// List&lt;Object&gt; objectList = stringList; // ❌ BŁĄD KOMPILACJI — nie jest covariant!
+// List&lt;Object&gt; jest INNYM typem niż List&lt;String&gt;
+
+// Upper wildcard — covariant:
+List&lt;? extends Number&gt; numList = new ArrayList&lt;Integer&gt;(); // ✅
+numList = new ArrayList&lt;Double&gt;();   // ✅
+// numList.add(3.14);                // ❌ — nie wiemy dokładnie jaki typ
+
+// Lower wildcard — contravariant:
+List&lt;? super Integer&gt; superList = new ArrayList&lt;Number&gt;(); // ✅
+superList = new ArrayList&lt;Object&gt;(); // ✅
+superList.add(42);                   // ✅ — możemy dodawać Integer
+
+// Podsumowanie wariantności:
+// String IS-A Object
+// String[] IS-A Object[]             (tablice — covariant, niebezpieczne)
+// List&lt;String&gt; NIE IS-A List&lt;Object&gt; (generyki — invariant)
+// List&lt;String&gt; IS-A List&lt;? extends Object&gt; (upper wildcard — covariant)
+// List&lt;Object&gt; IS-A List&lt;? super String&gt;   (lower wildcard — contravariant)
+</code></pre>
+
+<hr>
+
+<h2>12. Bridge Methods</h2>
+
+<h3>Pytanie 174 — metody mostkowe generowane przez kompilator</h3>
+
+<p>
+Kompilator generuje <strong>bridge methods</strong> gdy klasa dziedzicząca po generycznej nadklasie/interfejsie nadpisuje metodę z parametrami typów:
+</p>
+
+<pre><code class="language-java">// Interfejs generyczny:
+interface Comparable&lt;T&gt; {
+    int compareTo(T other);
+}
+
+// Implementacja:
+class Integer implements Comparable&lt;Integer&gt; {
+    private int value;
+
+    @Override
+    public int compareTo(Integer other) { // nasza implementacja
+        return Integer.compare(this.value, other.value);
+    }
+}
+
+// Co kompilator FAKTYCZNIE generuje:
+class Integer implements Comparable&lt;Integer&gt; {
+    private int value;
+
+    // Nasza implementacja:
+    public int compareTo(Integer other) { ... }
+
+    // Bridge method — generowana przez kompilator dla type erasure:
+    // Umożliwia wywoływanie przez referencję Comparable (raw type):
+    public int compareTo(Object other) {  // bridge — deleguje do naszej implementacji
+        return compareTo((Integer) other); // rzutowanie + delegacja
+    }
+}
+
+// Dlaczego bridge methods istnieją?
+// Po type erasure, interfejs Comparable ma: int compareTo(Object other)
+// Nasza klasa ma: int compareTo(Integer other)
+// To dwie różne sygnatury! Bridge method "łączy" je dla polimorfizmu.
+
+// Widoczność bridge methods przez refleksję:
+Method[] methods = Integer.class.getMethods();
+for (Method m : methods) {
+    if (m.getName().equals("compareTo")) {
+        System.out.println(m + " isBridge=" + m.isBridge());
+    }
+}
+</code></pre>
+
+<hr>
+
+<h2>13. Ograniczenia generyków</h2>
+
+<h3>Pytanie 175 — czego nie można robić z generykami</h3>
+
+<pre><code class="language-java">class Box&lt;T&gt; {
+    private T value;
+
+    // ❌ 1. Nie można tworzyć instancji parametru typu:
+    // T obj = new T(); // BŁĄD — T jest wymazane w runtime
+
+    // ❌ 2. Nie można tworzyć tablic parametru typu:
+    // T[] arr = new T[10]; // BŁĄD
+
+    // ❌ 3. Nie można używać w instanceof z konkretnym typem:
+    // boolean b = value instanceof T; // BŁĄD
+
+    // ❌ 4. Parametry typów nie mogą być prymitywami:
+    // Box&lt;int&gt; box = new Box&lt;&gt;(); // BŁĄD — musi być Integer
+    Box&lt;Integer&gt; intBox = new Box&lt;&gt;(); // ✅ OK — wrapper class
+
+    // ❌ 5. Statyczne pola nie mogą być parametrami typów:
+    // static T staticValue; // BŁĄD
+
+    // ❌ 6. Nie można catch/throw z parametrem typu:
+    // try { } catch (T e) { } // BŁĄD
+
+    // ✅ Ale można deklarować throws z bounded T:
+    &lt;E extends Exception&gt; void riskyOp() throws E { }
+
+    // ✅ Można tworzyć instancje przez Supplier lub refleksję:
+    T createNew(java.util.function.Supplier&lt;T&gt; factory) {
+        return factory.get(); // ✅ OK
+    }
+
+    // ✅ Można porównywać przez equals():
+    boolean isEqual(T other) {
+        return value != null &amp;&amp; value.equals(other); // ✅ OK
+    }
+}
+
+// ❌ 7. Nie można przeciążać metod które różnią się tylko parametrem typów:
+class Overloaded {
+    // void process(List&lt;String&gt; list) { }
+    // void process(List&lt;Integer&gt; list) { } // ❌ po erasure obie to List
+}
+</code></pre>
+
+<hr>
+
+<h2>14. Multiple Bounds</h2>
+
+<h3>Pytanie 176 — wielokrotne ograniczenia typów</h3>
+
+<pre><code class="language-java">// Typ T musi rozszerzać klasę A ORAZ implementować interfejsy B i C:
+// Klasa (jeśli jest) musi być PIERWSZA, potem interfejsy po &amp;:
+
+// T extends ClassA &amp; InterfaceB &amp; InterfaceC
+// Uwaga: tylko jedna klasa (lub zero), wiele interfejsów
+
+interface Printable { void print(); }
+interface Saveable { void save(); }
+abstract class Document { abstract String getContent(); }
+
+// Klasa + interfejs:
+static &lt;T extends Document &amp; Printable&gt; void printDocument(T doc) {
+    System.out.println(doc.getContent()); // metoda z Document
+    doc.print();                           // metoda z Printable
+}
+
+// Dwa interfejsy (brak klasy):
+static &lt;T extends Printable &amp; Saveable&gt; void printAndSave(T item) {
+    item.print();
+    item.save();
+}
+
+// Z wieloma interfejsami:
+static &lt;T extends Comparable&lt;T&gt; &amp; java.io.Serializable&gt; T clampedMax(T a, T b) {
+    return a.compareTo(b) &gt;= 0 ? a : b;
+}
+// T musi być Comparable i Serializable — np. String, Integer, Long
+
+// WAŻNE — kolejność: klasa zawsze PIERWSZA:
+// &lt;T extends Cloneable &amp; Number&gt; // ❌ BŁĄD — Number jest klasą, Cloneable interfejsem
+// &lt;T extends Number &amp; Cloneable&gt; // ✅ OK — klasa (Number) na pierwszym miejscu
+</code></pre>
+
+<hr>
+
+<h2>15. Generyczne interfejsy i dziedziczenie</h2>
+
+<h3>Pytanie 177 — hierarchia klas generycznych</h3>
+
+<pre><code class="language-java">// Klasa generyczna dziedzicząca po generycznej:
+class Container&lt;T&gt; {
+    protected T value;
+    Container(T value) { this.value = value; }
+    T get() { return value; }
+}
+
+// 1. Dziedziczenie z zachowaniem parametru:
+class NamedContainer&lt;T&gt; extends Container&lt;T&gt; {
+    private String name;
+    NamedContainer(String name, T value) {
+        super(value);
+        this.name = name;
+    }
+    String getName() { return name; }
+}
+
+// 2. Dziedziczenie z "ustaleniem" parametru:
+class StringContainer extends Container&lt;String&gt; {
+    StringContainer(String value) { super(value); }
+    void printUpperCase() { System.out.println(value.toUpperCase()); }
+}
+
+// 3. Klasa generyczna implementująca generyczny interfejs:
+interface Repository&lt;T, ID&gt; {
+    T findById(ID id);
+    void save(T entity);
+}
+
+class GenericRepository&lt;T, ID&gt; implements Repository&lt;T, ID&gt; {
+    private Map&lt;ID, T&gt; store = new HashMap&lt;&gt;();
+
+    @Override
+    public T findById(ID id) { return store.get(id); }
+
+    @Override
+    public void save(T entity) {
+        // ID musiałoby być inaczej pobrane — uproszczony przykład
+    }
+}
+
+// 4. Z ustaleniem typów:
+class UserRepository extends GenericRepository&lt;String, Integer&gt; {
+    // T = String, ID = Integer
+}
+</code></pre>
+
+<hr>
+
+<h2>16. Generyki i kolekcje — praktyczne wzorce</h2>
+
+<h3>Pytanie 178 — generyczne metody pomocnicze</h3>
+
+<pre><code class="language-java">// Generyczna metoda filtrowania:
+static &lt;T&gt; List&lt;T&gt; filter(List&lt;T&gt; list, java.util.function.Predicate&lt;? super T&gt; predicate) {
+    return list.stream().filter(predicate).collect(java.util.stream.Collectors.toList());
+}
+
+// Generyczna metoda transformacji:
+static &lt;T, R&gt; List&lt;R&gt; transform(List&lt;T&gt; list, java.util.function.Function&lt;? super T, ? extends R&gt; mapper) {
+    return list.stream().map(mapper).collect(java.util.stream.Collectors.toList());
+}
+
+// Generyczna metoda grupowania:
+static &lt;T, K&gt; Map&lt;K, List&lt;T&gt;&gt; groupBy(List&lt;T&gt; list, java.util.function.Function&lt;? super T, ? extends K&gt; classifier) {
+    return list.stream().collect(java.util.stream.Collectors.groupingBy(classifier));
+}
+
+// Użycie:
+List&lt;String&gt; names = List.of("Alice", "Bob", "Anna", "Charlie");
+List&lt;String&gt; aNames = filter(names, s -&gt; s.startsWith("A")); // [Alice, Anna]
+List&lt;Integer&gt; lengths = transform(names, String::length);     // [5, 3, 4, 7]
+Map&lt;Integer, List&lt;String&gt;&gt; byLength = groupBy(names, String::length); // {5=[Alice], 3=[Bob], ...}
+</code></pre>
+
+<hr>
+
+<h2>17. Rekurencja generyków (F-bounded polymorphism)</h2>
+
+<h3>Pytanie 179 — self-referential generic bounds</h3>
+
+<pre><code class="language-java">// F-bounded polymorphism — klasa parametryzowana samą sobą:
+// Używane w Comparable, Enum, Builder pattern
+
+// Comparable w JDK:
+// public interface Comparable&lt;T&gt; { int compareTo(T o); }
+// class Integer implements Comparable&lt;Integer&gt; { ... }
+// Wymaga: T extends Comparable&lt;T&gt;
+
+// Wzorzec Builder z F-bounded:
+abstract class Builder&lt;T, B extends Builder&lt;T, B&gt;&gt; {
+    protected String name;
+
+    @SuppressWarnings("unchecked")
+    public B withName(String name) {
+        this.name = name;
+        return (B) this; // zwraca konkretny Builder (this jest B)
+    }
+
+    public abstract T build();
+}
+
+class PersonBuilder extends Builder&lt;Person, PersonBuilder&gt; {
+    private int age;
+
+    public PersonBuilder withAge(int age) {
+        this.age = age;
+        return this; // zwraca PersonBuilder, nie Builder (fluent API)
+    }
+
+    @Override
+    public Person build() {
+        return new Person(name, age);
+    }
+}
+
+// Użycie — fluent API działa poprawnie:
+Person person = new PersonBuilder()
+    .withName("Alice")  // zwraca PersonBuilder (nie Builder!)
+    .withAge(30)        // metoda PersonBuilder dostępna
+    .build();
+</code></pre>
+
+<hr>
+
+<h2>18. Generic Classes w bibliotekach JDK</h2>
+
+<h3>Pytanie 180 — przykłady z JDK</h3>
+
+<pre><code class="language-java">// java.util.Optional&lt;T&gt;:
+Optional&lt;String&gt; opt = Optional.of("Hello");
+Optional&lt;Integer&gt; length = opt.map(String::length);         // Function&lt;String, Integer&gt;
+Optional&lt;String&gt; filtered = opt.filter(s -&gt; s.length() &gt; 3); // Predicate&lt;String&gt;
+
+// java.util.concurrent.Future&lt;V&gt;:
+java.util.concurrent.ExecutorService exec = java.util.concurrent.Executors.newFixedThreadPool(2);
+java.util.concurrent.Future&lt;String&gt; future = exec.submit(() -&gt; "Result");
+String result = future.get(); // blokuje, zwraca V
+
+// java.util.function.Function&lt;T,R&gt; — już omówione
+
+// java.lang.Comparable&lt;T&gt;:
+class Temperature implements Comparable&lt;Temperature&gt; {
+    private double celsius;
+    Temperature(double c) { this.celsius = c; }
+
+    @Override
+    public int compareTo(Temperature other) {
+        return Double.compare(this.celsius, other.celsius);
+    }
+}
+
+List&lt;Temperature&gt; temps = new ArrayList&lt;&gt;(
+    List.of(new Temperature(20), new Temperature(5), new Temperature(35))
+);
+Collections.sort(temps); // używa compareTo() — natural ordering
+</code></pre>
+
+<hr>
+
+<h2>19. Wzorzec Repository z generykami</h2>
+
+<h3>Pytanie 181 — generyczne repozytorium CRUD</h3>
+
+<pre><code class="language-java">interface Entity&lt;ID&gt; {
+    ID getId();
+}
+
+interface CrudRepository&lt;T extends Entity&lt;ID&gt;, ID&gt; {
+    void save(T entity);
+    Optional&lt;T&gt; findById(ID id);
+    List&lt;T&gt; findAll();
+    void deleteById(ID id);
+    boolean existsById(ID id);
+}
+
+class InMemoryCrudRepository&lt;T extends Entity&lt;ID&gt;, ID&gt; implements CrudRepository&lt;T, ID&gt; {
+    private final Map&lt;ID, T&gt; storage = new HashMap&lt;&gt;();
+
+    @Override
+    public void save(T entity) { storage.put(entity.getId(), entity); }
+
+    @Override
+    public Optional&lt;T&gt; findById(ID id) { return Optional.ofNullable(storage.get(id)); }
+
+    @Override
+    public List&lt;T&gt; findAll() { return new ArrayList&lt;&gt;(storage.values()); }
+
+    @Override
+    public void deleteById(ID id) { storage.remove(id); }
+
+    @Override
+    public boolean existsById(ID id) { return storage.containsKey(id); }
+}
+
+// Konkretne repozytorium:
+class User implements Entity&lt;Long&gt; {
+    private Long id;
+    private String name;
+    User(Long id, String name) { this.id = id; this.name = name; }
+    @Override public Long getId() { return id; }
+}
+
+class UserRepository extends InMemoryCrudRepository&lt;User, Long&gt; {
+    // Można dodać metody specyficzne dla User:
+    List&lt;User&gt; findByName(String name) {
+        return findAll().stream()
+                        .filter(u -&gt; u.name.equals(name))
+                        .collect(java.util.stream.Collectors.toList());
+    }
+}
+</code></pre>
+
+<hr>
+
+<h2>20. Generyki — zaawansowane przypadki egzaminacyjne</h2>
+
+<h3>Pytanie 182 — co się kompiluje, co nie?</h3>
+
+<pre><code class="language-java">// Pytania egzaminacyjne — co jest poprawne?
+
+// 1. Raw type assignment:
+List&lt;String&gt; strings = new ArrayList&lt;&gt;();
+List raw = strings; // ✅ OK — warning: unchecked
+strings = raw;      // ✅ OK — warning: unchecked
+
+// 2. Wildcard assignment:
+List&lt;? extends Number&gt; nums = new ArrayList&lt;Integer&gt;(); // ✅ OK
+// List&lt;Number&gt; numList = new ArrayList&lt;Integer&gt;();      // ❌ BŁĄD — invariant
+
+// 3. Nested wildcards:
+List&lt;List&lt;?&gt;&gt; listOfLists = new ArrayList&lt;List&lt;?&gt;&gt;(); // ✅ OK
+listOfLists.add(new ArrayList&lt;String&gt;());   // ✅ OK
+listOfLists.add(new ArrayList&lt;Integer&gt;());  // ✅ OK
+
+// 4. Wildcard capture:
+// List&lt;? extends Number&gt; list = new ArrayList&lt;Integer&gt;();
+// list.add(3.14); // ❌ BŁĄD — nie wiemy dokładnie jaki typ
+
+// 5. Generyczna metoda vs wildcard:
+// Te dwie sygnatury są NIE równoważne:
+static &lt;T&gt; void methodA(List&lt;T&gt; list1, List&lt;T&gt; list2) {
+    // OBIE listy MUSZĄ być tego samego T
+    list1.add(list2.get(0)); // ✅ OK — T jest znane
+}
+static void methodB(List&lt;?&gt; list1, List&lt;?&gt; list2) {
+    // Lista1 i lista2 mogą być różnych typów
+    // list1.add(list2.get(0)); // ❌ BŁĄD — ? i ? mogą być różne
+}
+
+// 6. ? extends vs konkretny typ:
+static &lt;T extends Number&gt; void m1(List&lt;T&gt; list) {
+    T first = list.get(0); // ✅ — typ T
+    list.add(first);       // ✅ — możemy dodać T
+}
+static void m2(List&lt;? extends Number&gt; list) {
+    Number first = list.get(0); // ✅ — jako Number
+    // list.add(first);         // ❌ — nie możemy dodać do ? extends
+}
+</code></pre>
+
+<hr>
+
+<h2>21. Generyki a varargs</h2>
+
+<h3>Pytanie 183 — @SafeVarargs i heap pollution</h3>
+
+<pre><code class="language-java">// Varargs z typem generycznym — potencjalne heap pollution:
+// ❌ Niebezpieczne:
+static &lt;T&gt; List&lt;T&gt; asList(T... elements) {
+    // T... jest faktycznie T[] — tablica generyku!
+    // Kompilator ostrzega: "unchecked or unsafe operations"
+    return Arrays.asList(elements);
+}
+
+// Ostrzeżenie: "Possible heap pollution from parameterized vararg type"
+
+// @SafeVarargs — informuje kompilator że metoda jest bezpieczna:
+@SafeVarargs
+static &lt;T&gt; List&lt;T&gt; safeAsList(T... elements) {
+    // ✅ OK — używamy tablicy tylko do odczytu
+    return new ArrayList&lt;&gt;(Arrays.asList(elements));
+}
+
+// @SafeVarargs można stosować tylko dla:
+// - metod statycznych
+// - metod final
+// - konstruktorów
+// (nie dla zwykłych nadpisywalnych metod)
+
+// Kiedy NIE jest bezpieczne (heap pollution):
+@SuppressWarnings("unchecked")
+static &lt;T&gt; T[] unsafeToArray(T... args) {
+    return args; // ❌ NIEBEZPIECZNE — zwracamy tablicę generyczną!
+}
+
+// Problem:
+String[] strings = unsafeToArray("a", "b"); // W teorii OK
+// Ale:
+Object[] objs = unsafeToArray("a", 42); // ❌ heap pollution!
+</code></pre>
+
+<hr>
+
+<h2>22. Typ Any (universal) przez generyki</h2>
+
+<h3>Pytanie 184 — generyczny Pair, Triple, Either</h3>
+
+<pre><code class="language-java">// Generyczne kontenery danych:
+record Pair&lt;A, B&gt;(A first, B second) {
+    public static &lt;A, B&gt; Pair&lt;A, B&gt; of(A a, B b) {
+        return new Pair&lt;&gt;(a, b);
+    }
+
+    public Pair&lt;B, A&gt; swap() {
+        return new Pair&lt;&gt;(second, first);
+    }
+
+    public &lt;C&gt; Pair&lt;A, C&gt; mapSecond(java.util.function.Function&lt;B, C&gt; f) {
+        return new Pair&lt;&gt;(first, f.apply(second));
+    }
+}
+
+// Either&lt;L, R&gt; — lewa lub prawa wartość (używane w FP):
+sealed interface Either&lt;L, R&gt; permits Either.Left, Either.Right {
+    record Left&lt;L, R&gt;(L value) implements Either&lt;L, R&gt; {}
+    record Right&lt;L, R&gt;(R value) implements Either&lt;L, R&gt; {}
+
+    static &lt;L, R&gt; Either&lt;L, R&gt; left(L value) { return new Left&lt;&gt;(value); }
+    static &lt;L, R&gt; Either&lt;L, R&gt; right(R value) { return new Right&lt;&gt;(value); }
+
+    default boolean isLeft() { return this instanceof Left; }
+    default boolean isRight() { return this instanceof Right; }
+}
+
+// Użycie — Either do obsługi błędów:
+Either&lt;String, Integer&gt; parse(String input) {
+    try {
+        return Either.right(Integer.parseInt(input));
+    } catch (NumberFormatException e) {
+        return Either.left("Not a number: " + input);
+    }
+}
+
+Either&lt;String, Integer&gt; result = parse("42");   // Right(42)
+Either&lt;String, Integer&gt; error = parse("abc");   // Left("Not a number: abc")
+</code></pre>
+
+<hr>
+
+<h2>23. Generyki w standardowych algorytmach</h2>
+
+<h3>Pytanie 185 — Collections utility methods</h3>
+
+<pre><code class="language-java">// Collections.sort() — wymaga Comparable lub Comparator:
+static &lt;T extends Comparable&lt;? super T&gt;&gt; void sort(List&lt;T&gt; list)
+// Dlaczego ? super T? PECS — T musi być "konsumentem" porównań
+// Pozwala sortować List&lt;Integer&gt; nawet gdy Comparable jest zdefiniowane w Number
+
+List&lt;Integer&gt; numbers = new ArrayList&lt;&gt;(List.of(3, 1, 4, 1, 5));
+Collections.sort(numbers); // T = Integer, Integer extends Comparable&lt;Integer&gt;
+
+// Collections.min/max:
+static &lt;T extends Object &amp; Comparable&lt;? super T&gt;&gt; T min(Collection&lt;? extends T&gt; coll)
+// ? extends T — PECS (kolekcja jest producentem)
+// Comparable&lt;? super T&gt; — T może porównywać ze swoimi nadtypami (PECS consumer)
+
+// Collections.binarySearch() — lista MUSI być posortowana:
+int idx = Collections.binarySearch(numbers, 4); // zwraca indeks
+
+// Collections.copy():
+static &lt;T&gt; void copy(List&lt;? super T&gt; dest, List&lt;? extends T&gt; src)
+// dest = consumer → super T
+// src = producer → extends T
+// PECS w praktyce!
+
+Collections.copy(new ArrayList&lt;&gt;(Arrays.asList(0, 0, 0, 0, 0)), numbers);
+</code></pre>
+
+<hr>
+
+<h2>24. Generyki — podsumowanie zasad egzaminacyjnych</h2>
+
+<h3>Pytanie 186–199 — kluczowe zasady</h3>
+
+<pre><code class="language-java">// ===== TYPE PARAMETERS =====
+class Box&lt;T&gt; { }
+// T — unbounded: akceptuje każdy typ
+// T extends Number — upper bound: T jest Number lub podtypem
+// T extends A &amp; B &amp; C — multiple bounds: T spełnia wszystkie
+
+// ===== WILDCARDS =====
+// List&lt;?&gt;             — nieznany typ, tylko null/Object
+// List&lt;? extends T&gt;   — T lub podtyp (read-only praktycznie, PRODUCER)
+// List&lt;? super T&gt;     — T lub nadtyp (write-friendly, CONSUMER)
+
+// ===== OGRANICZENIA RUNTIME =====
+// instanceof z parametrem typów — NIEMOŻLIWE
+// new T() — NIEMOŻLIWE
+// new T[n] — NIEMOŻLIWE
+// static T field — NIEMOŻLIWE
+// catch (T e) — NIEMOŻLIWE
+// List&lt;String&gt;[] — NIEMOŻLIWE
+
+// ===== TYPE ERASURE =====
+// List&lt;String&gt; → List (raw) w runtime
+// T → Object (lub upper bound) w bytecode
+// Bridge methods — generowane dla polimorfizmu
+
+// ===== COVARIANCE =====
+// String[] IS-A Object[] (tablice — covariant, ryzyko ArrayStoreException)
+// List&lt;String&gt; NIE IS-A List&lt;Object&gt; (generyki — invariant)
+// List&lt;String&gt; IS-A List&lt;? extends Object&gt; (upper wildcard)
+
+// ===== PECS MNEMONIKA =====
+// P-E-C-S: Producer Extends, Consumer Super
+// Czytasz z kolekcji → ? extends (source)
+// Zapisujesz do kolekcji → ? super (destination)
+// Robisz obie → konkretny typ T
+
+// ===== PORÓWNANIE List&lt;?&gt; vs List&lt;Object&gt; =====
+void raw(List&lt;Object&gt; list) {
+    list.add("Hello"); // ✅ OK — konkretny typ
+    list.add(42);      // ✅ OK
+    Object o = list.get(0); // ✅ OK
+}
+
+void wildcard(List&lt;?&gt; list) {
+    // list.add("Hello"); // ❌ BŁĄD — nie wiemy jakiego typu
+    // list.add(null);    // ✅ OK (null jest każdym typem)
+    Object o = list.get(0); // ✅ OK — jako Object
+}
+</code></pre>
+
+<strong>Tabela porównawcza — kluczowe do zapamiętania:</strong>
+
+<table>
+<tr><th>Construct</th><th>Add elements</th><th>Get elements</th><th>Use case</th></tr>
+<tr><td><code>List&lt;T&gt;</code></td><td>✅ T</td><td>✅ T</td><td>Konkretny znany typ</td></tr>
+<tr><td><code>List&lt;Object&gt;</code></td><td>✅ Object</td><td>✅ Object</td><td>Heterogenna lista</td></tr>
+<tr><td><code>List&lt;?&gt;</code></td><td>❌ (tylko null)</td><td>✅ Object</td><td>Tylko odczyt, dowolny typ</td></tr>
+<tr><td><code>List&lt;? extends T&gt;</code></td><td>❌</td><td>✅ T</td><td>Producer — źródło danych</td></tr>
+<tr><td><code>List&lt;? super T&gt;</code></td><td>✅ T</td><td>✅ Object</td><td>Consumer — cel danych</td></tr>
+</table>
+
+</body>
+</html>

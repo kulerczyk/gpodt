@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>java part8 streamy</title>
+  <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #24292e;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 48px;
+  }
+  h1 { font-size: 2em; border-bottom: 2px solid #e1e4e8; padding-bottom: 10px; margin: 24px 0 16px; color: #1a1a2e; }
+  h2 { font-size: 1.5em; border-bottom: 1px solid #e1e4e8; padding-bottom: 6px; margin: 28px 0 12px; color: #2d4a7a; }
+  h3 { font-size: 1.2em; margin: 20px 0 8px; color: #3d6b9e; }
+  h4 { font-size: 1em; margin: 16px 0 6px; color: #555; font-weight: 600; }
+  p { margin: 8px 0; }
+  code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 12.5px;
+    background: #f0f3f6;
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: #c7254e;
+  }
+  pre {
+    background: #1e1e2e;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 14px 0;
+    border-left: 4px solid #7c3aed;
+  }
+  pre code {
+    background: none;
+    color: #cdd6f4;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+  th {
+    background: #7c3aed;
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #e1e4e8;
+  }
+  tr:nth-child(even) td { background: #f8f9ff; }
+  ul, ol { padding-left: 24px; margin: 8px 0; }
+  li { margin: 4px 0; }
+  hr { border: none; border-top: 2px solid #e1e4e8; margin: 28px 0; }
+  blockquote {
+    border-left: 4px solid #7c3aed;
+    background: #f5f0ff;
+    padding: 10px 16px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+    color: #4a3080;
+  }
+  strong { color: #1a1a2e; }
+  @media print {
+    body { padding: 20px 28px; font-size: 12px; }
+    pre { page-break-inside: avoid; }
+    h2, h3 { page-break-after: avoid; }
+    table { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<h1>Przewodnik egzaminacyjny Java — Część 8: Stream API</h1>
+<h2>(pytania 220–259)</h2>
+
+<hr>
+
+<h2>1. Podstawy Stream API — pipeline</h2>
+
+<h3>Pytanie 220 — architektura Stream API</h3>
+
+<code>Stream API</code> (Java 8) to narzędzie do przetwarzania sekwencji elementów w stylu funkcyjnym. Kluczowa architektura: <strong>pipeline</strong> (potok przetwarzania).
+
+<pre><code class="language-">Źródło (Source) → Operacje pośrednie (Intermediate) → Operacja końcowa (Terminal)
+</code></pre>
+
+<pre><code class="language-java">// Pełny przykład pipeline'u:
+List&lt;String&gt; names = List.of("Alice", "Bob", "Anna", "Charlie", "David", "Alicia");
+
+long count = names.stream()           // 1. Źródło — Stream&lt;String&gt;
+    .filter(s -&gt; s.startsWith("A"))   // 2. Intermediate — filtruj
+    .map(String::toLowerCase)         // 3. Intermediate — transformuj
+    .sorted()                         // 4. Intermediate — posortuj
+    .distinct()                       // 5. Intermediate — unikalne
+    .peek(s -&gt; System.out.println("Processing: " + s)) // 6. debug
+    .count();                         // 7. Terminal — zlicz → long
+
+// KLUCZOWE właściwości pipeline'u:
+// 1. LENIWE obliczenia (lazy) — operacje intermediate NIE są wykonywane do momentu
+//    wywołania operacji terminal!
+// 2. Stream może być skonsumowany TYLKO RAZ — po wykonaniu operacji terminal jest "zamknięty"
+// 3. Oryginalne dane NIE są modyfikowane — Stream tworzy nowy widok
+</code></pre>
+
+<hr>
+
+<h2>2. Źródła Streamów</h2>
+
+<h3>Pytanie 221 — skąd biorą się Streamy?</h3>
+
+<pre><code class="language-java">// 1. Z kolekcji:
+List&lt;String&gt; list = List.of("a", "b", "c");
+Stream&lt;String&gt; fromList = list.stream();
+Stream&lt;String&gt; parallel = list.parallelStream(); // wersja równoległa
+
+// 2. Z tablicy:
+String[] array = {"x", "y", "z"};
+Stream&lt;String&gt; fromArray = Arrays.stream(array);
+Stream&lt;String&gt; fromArrayRange = Arrays.stream(array, 1, 3); // [1,3) → "y", "z"
+
+// 3. Stream.of():
+Stream&lt;String&gt; explicit = Stream.of("a", "b", "c");
+Stream&lt;String&gt; singleElem = Stream.of("only");
+Stream&lt;Object&gt; empty = Stream.empty(); // pusty stream
+
+// 4. Stream.generate() — nieskończony (lazy):
+Stream&lt;Double&gt; randoms = Stream.generate(Math::random); // nieskończony!
+Stream&lt;Integer&gt; zeros = Stream.generate(() -&gt; 0);
+Stream&lt;String&gt; uuids = Stream.generate(() -&gt; java.util.UUID.randomUUID().toString());
+// ZAWSZE musisz ograniczyć: .limit(n)
+List&lt;Double&gt; fiveRandoms = Stream.generate(Math::random).limit(5).collect(java.util.stream.Collectors.toList());
+
+// 5. Stream.iterate() — nieskończony sekwencyjny:
+// Stara wersja (Java 8+):
+Stream&lt;Integer&gt; evens = Stream.iterate(0, n -&gt; n + 2); // 0, 2, 4, 6, ...
+// Nowa wersja z predykatem (Java 9+):
+Stream&lt;Integer&gt; under100 = Stream.iterate(0, n -&gt; n &lt; 100, n -&gt; n + 2); // 0,2,4,...,98
+
+// 6. IntStream/LongStream ranges:
+IntStream range = IntStream.range(0, 10);         // 0..9 (exclusive end)
+IntStream rangeClosed = IntStream.rangeClosed(1, 10); // 1..10 (inclusive end)
+LongStream longs = LongStream.range(0L, 1_000_000L);
+
+// 7. Inne metody:
+Stream&lt;String&gt; lines = Files.lines(Path.of("file.txt")); // linie pliku (lazy!)
+Stream&lt;Path&gt; paths = Files.walk(Path.of("."));            // drzewo katalogów
+Random random = new Random(42);
+IntStream randomInts = random.ints(100, 0, 100);           // 100 liczb w [0,100)
+</code></pre>
+
+<hr>
+
+<h2>3. Operacje intermediate — lazy</h2>
+
+<h3>Pytanie 222 — filter, map, flatMap, distinct, sorted, peek, limit, skip</h3>
+
+<pre><code class="language-java">List&lt;String&gt; words = List.of("hello", "world", "java", "stream", "api", "hello");
+
+// filter(Predicate) — zachowaj elementy spełniające warunek:
+Stream&lt;String&gt; longWords = words.stream()
+    .filter(s -&gt; s.length() &gt; 4); // "hello", "world", "stream"
+
+// map(Function) — transformuj każdy element:
+Stream&lt;Integer&gt; lengths = words.stream()
+    .map(String::length); // 5, 5, 4, 6, 3, 5
+
+// distinct() — usuń duplikaty (używa equals/hashCode):
+Stream&lt;String&gt; unique = words.stream()
+    .distinct(); // "hello", "world", "java", "stream", "api"
+
+// sorted() — posortuj (natural ordering lub Comparator):
+Stream&lt;String&gt; sorted = words.stream()
+    .sorted(); // "api", "hello", "hello", "java", "stream", "world"
+Stream&lt;String&gt; sortedByLength = words.stream()
+    .sorted(Comparator.comparingInt(String::length));
+
+// limit(n) — weź pierwsze n elementów (short-circuit!):
+Stream&lt;String&gt; first3 = words.stream()
+    .limit(3); // "hello", "world", "java"
+
+// skip(n) — pomiń pierwsze n elementów:
+Stream&lt;String&gt; skip2 = words.stream()
+    .skip(2); // "java", "stream", "api", "hello"
+
+// peek(Consumer) — efekt uboczny (DO DEBUGOWANIA TYLKO):
+Stream&lt;String&gt; debugged = words.stream()
+    .peek(s -&gt; System.out.println("Before filter: " + s))
+    .filter(s -&gt; s.length() &gt; 4)
+    .peek(s -&gt; System.out.println("After filter: " + s));
+// UWAGA: peek jest intermediate — nic nie wykona się bez operacji terminal!
+</code></pre>
+
+<hr>
+
+<h2>4. flatMap — kluczowa operacja</h2>
+
+<h3>Pytanie 223 — flatMap vs map</h3>
+
+<strong><code>flatMap</code></strong> to jedna z ważniejszych operacji — spłaszcza stream streamów:
+
+<pre><code class="language-java">// map() → Stream&lt;Stream&lt;T&gt;&gt;:
+List&lt;String&gt; sentences = List.of("Hello World", "Java Stream API");
+Stream&lt;String[]&gt; mapped = sentences.stream()
+    .map(s -&gt; s.split(" ")); // Stream&lt;String[]&gt;
+
+// flatMap() → Stream&lt;T&gt; — spłaszcza jeden poziom:
+Stream&lt;String&gt; flattened = sentences.stream()
+    .flatMap(s -&gt; Arrays.stream(s.split(" "))); // Stream&lt;String&gt;
+// "Hello", "World", "Java", "Stream", "API"
+
+// Konkretny przykład — zliczanie unikalnych słów ze wszystkich zdań:
+List&lt;String&gt; docs = List.of("the quick brown fox", "the lazy dog", "quick brown fox jumps");
+long uniqueWords = docs.stream()
+    .flatMap(doc -&gt; Arrays.stream(doc.split("\\s+")))
+    .distinct()
+    .count(); // 7 unikalnych słów
+
+// flatMap z kolekcjami zagnieżdżonymi:
+record Order(String id, List&lt;String&gt; items) {}
+List&lt;Order&gt; orders = List.of(
+    new Order("1", List.of("Apple", "Banana")),
+    new Order("2", List.of("Cherry", "Apple", "Date")),
+    new Order("3", List.of("Banana", "Elderberry"))
+);
+
+List&lt;String&gt; allItems = orders.stream()
+    .flatMap(order -&gt; order.items().stream())
+    .collect(java.util.stream.Collectors.toList());
+// [Apple, Banana, Cherry, Apple, Date, Banana, Elderberry]
+
+List&lt;String&gt; uniqueItems = orders.stream()
+    .flatMap(order -&gt; order.items().stream())
+    .distinct()
+    .sorted()
+    .collect(java.util.stream.Collectors.toList());
+// [Apple, Banana, Cherry, Date, Elderberry]
+
+// flatMapToInt/Long/Double — dla primitive streams:
+List&lt;int[]&gt; arrays = List.of(new int[]{1,2,3}, new int[]{4,5,6});
+IntStream allInts = arrays.stream()
+    .flatMapToInt(Arrays::stream); // 1, 2, 3, 4, 5, 6
+</code></pre>
+
+<hr>
+
+<h2>5. Operacje terminal</h2>
+
+<h3>Pytanie 224 — operacje kończące pipeline</h3>
+
+<pre><code class="language-java">List&lt;Integer&gt; numbers = List.of(5, 2, 8, 1, 9, 3, 7, 4, 6);
+
+// count() — liczba elementów:
+long count = numbers.stream().filter(n -&gt; n &gt; 5).count(); // 4
+
+// sum(), min(), max() — dla primitive streams:
+OptionalInt minInt = numbers.stream().mapToInt(Integer::intValue).min(); // OptionalInt[1]
+OptionalInt maxInt = numbers.stream().mapToInt(Integer::intValue).max(); // OptionalInt[9]
+int sum = numbers.stream().mapToInt(Integer::intValue).sum();            // 45
+double avg = numbers.stream().mapToInt(Integer::intValue).average().orElse(0); // 5.0
+
+// min/max dla Stream&lt;T&gt; (wymaga Comparator):
+Optional&lt;Integer&gt; min = numbers.stream().min(Integer::compare);  // Optional[1]
+Optional&lt;Integer&gt; max = numbers.stream().max(Integer::compare);  // Optional[9]
+
+// findFirst() — pierwszy element (short-circuit):
+Optional&lt;Integer&gt; first = numbers.stream()
+    .filter(n -&gt; n &gt; 5)
+    .findFirst(); // Optional[8] — zawsze ten sam, deterministyczny
+
+// findAny() — dowolny element (szybszy przy parallel streams):
+Optional&lt;Integer&gt; any = numbers.stream()
+    .filter(n -&gt; n &gt; 5)
+    .findAny(); // Optional[8] lub inny — niedeterministyczny przy parallel
+
+// anyMatch/allMatch/noneMatch (short-circuit):
+boolean anyAbove8 = numbers.stream().anyMatch(n -&gt; n &gt; 8);   // true (9 &gt; 8)
+boolean allPositive = numbers.stream().allMatch(n -&gt; n &gt; 0); // true
+boolean noneNegative = numbers.stream().noneMatch(n -&gt; n &lt; 0); // true
+
+// forEach — efekt uboczny dla każdego elementu:
+numbers.stream().forEach(n -&gt; System.out.print(n + " "));
+numbers.forEach(n -&gt; System.out.print(n + " ")); // lepiej! Bezpośrednio na Iterable
+
+// toArray():
+Integer[] arr = numbers.stream().toArray(Integer[]::new);
+Object[] objArr = numbers.stream().toArray(); // tablica Object[]
+</code></pre>
+
+<hr>
+
+<h2>6. collect() i Collectors</h2>
+
+<h3>Pytanie 225 — Collectors — zbieranie wyników</h3>
+
+<pre><code class="language-java">import java.util.stream.Collectors;
+
+List&lt;String&gt; names = List.of("Alice", "Bob", "Anna", "Charlie", "Dave", "Alicia");
+
+// Podstawowe zbieranie:
+List&lt;String&gt; nameList = names.stream().collect(Collectors.toList());
+Set&lt;String&gt; nameSet = names.stream().collect(Collectors.toSet());
+// Java 16+:
+List&lt;String&gt; unmodList = names.stream().collect(Collectors.toUnmodifiableList());
+
+// toMap — konwersja do Map:
+Map&lt;String, Integer&gt; nameToLength = names.stream()
+    .collect(Collectors.toMap(
+        n -&gt; n,             // keyMapper
+        String::length      // valueMapper
+    ));
+// Problem: duplikaty kluczy rzucają IllegalStateException!
+// Rozwiązanie — mergeFunction:
+Map&lt;String, Integer&gt; withMerge = names.stream()
+    .collect(Collectors.toMap(
+        n -&gt; n.substring(0, 1), // klucz = pierwsza litera (duplikaty!)
+        String::length,          // wartość = długość
+        (v1, v2) -&gt; v1 + v2     // merge: dodaj przy konflikcie
+    ));
+// A → Alice(5) + Anna(4) + Alicia(6) = 15
+
+// groupingBy — grupowanie:
+Map&lt;Integer, List&lt;String&gt;&gt; byLength = names.stream()
+    .collect(Collectors.groupingBy(String::length));
+// {3=[Bob], 4=[Anna, Dave], 5=[Alice], 7=[Charlie], 6=[Alicia]}
+
+// groupingBy z downstream collector:
+Map&lt;Integer, Long&gt; countByLength = names.stream()
+    .collect(Collectors.groupingBy(String::length, Collectors.counting()));
+// {3=1, 4=2, 5=1, 7=1, 6=1}
+
+Map&lt;Integer, List&lt;String&gt;&gt; upperByLength = names.stream()
+    .collect(Collectors.groupingBy(
+        String::length,
+        Collectors.mapping(String::toUpperCase, Collectors.toList())
+    ));
+
+// partitioningBy — podział na true/false:
+Map&lt;Boolean, List&lt;String&gt;&gt; partition = names.stream()
+    .collect(Collectors.partitioningBy(s -&gt; s.startsWith("A")));
+// {true=[Alice, Anna, Alicia], false=[Bob, Charlie, Dave]}
+
+// joining — łączenie ciągów:
+String joined = names.stream().collect(Collectors.joining());           // "AliceBobAnna..."
+String withDelim = names.stream().collect(Collectors.joining(", "));    // "Alice, Bob, ..."
+String full = names.stream().collect(Collectors.joining(", ", "[", "]")); // "[Alice, Bob, ...]"
+
+// counting():
+Long total = names.stream().collect(Collectors.counting()); // 6
+
+// summingInt/Long/Double:
+Integer totalLength = names.stream().collect(Collectors.summingInt(String::length)); // 30
+
+// averagingInt/Long/Double:
+Double avgLength = names.stream().collect(Collectors.averagingInt(String::length)); // 5.0
+
+// summarizingInt — wszystkie statystyki naraz:
+java.util.IntSummaryStatistics stats = names.stream()
+    .collect(Collectors.summarizingInt(String::length));
+System.out.println(stats.getMin());   // 3
+System.out.println(stats.getMax());   // 7
+System.out.println(stats.getSum());   // 30
+System.out.println(stats.getAverage()); // 5.0
+System.out.println(stats.getCount()); // 6
+</code></pre>
+
+<hr>
+
+<h2>7. Optional — obsługa wartości opcjonalnych</h2>
+
+<h3>Pytanie 226 — Optional — API i przypadki użycia</h3>
+
+<pre><code class="language-java">import java.util.Optional;
+
+// Tworzenie Optional:
+Optional&lt;String&gt; present = Optional.of("Hello");       // nie-null wartość
+Optional&lt;String&gt; empty = Optional.empty();              // pusta Optional
+Optional&lt;String&gt; nullable = Optional.ofNullable(null); // może być null → empty
+
+// Optional.of() z null → NullPointerException!
+// Optional.ofNullable() z null → Optional.empty()
+
+// Sprawdzanie:
+present.isPresent();  // true
+empty.isPresent();    // false
+present.isEmpty();    // false (Java 11+)
+empty.isEmpty();      // true  (Java 11+)
+
+// Pobieranie wartości:
+String value = present.get();          // "Hello" (NullPointerException jeśli empty!)
+String orElse = empty.orElse("default"); // "default" (wartość domyślna)
+// RÓŻNICA orElse vs orElseGet:
+String eager = empty.orElse(createDefault()); // createDefault() ZAWSZE wywoływana
+String lazy = empty.orElseGet(() -&gt; createDefault()); // ✅ LAZY — tylko gdy empty
+
+// orElseThrow:
+String orThrow = present.orElseThrow();                          // "Hello" lub NoSuchElement
+String withMsg = empty.orElseThrow(() -&gt; new IllegalStateException("Empty!")); // rzuca
+
+// Transformacje:
+Optional&lt;Integer&gt; length = present.map(String::length);          // Optional[5]
+Optional&lt;String&gt; upper = present.map(String::toUpperCase);       // Optional["HELLO"]
+Optional&lt;String&gt; emptyMapped = empty.map(String::toUpperCase);   // Optional.empty
+
+// flatMap — gdy mapper zwraca Optional:
+Optional&lt;String&gt; name = Optional.of("  Alice  ");
+Optional&lt;String&gt; trimmed = name.map(String::trim);               // "Alice"
+// Bez flatMap (gdy mapper zwraca Optional):
+Optional&lt;Optional&lt;String&gt;&gt; nested = name.map(s -&gt; Optional.of(s.trim())); // Optional[Optional["Alice"]]
+Optional&lt;String&gt; flat = name.flatMap(s -&gt; Optional.of(s.trim()));  // Optional["Alice"]
+
+// filter:
+Optional&lt;String&gt; filtered = present.filter(s -&gt; s.length() &gt; 3); // Optional["Hello"]
+Optional&lt;String&gt; filteredOut = present.filter(s -&gt; s.length() &gt; 10); // Optional.empty
+
+// ifPresent — efekt uboczny tylko gdy wartość jest:
+present.ifPresent(System.out::println); // drukuje "Hello"
+empty.ifPresent(System.out::println);   // nic nie robi
+
+// ifPresentOrElse (Java 9+):
+present.ifPresentOrElse(
+    s -&gt; System.out.println("Present: " + s),
+    () -&gt; System.out.println("Empty")
+); // "Present: Hello"
+
+// or() (Java 9+) — alternatywna Optional:
+Optional&lt;String&gt; result = empty.or(() -&gt; Optional.of("fallback")); // Optional["fallback"]
+
+// stream() (Java 9+) — konwersja Optional → Stream:
+Optional.of("hello").stream().forEach(System.out::println); // "hello"
+Optional.&lt;String&gt;empty().stream().forEach(System.out::println); // nic
+
+// Praktyczny wzorzec — łańcuch Optional:
+Optional&lt;String&gt; processedName = Optional.ofNullable(getUserName())
+    .filter(s -&gt; !s.isBlank())
+    .map(String::trim)
+    .map(String::toUpperCase);
+</code></pre>
+
+<hr>
+
+<h2>8. reduce() — agregacja</h2>
+
+<h3>Pytanie 227 — reduce() — składanie do jednej wartości</h3>
+
+<pre><code class="language-java">List&lt;Integer&gt; numbers = List.of(1, 2, 3, 4, 5);
+
+// reduce(identity, BinaryOperator) — z wartością tożsamości:
+int sum = numbers.stream().reduce(0, Integer::sum);   // 0+1+2+3+4+5 = 15
+int product = numbers.stream().reduce(1, (a, b) -&gt; a * b); // 1*1*2*3*4*5 = 120
+String concat = Stream.of("a","b","c").reduce("", String::concat); // "abc"
+
+// reduce(BinaryOperator) — bez identity, zwraca Optional:
+Optional&lt;Integer&gt; max = numbers.stream().reduce(Integer::max); // Optional[5]
+Optional&lt;Integer&gt; min = numbers.stream().reduce(Integer::min); // Optional[1]
+Optional&lt;Integer&gt; emptyReduce = Stream.&lt;Integer&gt;empty().reduce(Integer::sum); // Optional.empty
+
+// WAŻNE — identity musi być prawdziwą wartością tożsamości:
+// identity e spełnia: f(e, x) = x dla każdego x
+// Dla sumy: 0 (bo 0+x = x) ✅
+// Dla mnożenia: 1 (bo 1*x = x) ✅
+// Dla String concat: "" (bo ""+s = s) ✅
+
+// reduce(identity, accumulator, combiner) — dla parallel streams:
+// combiner łączy wyniki z różnych wątków
+int parallelSum = numbers.parallelStream()
+    .reduce(0, Integer::sum, Integer::sum); // trzeci arg = combiner
+
+// Przykład — sumowanie długości:
+int totalLength = Stream.of("Hello", "World", "Java")
+    .reduce(0,
+        (acc, s) -&gt; acc + s.length(), // accumulator: int + String → int
+        Integer::sum                   // combiner (dla parallel)
+    ); // 5 + 5 + 4 = 14
+
+// ZASADA: reduce jest ASOCJATYWNA — wynik nie powinien zależeć od kolejności
+// Dla parallel stream: (a ⊕ b) ⊕ c == a ⊕ (b ⊕ c) musi być prawdą
+</code></pre>
+
+<hr>
+
+<h2>9. Collectors — zaawansowane</h2>
+
+<h3>Pytanie 228 — zagnieżdżone i niestandardowe Collectors</h3>
+
+<pre><code class="language-java">// Zagnieżdżony groupingBy:
+record Student(String name, String subject, int grade) {}
+List&lt;Student&gt; students = List.of(
+    new Student("Alice", "Math", 90),
+    new Student("Bob", "Math", 85),
+    new Student("Alice", "Science", 92),
+    new Student("Bob", "Science", 78),
+    new Student("Charlie", "Math", 88)
+);
+
+// Grupowanie po przedmiocie, potem po nazwie:
+Map&lt;String, Map&lt;String, Integer&gt;&gt; gradesBySubjectAndName = students.stream()
+    .collect(Collectors.groupingBy(
+        Student::subject,
+        Collectors.toMap(Student::name, Student::grade, Integer::sum)
+    ));
+// {Math={Alice=90, Bob=85, Charlie=88}, Science={Alice=92, Bob=78}}
+
+// Collector.teeing() (Java 12+) — zbieranie dwoma Collectorami jednocześnie:
+List&lt;Integer&gt; nums = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+var stats = nums.stream()
+    .collect(Collectors.teeing(
+        Collectors.summingInt(Integer::intValue),   // sum
+        Collectors.counting(),                       // count
+        (sum, count) -&gt; Map.of("sum", sum, "count", count)
+    ));
+// {sum=55, count=10}
+
+// Collectors.toUnmodifiableMap/List/Set (Java 10+):
+Map&lt;String, Integer&gt; unmodMap = students.stream()
+    .collect(Collectors.toUnmodifiableMap(
+        Student::name,
+        Student::grade,
+        Integer::max // merge dla duplikatów
+    ));
+
+// Collectors.filtering (Java 9+):
+Map&lt;String, List&lt;Student&gt;&gt; filteredBySubject = students.stream()
+    .collect(Collectors.groupingBy(
+        Student::subject,
+        Collectors.filtering(s -&gt; s.grade() &gt;= 88, Collectors.toList())
+    ));
+
+// Własny Collector:
+Collector&lt;String, StringBuilder, String&gt; joining = Collector.of(
+    StringBuilder::new,                    // supplier
+    StringBuilder::append,                 // accumulator
+    StringBuilder::append,                 // combiner (dla parallel)
+    StringBuilder::toString                // finisher
+);
+String result = Stream.of("a", "b", "c").collect(joining); // "abc"
+</code></pre>
+
+<hr>
+
+<h2>10. Stream vs Collection — różnice</h2>
+
+<h3>Pytanie 229 — kiedy Stream, kiedy Collection?</h3>
+
+<pre><code class="language-java">// STREAM:
+// - Jednokrotne użycie (nie możesz iterować dwa razy bez nowego stream())
+// - Lazy evaluation — operacje nie wykonują się do terminal
+// - Może być nieskończony (Stream.generate, Stream.iterate)
+// - Funkcyjny styl, brak stanu (ideally)
+// - Może być parallel (parallelStream())
+// - Nie przechowuje danych — przetwarza je
+
+// COLLECTION:
+// - Przechowuje dane w pamięci
+// - Wielokrotna iteracja
+// - Modyfikowalna (ArrayList, HashMap)
+// - Zawsze skończona
+// - Sekwencyjna iteracja (chyba że spliterator + parallel)
+
+// Przykład ponownego użycia — BŁĄD:
+Stream&lt;String&gt; stream = List.of("a", "b", "c").stream();
+long count1 = stream.count();         // 3 — OK
+// long count2 = stream.count();      // ❌ IllegalStateException — stream już użyty!
+
+// Rozwiązanie: utwórz nowy stream za każdym razem lub użyj Collection:
+List&lt;String&gt; list = List.of("a", "b", "c");
+long count1b = list.stream().count();  // ✅ zawsze nowy stream
+long count2b = list.stream().count();  // ✅ kolejny nowy stream
+
+// Kiedy Stream jest lepszy:
+// - Transformacje danych (map, flatMap, filter)
+// - Agregacje (sum, count, groupBy)
+// - Lazy processing dużych zbiorów danych
+// - Parallel processing
+
+// Kiedy Collection jest lepsza:
+// - Wielokrotny dostęp do danych
+// - Losowy dostęp przez indeks
+// - Modyfikowanie danych (add, remove, set)
+// - Przekazywanie danych między metodami
+</code></pre>
+
+<hr>
+
+<h2>11. Parallel Streams</h2>
+
+<h3>Pytanie 230 — strumienie równoległe</h3>
+
+<pre><code class="language-java">// Tworzenie parallel stream:
+List&lt;Integer&gt; bigList = java.util.stream.IntStream.rangeClosed(1, 1_000_000)
+    .boxed()
+    .collect(java.util.stream.Collectors.toList());
+
+// Opcja 1 — parallelStream():
+long sum1 = bigList.parallelStream()
+    .mapToLong(Integer::longValue)
+    .sum(); // używa ForkJoinPool.commonPool()
+
+// Opcja 2 — .parallel() na istniejącym stream:
+long sum2 = bigList.stream()
+    .parallel()
+    .mapToLong(Integer::longValue)
+    .sum();
+
+// .sequential() — powrót do sekwencyjnego:
+long seq = bigList.stream()
+    .parallel()
+    .filter(n -&gt; n % 2 == 0)
+    .sequential() // wróć do sekwencyjnego od tego momentu
+    .mapToLong(Long::valueOf)
+    .sum();
+
+// KIEDY parallel jest korzystny:
+// ✅ Duże zbiory danych (&gt; 10_000 elementów zazwyczaj)
+// ✅ Kosztowne operacje per element (CPU-intensive)
+// ✅ Operacje bezstanowe (stateless)
+// ✅ Asocjatywne operacje (kolejność nie ma znaczenia dla wyniku)
+
+// KIEDY parallel SZKODZI:
+// ❌ Mały zbiór danych (overhead wątków &gt; zysk)
+// ❌ Operacje I/O bound (wątki czekają na I/O — nie CPU)
+// ❌ Operacje z efektami ubocznymi (modyfikacja wspólnego stanu!)
+// ❌ Gdy kolejność elementów ważna (findFirst, limit - może być nieprzewidywalne)
+
+// PUŁAPKA — efekty uboczne w parallel:
+List&lt;Integer&gt; result = new ArrayList&lt;&gt;();
+IntStream.range(0, 1000)
+    .parallel()
+    .forEach(i -&gt; result.add(i)); // ❌ RACE CONDITION! ArrayList nie jest thread-safe
+// Poprawnie:
+List&lt;Integer&gt; safeResult = IntStream.range(0, 1000)
+    .parallel()
+    .boxed()
+    .collect(java.util.stream.Collectors.toList()); // ✅ Collectors są thread-safe
+
+// Spliterator — mechanizm podziału dla parallel:
+// Spliterator dzieli dane na mniejsze części dla wątków
+// Większość kolekcji Java ma wydajny spliterator
+</code></pre>
+
+<hr>
+
+<h2>12. IntStream, LongStream, DoubleStream</h2>
+
+<h3>Pytanie 231 — primitive streams</h3>
+
+<pre><code class="language-java">// Primitive streams unikają autoboxingu — wydajniejsze dla prymitywów!
+
+// IntStream:
+IntStream intStream = IntStream.of(1, 2, 3, 4, 5);
+IntStream range = IntStream.range(1, 6);       // 1,2,3,4,5 (exclusive end)
+IntStream closed = IntStream.rangeClosed(1, 5); // 1,2,3,4,5 (inclusive end)
+IntStream randomInts = new java.util.Random().ints(10, 0, 100);
+
+// Operacje na primitive streams:
+int sum = intStream.sum();                  // 15
+OptionalInt min = intStream.min();          // ale stream już zużyty! — nowy:
+OptionalInt max = IntStream.of(1,2,3).max();
+OptionalDouble avg = IntStream.of(1,2,3).average();
+IntSummaryStatistics stats = IntStream.rangeClosed(1,10).summaryStatistics();
+
+// Konwersja Stream&lt;T&gt; ↔ IntStream/LongStream/DoubleStream:
+List&lt;String&gt; words = List.of("hello", "world", "java");
+
+// Stream&lt;T&gt; → IntStream:
+IntStream lengths = words.stream().mapToInt(String::length); // 5, 5, 4
+// Stream&lt;T&gt; → LongStream:
+LongStream longLengths = words.stream().mapToLong(String::length);
+// Stream&lt;T&gt; → DoubleStream:
+DoubleStream doubleVals = words.stream().mapToDouble(String::length);
+
+// IntStream → Stream&lt;T&gt;:
+Stream&lt;Integer&gt; boxed = IntStream.range(1, 5).boxed();   // autobox → Stream&lt;Integer&gt;
+Stream&lt;String&gt; mapped = IntStream.range(1, 5).mapToObj(i -&gt; "item_" + i); // "item_1"...
+
+// Przydatne metody:
+int sumOfSquares = IntStream.rangeClosed(1, 10)
+    .map(n -&gt; n * n)
+    .sum(); // 1+4+9+...+100 = 385
+
+// chars() — String → IntStream (kod Unicode):
+"Hello".chars()                         // IntStream z Unicode code points
+    .filter(c -&gt; c != 'l')              // filtruj 'l'
+    .forEach(c -&gt; System.out.print((char) c)); // Heo
+</code></pre>
+
+<hr>
+
+<h2>13. Lazy Evaluation — jak działa leniwe obliczanie</h2>
+
+<h3>Pytanie 232 — lazy evaluation w praktyce</h3>
+
+<pre><code class="language-java">// Operacje intermediate są LAZY — nie wykonują się do terminal!
+Stream&lt;Integer&gt; stream = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    .filter(n -&gt; {
+        System.out.println("Filtering: " + n);
+        return n % 2 == 0;
+    })
+    .map(n -&gt; {
+        System.out.println("Mapping: " + n);
+        return n * n;
+    });
+// Jeszcze nic nie zostało wypisane!
+
+Optional&lt;Integer&gt; first = stream.findFirst(); // TERAZ zaczyna się przetwarzanie!
+// Wypisuje:
+// Filtering: 1 (nie przechodzi filter)
+// Filtering: 2 (przechodzi filter)
+// Mapping: 2 (mapowanie 2 → 4)
+// STOP! findFirst() znalazł wynik — reszta nie jest przetwarzana!
+
+// Short-circuit operations — zatrzymują przetwarzanie wcześniej:
+// findFirst(), findAny(), anyMatch(), allMatch(), noneMatch(), limit()
+
+// Przykład efektu lazy + short-circuit:
+long count = Stream.iterate(0, n -&gt; n + 1) // nieskończony stream 0,1,2,3,...
+    .filter(n -&gt; n % 2 == 0)              // parzyste
+    .limit(5)                              // zatrzymaj po 5
+    .count(); // 5 — i zatrzymuje nieskończony stream!
+
+// Bez limit() byłoby nieskończone przetwarzanie!
+
+// Kolejność operacji ma znaczenie dla wydajności:
+List&lt;String&gt; names = List.of("Alice", "Bob", "Anna", "Charlie", "Adam", "David");
+
+// ❌ NIEOPTYMALNE — filter po sortowaniu (sortuje wszystkich):
+names.stream()
+    .sorted()
+    .filter(s -&gt; s.startsWith("A"))
+    .forEach(System.out::println);
+
+// ✅ OPTYMALNE — filter przed sortowaniem (sortuje tylko pasujących):
+names.stream()
+    .filter(s -&gt; s.startsWith("A"))
+    .sorted()
+    .forEach(System.out::println);
+</code></pre>
+
+<hr>
+
+<h2>14. Short-circuit Operations</h2>
+
+<h3>Pytanie 233 — operacje przerywające strumień</h3>
+
+<pre><code class="language-java">// OPERACJE SHORT-CIRCUIT mogą zakończyć przetwarzanie wcześniej niż koniec strumienia
+
+// findFirst() — zwraca pierwszy pasujący element, natychmiast kończy:
+Optional&lt;Integer&gt; firstEven = IntStream.rangeClosed(1, 1_000_000)
+    .filter(n -&gt; n % 2 == 0)
+    .boxed()
+    .findFirst(); // Optional[2] — sprawdza tylko: 1 (nie), 2 (tak!) → koniec
+
+// findAny() — dowolny pasujący (przydatny dla parallel):
+Optional&lt;Integer&gt; anyEven = IntStream.rangeClosed(1, 1_000_000)
+    .parallel()
+    .filter(n -&gt; n % 2 == 0)
+    .boxed()
+    .findAny(); // może być 2, ale może być cokolwiek innego
+
+// anyMatch — szybkie sprawdzenie czy cokolwiek pasuje:
+boolean hasEven = IntStream.rangeClosed(1, 1_000_000)
+    .anyMatch(n -&gt; n % 2 == 0); // true — kończy po znalezieniu 2
+
+// allMatch — sprawdza wszystkie (kończy przy pierwszym false):
+boolean allPositive = IntStream.rangeClosed(1, 1_000_000)
+    .allMatch(n -&gt; n &gt; 0); // true — musi sprawdzić wszystkie...
+boolean allSmall = IntStream.rangeClosed(1, 1_000_000)
+    .allMatch(n -&gt; n &lt; 100); // false — kończy po znalezieniu 100
+
+// noneMatch — kończy przy pierwszym true:
+boolean noneNegative = IntStream.rangeClosed(1, 1_000_000)
+    .noneMatch(n -&gt; n &lt; 0); // true — musi sprawdzić wszystkie...
+boolean noneAbove999 = IntStream.rangeClosed(1, 1_000_000)
+    .noneMatch(n -&gt; n &gt; 999); // false — kończy po znalezieniu 1000
+
+// limit() — intermediate short-circuit:
+IntStream.iterate(0, n -&gt; n + 1)  // nieskończony!
+    .filter(n -&gt; n % 3 == 0)
+    .limit(5)                      // koniec po 5 elementach
+    .forEach(System.out::println); // 0, 3, 6, 9, 12
+</code></pre>
+
+<hr>
+
+<h2>15. Stateful vs Stateless Intermediate Operations</h2>
+
+<h3>Pytanie 234 — operacje stanowe i bezstanowe</h3>
+
+<pre><code class="language-java">// STATELESS (bezstanowe) — każdy element przetwarzany niezależnie:
+// filter(), map(), flatMap(), peek(), mapToInt(), mapToLong(), mapToDouble()
+// Mogą być efektywnie przetworzone równolegle
+// Nie potrzebują widzieć innych elementów
+
+// STATEFUL (stanowe) — muszą widzieć wiele/wszystkie elementy:
+// distinct() — musi pamiętać widziane elementy
+// sorted() — musi zebrać wszystkie elementy przed posortowaniem
+// limit() — musi liczyć elementy (ale short-circuit)
+// skip() — musi liczyć elementy (ale bezpiecznie z parallel)
+
+// Dlaczego to ważne dla parallel streams?
+List&lt;Integer&gt; numbers = List.of(5, 3, 1, 4, 2);
+
+// sorted() wymaga zebrania wszystkich elementów — bariera synchronizacji:
+numbers.parallelStream()
+    .filter(n -&gt; n &gt; 0)        // stateless — parallel-friendly
+    .sorted()                   // STATEFUL — musi zebrać wszystkie przed posortowaniem
+    .limit(3)                   // stateful ale short-circuit
+    .forEach(System.out::println); // 1, 2, 3
+
+// Najlepiej: stateless operacje przed stateful:
+numbers.parallelStream()
+    .filter(n -&gt; n &gt; 2)   // stateless — parallel przetwarzanie
+    .map(n -&gt; n * 2)      // stateless — parallel przetwarzanie
+    .sorted()             // stateful — bariera; tu parallel jest łączony
+    .collect(java.util.stream.Collectors.toList());
+</code></pre>
+
+<hr>
+
+<h2>16. Stream.generate() i Stream.iterate() — szczegóły</h2>
+
+<h3>Pytanie 235 — nieskończone strumienie</h3>
+
+<pre><code class="language-java">// Stream.generate() — każdy element generowany niezależnie (bezstanowe):
+Stream.generate(() -&gt; "hello")     // nieskończone "hello", "hello", ...
+    .limit(5)
+    .forEach(System.out::println); // hello x5
+
+// Stream.generate() z Supplier z stanem (antipattern dla parallel!):
+int[] counter = {0}; // HACK — effectively final array
+Stream.generate(() -&gt; ++counter[0])
+    .limit(5)
+    .forEach(System.out::println); // 1,2,3,4,5 sekwencyjnie (ale brak gwarancji!)
+
+// Stream.iterate() — sekwencyjne, każdy element zależy od poprzedniego:
+// Java 8 — bez predykatu (nieskończone):
+Stream.iterate(1, n -&gt; n * 2)      // 1, 2, 4, 8, 16, ...
+    .limit(10)
+    .forEach(System.out::println);
+
+// Java 9+ — z predykatem (skończone):
+Stream.iterate(1, n -&gt; n &lt;= 1000, n -&gt; n * 2) // dopóki n &lt;= 1000, podwajaj
+    .forEach(System.out::println); // 1, 2, 4, 8, 16, ..., 512
+
+// Fibonacci z Stream.iterate():
+Stream.iterate(
+    new long[]{0, 1},           // stan: [a, b]
+    arr -&gt; new long[]{arr[1], arr[0] + arr[1]} // [b, a+b]
+)
+.limit(10)
+.map(arr -&gt; arr[0])            // weź pierwszy element
+.forEach(System.out::println); // 0,1,1,2,3,5,8,13,21,34
+</code></pre>
+
+<hr>
+
+<h2>17. Collectors.groupingBy — zaawansowane</h2>
+
+<h3>Pytanie 236 — wielopoziomowe grupowanie</h3>
+
+<pre><code class="language-java">record Employee(String name, String dept, int salary) {}
+List&lt;Employee&gt; employees = List.of(
+    new Employee("Alice", "IT", 90000),
+    new Employee("Bob", "HR", 60000),
+    new Employee("Charlie", "IT", 85000),
+    new Employee("Diana", "HR", 65000),
+    new Employee("Eve", "IT", 95000)
+);
+
+// Grupowanie z liczeniem:
+Map&lt;String, Long&gt; countByDept = employees.stream()
+    .collect(Collectors.groupingBy(Employee::dept, Collectors.counting()));
+// {IT=3, HR=2}
+
+// Grupowanie z sumowaniem:
+Map&lt;String, Integer&gt; totalSalaryByDept = employees.stream()
+    .collect(Collectors.groupingBy(
+        Employee::dept,
+        Collectors.summingInt(Employee::salary)
+    ));
+// {IT=270000, HR=125000}
+
+// Grupowanie z wartością max:
+Map&lt;String, Optional&lt;Employee&gt;&gt; highestPaidByDept = employees.stream()
+    .collect(Collectors.groupingBy(
+        Employee::dept,
+        Collectors.maxBy(Comparator.comparingInt(Employee::salary))
+    ));
+// {IT=Optional[Eve(95000)], HR=Optional[Diana(65000)]}
+
+// Grupowanie z joining:
+Map&lt;String, String&gt; namesByDept = employees.stream()
+    .collect(Collectors.groupingBy(
+        Employee::dept,
+        Collectors.mapping(Employee::name, Collectors.joining(", "))
+    ));
+// {IT=Alice, Charlie, Eve; HR=Bob, Diana}
+
+// Dwupoziomowe grupowanie (by dept, then by salary range):
+Map&lt;String, Map&lt;String, List&lt;Employee&gt;&gt;&gt; twoLevel = employees.stream()
+    .collect(Collectors.groupingBy(
+        Employee::dept,
+        Collectors.groupingBy(e -&gt; e.salary() &gt;= 85000 ? "high" : "low")
+    ));
+</code></pre>
+
+<hr>
+
+<h2>18. reduce() vs collect() — kiedy co?</h2>
+
+<h3>Pytanie 237 — reduce vs collect porównanie</h3>
+
+<pre><code class="language-java">// reduce() — dla niemutowalnych akumulacji:
+// ✅ Gdy wynik to pojedyncza wartość (int, String, Optional)
+// ✅ Gdy operacja jest asocjatywna
+// ✅ Bezpieczne dla parallel streams
+
+// collect() — dla mutowalnych akumulacji:
+// ✅ Gdy budujesz kolekcję (List, Map, Set)
+// ✅ Wydajniejszy niż reduce() dla kolekcji
+// ✅ Collectors są thread-safe w parallel
+
+// ❌ ZŁE użycie reduce() do budowania listy:
+List&lt;String&gt; badList = Stream.of("a", "b", "c")
+    .reduce(new ArrayList&lt;&gt;(),
+        (list, elem) -&gt; { // PROBLEM: modify and return new list każdorazowo!
+            ArrayList&lt;String&gt; copy = new ArrayList&lt;&gt;(list);
+            copy.add(elem);
+            return copy;
+        },
+        (l1, l2) -&gt; { l1.addAll(l2); return l1; }
+    ); // Działa, ale tworzy dużo kopii pośrednich — nieefektywne!
+
+// ✅ DOBRE użycie collect() do budowania listy:
+List&lt;String&gt; goodList = Stream.of("a", "b", "c")
+    .collect(java.util.stream.Collectors.toList()); // O(n) bez kopii
+
+// ✅ DOBRE użycie reduce() do sumowania:
+int sum = Stream.of(1, 2, 3, 4, 5).reduce(0, Integer::sum); // 15
+String concat = Stream.of("a","b","c").reduce("", String::concat); // "abc"
+</code></pre>
+
+<hr>
+
+<h2>19. Stream API — operacje na mapach</h2>
+
+<h3>Pytanie 238 — Streams z Map</h3>
+
+<pre><code class="language-java">Map&lt;String, Integer&gt; scores = Map.of(
+    "Alice", 90, "Bob", 75, "Charlie", 88, "Diana", 92, "Eve", 65
+);
+
+// Strumień z Map:
+scores.entrySet().stream()                     // Stream&lt;Map.Entry&lt;String,Integer&gt;&gt;
+    .filter(e -&gt; e.getValue() &gt;= 80)           // filtruj wysokie wyniki
+    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())) // sortuj malejąco
+    .forEach(e -&gt; System.out.println(e.getKey() + ": " + e.getValue()));
+// Diana: 92, Alice: 90, Charlie: 88
+
+// Strumień po kluczach:
+List&lt;String&gt; topStudents = scores.keySet().stream()
+    .filter(name -&gt; scores.get(name) &gt;= 85)
+    .sorted()
+    .collect(java.util.stream.Collectors.toList()); // [Alice, Charlie, Diana]
+
+// Strumień po wartościach:
+OptionalDouble avg = scores.values().stream()
+    .mapToInt(Integer::intValue)
+    .average(); // 82.0
+
+// Transformacja Map przez Streams:
+Map&lt;String, String&gt; gradeMap = scores.entrySet().stream()
+    .collect(java.util.stream.Collectors.toMap(
+        Map.Entry::getKey,
+        e -&gt; e.getValue() &gt;= 90 ? "A" : e.getValue() &gt;= 80 ? "B" : "C"
+    ));
+// {Alice=A, Bob=C, Charlie=B, Diana=A, Eve=C}
+</code></pre>
+
+<hr>
+
+<h2>20. Collectors.toMap() — szczegóły i pułapki</h2>
+
+<h3>Pytanie 239 — toMap() z duplikatami</h3>
+
+<pre><code class="language-java">// Problem: duplikaty kluczy rzucają IllegalStateException:
+List&lt;String&gt; words = List.of("hello", "HELLO", "world");
+
+// ❌ Błąd — zduplikowane klucze po toLowerCase():
+// words.stream().collect(Collectors.toMap(
+//     String::toLowerCase,  // "hello" i "HELLO" oba dają "hello"!
+//     s -&gt; s
+// )); // IllegalStateException: Duplicate key hello
+
+// ✅ Rozwiązanie — merge function:
+Map&lt;String, String&gt; merged = words.stream()
+    .collect(java.util.stream.Collectors.toMap(
+        String::toLowerCase,  // key
+        s -&gt; s,               // value
+        (existing, newVal) -&gt; existing + ", " + newVal  // merge: "hello, HELLO"
+    ));
+// {hello=hello, HELLO, world=world}
+
+// ✅ Zachowanie pierwszej wartości:
+Map&lt;String, String&gt; keepFirst = words.stream()
+    .collect(java.util.stream.Collectors.toMap(
+        String::toLowerCase,
+        s -&gt; s,
+        (a, b) -&gt; a // zachowaj pierwszą
+    ));
+
+// ✅ Z LinkedHashMap (zachowanie kolejności):
+Map&lt;String, Integer&gt; linkedMap = words.stream()
+    .collect(java.util.stream.Collectors.toMap(
+        s -&gt; s,
+        String::length,
+        (a, b) -&gt; a,
+        java.util.LinkedHashMap::new // czwarty argument: Map factory
+    ));
+</code></pre>
+
+<hr>
+
+<h2>21. Stream API — przykłady egzaminacyjne</h2>
+
+<h3>Pytanie 240–259 — typowe zadania egzaminacyjne</h3>
+
+<pre><code class="language-java">// ZADANIE 1: Znajdź 3 najdroższe produkty i wypisz ich nazwy:
+record Product(String name, double price) {}
+List&lt;Product&gt; products = List.of(
+    new Product("Apple", 1.5), new Product("Laptop", 999.0),
+    new Product("Book", 25.0), new Product("Phone", 599.0),
+    new Product("Coffee", 5.0), new Product("Tablet", 349.0)
+);
+
+List&lt;String&gt; top3 = products.stream()
+    .sorted(Comparator.comparingDouble(Product::price).reversed())
+    .limit(3)
+    .map(Product::name)
+    .collect(java.util.stream.Collectors.toList());
+// [Laptop, Phone, Tablet]
+
+// ZADANIE 2: Czy wszystkie imiona zaczynają się wielką literą?
+List&lt;String&gt; names = List.of("Alice", "Bob", "Charlie");
+boolean allCapitalized = names.stream()
+    .allMatch(s -&gt; Character.isUpperCase(s.charAt(0))); // true
+
+// ZADANIE 3: Połącz wszystkie imiona przez ", " posortowane alfabetycznie:
+String result = names.stream()
+    .sorted()
+    .collect(java.util.stream.Collectors.joining(", ")); // "Alice, Bob, Charlie"
+
+// ZADANIE 4: Zlicz słowa w tekście:
+String text = "the quick brown fox jumps over the lazy dog";
+Map&lt;String, Long&gt; wordCount = Arrays.stream(text.split("\\s+"))
+    .collect(java.util.stream.Collectors.groupingBy(
+        w -&gt; w,
+        java.util.stream.Collectors.counting()
+    ));
+// {the=2, quick=1, brown=1, fox=1, ...}
+
+// ZADANIE 5: Suma kwadratów liczb nieparzystych w [1,10]:
+int sumOfOddSquares = IntStream.rangeClosed(1, 10)
+    .filter(n -&gt; n % 2 != 0)
+    .map(n -&gt; n * n)
+    .sum(); // 1+9+25+49+81 = 165
+
+// ZADANIE 6: Odwróć listę przez Stream:
+List&lt;Integer&gt; reversed = IntStream.rangeClosed(1, 5)
+    .boxed()
+    .sorted(Comparator.reverseOrder())
+    .collect(java.util.stream.Collectors.toList()); // [5,4,3,2,1]
+
+// ZADANIE 7: Znalezienie drugiej największej liczby:
+OptionalInt secondMax = IntStream.of(3, 1, 4, 1, 5, 9, 2, 6, 5, 3)
+    .distinct()
+    .sorted()
+    .skip(IntStream.of(3,1,4,1,5,9,2,6,5,3).distinct().count() - 2)
+    .findFirst(); // 6
+
+// Lepsze podejście:
+List&lt;Integer&gt; nums = List.of(3, 1, 4, 1, 5, 9, 2, 6, 5, 3);
+OptionalInt second = nums.stream()
+    .mapToInt(Integer::intValue)
+    .distinct()
+    .boxed()
+    .sorted(Comparator.reverseOrder())
+    .skip(1)
+    .mapToInt(Integer::intValue)
+    .findFirst(); // 6
+
+// ZADANIE 8: Flatten i deduplicate:
+List&lt;List&lt;Integer&gt;&gt; nested = List.of(
+    List.of(1, 2, 3),
+    List.of(2, 3, 4),
+    List.of(3, 4, 5)
+);
+List&lt;Integer&gt; flat = nested.stream()
+    .flatMap(List::stream)
+    .distinct()
+    .sorted()
+    .collect(java.util.stream.Collectors.toList()); // [1,2,3,4,5]
+</code></pre>
+
+<strong>Podsumowanie kluczowych zasad Stream API:</strong>
+
+<table>
+<tr><th>Operacja</th><th>Typ</th><th>Short-circuit</th><th>Stateful</th></tr>
+<tr><td><code>filter</code></td><td>Intermediate</td><td>❌</td><td>❌</td></tr>
+<tr><td><code>map</code></td><td>Intermediate</td><td>❌</td><td>❌</td></tr>
+<tr><td><code>flatMap</code></td><td>Intermediate</td><td>❌</td><td>❌</td></tr>
+<tr><td><code>distinct</code></td><td>Intermediate</td><td>❌</td><td>✅</td></tr>
+<tr><td><code>sorted</code></td><td>Intermediate</td><td>❌</td><td>✅</td></tr>
+<tr><td><code>limit</code></td><td>Intermediate</td><td>✅</td><td>✅</td></tr>
+<tr><td><code>skip</code></td><td>Intermediate</td><td>❌</td><td>✅</td></tr>
+<tr><td><code>peek</code></td><td>Intermediate</td><td>❌</td><td>❌</td></tr>
+<tr><td><code>count</code></td><td>Terminal</td><td>❌</td><td>-</td></tr>
+<tr><td><code>collect</code></td><td>Terminal</td><td>❌</td><td>-</td></tr>
+<tr><td><code>forEach</code></td><td>Terminal</td><td>❌</td><td>-</td></tr>
+<tr><td><code>reduce</code></td><td>Terminal</td><td>❌</td><td>-</td></tr>
+<tr><td><code>findFirst</code></td><td>Terminal</td><td>✅</td><td>-</td></tr>
+<tr><td><code>findAny</code></td><td>Terminal</td><td>✅</td><td>-</td></tr>
+<tr><td><code>anyMatch</code></td><td>Terminal</td><td>✅</td><td>-</td></tr>
+<tr><td><code>allMatch</code></td><td>Terminal</td><td>✅</td><td>-</td></tr>
+<tr><td><code>noneMatch</code></td><td>Terminal</td><td>✅</td><td>-</td></tr>
+<tr><td><code>min/max</code></td><td>Terminal</td><td>❌</td><td>-</td></tr>
+</table>
+
+</body>
+</html>

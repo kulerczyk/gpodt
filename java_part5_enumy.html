@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>java part5 enumy</title>
+  <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #24292e;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 48px;
+  }
+  h1 { font-size: 2em; border-bottom: 2px solid #e1e4e8; padding-bottom: 10px; margin: 24px 0 16px; color: #1a1a2e; }
+  h2 { font-size: 1.5em; border-bottom: 1px solid #e1e4e8; padding-bottom: 6px; margin: 28px 0 12px; color: #2d4a7a; }
+  h3 { font-size: 1.2em; margin: 20px 0 8px; color: #3d6b9e; }
+  h4 { font-size: 1em; margin: 16px 0 6px; color: #555; font-weight: 600; }
+  p { margin: 8px 0; }
+  code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 12.5px;
+    background: #f0f3f6;
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: #c7254e;
+  }
+  pre {
+    background: #1e1e2e;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 14px 0;
+    border-left: 4px solid #7c3aed;
+  }
+  pre code {
+    background: none;
+    color: #cdd6f4;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+  th {
+    background: #7c3aed;
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #e1e4e8;
+  }
+  tr:nth-child(even) td { background: #f8f9ff; }
+  ul, ol { padding-left: 24px; margin: 8px 0; }
+  li { margin: 4px 0; }
+  hr { border: none; border-top: 2px solid #e1e4e8; margin: 28px 0; }
+  blockquote {
+    border-left: 4px solid #7c3aed;
+    background: #f5f0ff;
+    padding: 10px 16px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+    color: #4a3080;
+  }
+  strong { color: #1a1a2e; }
+  @media print {
+    body { padding: 20px 28px; font-size: 12px; }
+    pre { page-break-inside: avoid; }
+    h2, h3 { page-break-after: avoid; }
+    table { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<h1>Przewodnik egzaminacyjny Java — Część 5: Typy wyliczeniowe Enum</h1>
+<h2>(pytania 141–160)</h2>
+
+<hr>
+
+<h2>1. Podstawy enum — co kompilator generuje</h2>
+
+<h3>Pytanie 141 — czym jest enum i co kompilator tworzy?</h3>
+
+<code>enum</code> to specjalny typ klasy w Javie. Kompilator generuje dla niego konkretną klasę dziedziczącą po <code>java.lang.Enum&lt;E&gt;</code>.
+
+<pre><code class="language-java">// To co piszesz:
+public enum Day {
+    MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+}
+
+// Co kompilator FAKTYCZNIE generuje (przybliżony odpowiednik):
+public final class Day extends java.lang.Enum&lt;Day&gt; {
+    public static final Day MONDAY   = new Day("MONDAY", 0);
+    public static final Day TUESDAY  = new Day("TUESDAY", 1);
+    public static final Day WEDNESDAY = new Day("WEDNESDAY", 2);
+    public static final Day THURSDAY = new Day("THURSDAY", 3);
+    public static final Day FRIDAY   = new Day("FRIDAY", 4);
+    public static final Day SATURDAY = new Day("SATURDAY", 5);
+    public static final Day SUNDAY   = new Day("SUNDAY", 6);
+
+    private static final Day[] VALUES = { MONDAY, TUESDAY, ... };
+
+    private Day(String name, int ordinal) {
+        super(name, ordinal); // konstruktor Enum
+    }
+
+    public static Day[] values() { return VALUES.clone(); }
+    public static Day valueOf(String name) { ... }
+    // Dziedziczy z Enum: name(), ordinal(), toString(), equals(), hashCode(), compareTo()
+}
+</code></pre>
+
+<strong>KLUCZOWE fakty o enum:</strong>
+
+<ol>
+<li><strong>Niejawnie <code>final</code></strong> — nie można dziedziczyć po enum (ani po nim dziedziczyć).</li>
+<li><strong>Dziedziczy po <code>java.lang.Enum&lt;E&gt;</code></strong> — automatycznie.</li>
+<li><strong>Konstruktor jest zawsze <code>private</code></strong> (lub package-private) — nie można tworzyć instancji przez <code>new</code>.</li>
+<li><strong>Stałe są <code>public static final</code></strong> — inicjalizowane przy ładowaniu klasy.</li>
+<li><strong>Implementuje <code>Comparable&lt;E&gt;</code> i <code>Serializable</code></strong> — przez <code>java.lang.Enum</code>.</li>
+</ol>
+
+<hr>
+
+<h2>2. Konstruktor, pola i metody w enum</h2>
+
+<h3>Pytanie 142 — enum z polami i metodami</h3>
+
+<pre><code class="language-java">public enum Planet {
+    MERCURY(3.303e+23, 2.4397e6),
+    VENUS  (4.869e+24, 6.0518e6),
+    EARTH  (5.976e+24, 6.37814e6),
+    MARS   (6.421e+23, 3.3972e6);
+
+    private final double mass;   // kg
+    private final double radius; // metry
+
+    // Konstruktor MUSI być private lub package-private
+    // (nigdy public ani protected)
+    Planet(double mass, double radius) {
+        this.mass = mass;
+        this.radius = radius;
+    }
+
+    // Stała grawitacji
+    static final double G = 6.67300E-11;
+
+    // Metody instancyjne — każda stała enum może je wywoływać
+    double surfaceGravity() {
+        return G * mass / (radius * radius);
+    }
+
+    double surfaceWeight(double otherMass) {
+        return otherMass * surfaceGravity();
+    }
+
+    // Gettery:
+    public double getMass() { return mass; }
+    public double getRadius() { return radius; }
+}
+
+// Użycie:
+double earthWeight = 75.0;
+double mass = earthWeight / Planet.EARTH.surfaceGravity();
+for (Planet p : Planet.values()) {
+    System.out.printf("Weight on %s is %6.2f%n", p, p.surfaceWeight(mass));
+}
+</code></pre>
+
+<hr>
+
+<h2>3. Metody values(), valueOf(), ordinal(), name()</h2>
+
+<h3>Pytanie 143 — wbudowane metody enum</h3>
+
+<pre><code class="language-java">enum Color { RED, GREEN, BLUE }
+
+// values() — zwraca tablicę wszystkich stałych w kolejności deklaracji
+Color[] allColors = Color.values();
+System.out.println(allColors.length); // 3
+for (Color c : Color.values()) {
+    System.out.println(c); // RED, GREEN, BLUE
+}
+
+// valueOf(String) — pobierz stałą po nazwie (case-sensitive!)
+Color green = Color.valueOf("GREEN"); // Color.GREEN
+// ❌ Color.valueOf("green") — rzuca IllegalArgumentException (małe litery!)
+// ❌ Color.valueOf("PINK") — rzuca IllegalArgumentException (nieistniejąca stała)
+
+// name() — zwraca nazwę stałej jako String (dokładnie jak w kodzie)
+System.out.println(Color.RED.name());     // "RED"
+System.out.println(Color.GREEN.name());   // "GREEN"
+
+// ordinal() — zwraca pozycję (0-based) w kolejności deklaracji
+System.out.println(Color.RED.ordinal());   // 0
+System.out.println(Color.GREEN.ordinal()); // 1
+System.out.println(Color.BLUE.ordinal());  // 2
+
+// toString() — domyślnie zwraca name(), ale można nadpisać
+System.out.println(Color.RED.toString()); // "RED" (domyślnie)
+
+// Nadpisanie toString():
+enum Status {
+    ACTIVE, INACTIVE, PENDING;
+
+    @Override
+    public String toString() {
+        return name().charAt(0) + name().substring(1).toLowerCase();
+        // ACTIVE → "Active", INACTIVE → "Inactive"
+    }
+}
+System.out.println(Status.ACTIVE); // "Active" — toString() nadpisane
+
+// WAŻNE: ordinal() jest wrażliwe na kolejność deklaracji!
+// Nigdy nie używaj ordinal() do logiki biznesowej — może się zmienić przy refaktoryzacji!
+// ✅ Zamiast tego używaj własnych pól liczbowych.
+</code></pre>
+
+<hr>
+
+<h2>4. Implementacja interfejsów przez enum</h2>
+
+<h3>Pytanie 144 — enum implements interface</h3>
+
+<pre><code class="language-java">interface Describable {
+    String getDescription();
+}
+
+interface Togglable {
+    boolean isActive();
+}
+
+enum Feature implements Describable, Togglable {
+    DARK_MODE("Enables dark color scheme", true),
+    NOTIFICATIONS("Send push notifications", false),
+    AUTO_SAVE("Automatically save changes", true);
+
+    private final String description;
+    private boolean active; // NOTE: zwykłe pole (nie final) — można modyfikować
+
+    Feature(String description, boolean active) {
+        this.description = description;
+        this.active = active;
+    }
+
+    @Override
+    public String getDescription() { return description; }
+
+    @Override
+    public boolean isActive() { return active; }
+
+    // Dodatkowa metoda
+    public void toggle() { active = !active; }
+}
+
+// Użycie polimorfizmu:
+Describable d = Feature.DARK_MODE;
+System.out.println(d.getDescription()); // "Enables dark color scheme"
+
+// Iteracja przez interfejs:
+for (Feature f : Feature.values()) {
+    if (f.isActive()) {
+        System.out.println(f.name() + " is active");
+    }
+}
+</code></pre>
+
+<hr>
+
+<h2>5. Abstract methods w enum (per-constant class body)</h2>
+
+<h3>Pytanie 145 — każda stała z własną implementacją</h3>
+
+<p>
+To jeden z <strong>najważniejszych</strong> i najtrudniejszych tematów egzaminacyjnych o enum:
+</p>
+
+<pre><code class="language-java">// Metoda abstrakcyjna w enum — KAŻDA stała musi ją zaimplementować!
+enum Operation {
+    PLUS("+") {
+        @Override
+        public double apply(double x, double y) { return x + y; }
+    },
+    MINUS("-") {
+        @Override
+        public double apply(double x, double y) { return x - y; }
+    },
+    TIMES("*") {
+        @Override
+        public double apply(double x, double y) { return x * y; }
+    },
+    DIVIDE("/") {
+        @Override
+        public double apply(double x, double y) {
+            if (y == 0) throw new ArithmeticException("Division by zero");
+            return x / y;
+        }
+    };
+
+    private final String symbol;
+
+    Operation(String symbol) { this.symbol = symbol; }
+
+    // Metoda abstrakcyjna — musi być zaimplementowana przez każdą stałą
+    public abstract double apply(double x, double y);
+
+    @Override
+    public String toString() { return symbol; }
+}
+
+// Użycie:
+double x = 10, y = 3;
+for (Operation op : Operation.values()) {
+    System.out.printf("%.0f %s %.0f = %.2f%n", x, op, y, op.apply(x, y));
+}
+// 10 + 3 = 13.00
+// 10 - 3 = 7.00
+// 10 * 3 = 30.00
+// 10 / 3 = 3.33
+</code></pre>
+
+<strong>WAŻNE:</strong> Gdy stała ma własne ciało (per-constant class body), <strong>tworzona jest anonimowa podklasa</strong> enum. Dlatego:
+<ul>
+<li>Takie stałe <strong>nie są tej samej klasy co enum</strong> — są anonimowymi podklasami.</li>
+<li><code>Operation.PLUS.getClass() != Operation.class</code> — ale <code>Operation.PLUS.getClass().getSuperclass() == Operation.class</code>.</li>
+<li>Nadal <code>Operation.PLUS instanceof Operation</code> zwraca <code>true</code>.</li>
+</ul>
+
+<hr>
+
+<h2>6. Enum w switch — tradycyjny i switch expression (Java 14+)</h2>
+
+<h3>Pytanie 146 — switch z enum</h3>
+
+<pre><code class="language-java">enum Season { SPRING, SUMMER, AUTUMN, WINTER }
+
+// Tradycyjny switch (stary styl):
+Season season = Season.SUMMER;
+switch (season) {
+    case SPRING:
+        System.out.println("Warm and rainy");
+        break;
+    case SUMMER:
+        System.out.println("Hot and sunny"); // to się wypisze
+        break;
+    case AUTUMN:
+        System.out.println("Cool and windy");
+        break;
+    case WINTER:
+        System.out.println("Cold and snowy");
+        break;
+    // WAŻNE: w switch z enum NIE piszemy Season.SUMMER — tylko SUMMER
+    // (kompilator już wie, że chodzi o stałe Season)
+}
+
+// Switch Expression (Java 14+ stable):
+String description = switch (season) {
+    case SPRING -&gt; "Warm and rainy";
+    case SUMMER -&gt; "Hot and sunny";
+    case AUTUMN -&gt; "Cool and windy";
+    case WINTER -&gt; "Cold and snowy";
+    // Kompilator sprawdza wyczerpanie — jeśli wszystkie przypadki pokryte, nie trzeba default!
+};
+
+// Switch Expression z blokiem i yield:
+int avgTemp = switch (season) {
+    case SPRING -&gt; 15;
+    case SUMMER -&gt; 28;
+    case AUTUMN -&gt; {
+        System.out.println("Computing autumn temperature...");
+        yield 10; // yield zwraca wartość z bloku
+    }
+    case WINTER -&gt; -5;
+};
+
+// Pattern matching w switch (Java 21+):
+sealed interface Shape permits Circle, Rectangle {}
+record Circle(double r) implements Shape {}
+record Rectangle(double w, double h) implements Shape {}
+
+double area(Shape s) {
+    return switch (s) {
+        case Circle c -&gt; Math.PI * c.r() * c.r();
+        case Rectangle r -&gt; r.w() * r.h();
+    };
+}
+</code></pre>
+
+<hr>
+
+<h2>7. EnumSet</h2>
+
+<h3>Pytanie 147 — EnumSet — wydajna kolekcja dla enum</h3>
+
+<code>EnumSet</code> to wyspecjalizowana implementacja <code>Set</code> dla wartości enum. Wewnętrznie używa <strong>bitmapy</strong> (long lub tablica long), co czyni ją ekstremalnie wydajną:
+
+<pre><code class="language-java">import java.util.EnumSet;
+
+enum Day { MON, TUE, WED, THU, FRI, SAT, SUN }
+
+// Tworzenie EnumSet:
+EnumSet&lt;Day&gt; weekdays = EnumSet.of(Day.MON, Day.TUE, Day.WED, Day.THU, Day.FRI);
+EnumSet&lt;Day&gt; weekend  = EnumSet.of(Day.SAT, Day.SUN);
+EnumSet&lt;Day&gt; allDays  = EnumSet.allOf(Day.class);
+EnumSet&lt;Day&gt; noDays   = EnumSet.noneOf(Day.class);
+EnumSet&lt;Day&gt; monToFri = EnumSet.range(Day.MON, Day.FRI); // zakres
+
+// Kopiowanie:
+EnumSet&lt;Day&gt; copy = EnumSet.copyOf(weekdays);
+
+// Komplement:
+EnumSet&lt;Day&gt; notWeekdays = EnumSet.complementOf(weekdays); // SAT, SUN
+
+// Operacje:
+weekdays.add(Day.SAT);
+weekdays.remove(Day.MON);
+weekdays.contains(Day.WED); // true
+
+// Iteracja w kolejności deklaracji (nie insertion order jak HashSet):
+for (Day d : weekdays) {
+    System.out.println(d); // w kolejności: TUE, WED, THU, FRI, SAT
+}
+
+// Porównanie wydajności:
+// EnumSet: O(1) dla contains/add/remove dzięki bitmapie
+// HashSet: O(1) ale z narzutem obliczenia hashCode i porównania
+// TreeSet: O(log n) — wolniejszy, ale posortowany
+</code></pre>
+
+<strong>WAŻNE:</strong>
+<ul>
+<li><code>EnumSet</code> jest <strong>niemutowalne</strong> jeśli stworzony przez <code>EnumSet.of()</code> w starszych wersjach — ale w nowszych Javach jest mutowalny.</li>
+<li><code>EnumSet</code> <strong>nie może być null</strong> — nie pozwala na <code>null</code> jako element.</li>
+<li>Jest implementacją <code>Set</code> — nie ma duplikatów.</li>
+</ul>
+
+<hr>
+
+<h2>8. EnumMap</h2>
+
+<h3>Pytanie 148 — EnumMap — wydajna mapa dla kluczy enum</h3>
+
+<code>EnumMap</code> to wyspecjalizowana implementacja <code>Map</code> z kluczami będącymi wartościami enum. Używa tablicy indeksowanej <code>ordinal()</code>:
+
+<pre><code class="language-java">import java.util.EnumMap;
+
+enum Priority { LOW, MEDIUM, HIGH, CRITICAL }
+
+// Tworzenie EnumMap:
+EnumMap&lt;Priority, List&lt;String&gt;&gt; tasksByPriority = new EnumMap&lt;&gt;(Priority.class);
+
+// Wstawianie:
+tasksByPriority.put(Priority.HIGH, new ArrayList&lt;&gt;(List.of("Fix bug", "Deploy")));
+tasksByPriority.put(Priority.LOW, new ArrayList&lt;&gt;(List.of("Write docs")));
+tasksByPriority.put(Priority.MEDIUM, new ArrayList&lt;&gt;(List.of("Code review")));
+tasksByPriority.put(Priority.CRITICAL, new ArrayList&lt;&gt;(List.of("Server down!")));
+
+// Dostęp:
+List&lt;String&gt; criticalTasks = tasksByPriority.get(Priority.CRITICAL);
+System.out.println(criticalTasks); // ["Server down!"]
+
+// Iteracja w kolejności deklaracji enum (nie insertion order!):
+tasksByPriority.forEach((priority, tasks) -&gt; {
+    System.out.println(priority + ": " + tasks);
+});
+// LOW: [Write docs]
+// MEDIUM: [Code review]
+// HIGH: [Fix bug, Deploy]
+// CRITICAL: [Server down!]
+
+// Porównanie:
+// EnumMap: O(1) dostęp, iteracja w kolejności enum, brak null kluczy
+// HashMap: O(1) średnio, brak gwarantowanej kolejności, jeden null klucz
+// TreeMap: O(log n) dostęp, iteracja posortowana (naturalny porządek enum to kolejność deklaracji)
+</code></pre>
+
+<hr>
+
+<h2>9. Enum a Singleton pattern</h2>
+
+<h3>Pytanie 149 — enum jako najlepsza implementacja Singletona</h3>
+
+<p>
+Joshua Bloch w "Effective Java" rekomenduje <code>enum</code> jako <strong>najlepszą implementację Singletona</strong> w Javie:
+</p>
+
+<pre><code class="language-java">// ✅ NAJLEPSZA implementacja Singletona — przez enum:
+public enum DatabaseConnection {
+    INSTANCE;
+
+    private final String url;
+    private final int maxConnections;
+
+    DatabaseConnection() {
+        // Konstruktor wywołany raz przy inicjalizacji klasy
+        this.url = "jdbc:postgresql://localhost:5432/mydb";
+        this.maxConnections = 10;
+    }
+
+    public String getUrl() { return url; }
+    public int getMaxConnections() { return maxConnections; }
+    public void executeQuery(String sql) {
+        System.out.println("Executing: " + sql);
+    }
+}
+
+// Użycie:
+DatabaseConnection db = DatabaseConnection.INSTANCE;
+db.executeQuery("SELECT * FROM users");
+
+// Dlaczego enum Singleton jest lepszy niż klasyczny Singleton?
+// 1. Thread-safe — inicjalizacja przez class loader (JVM gwarantuje single-thread)
+// 2. Serializacja bezpieczna — JVM gwarantuje jeden egzemplarz nawet po deserializacji
+// 3. Ochrona przed reflection — nie można wywołać konstruktora przez refleksję
+// 4. Odporny na clone() — enum nie może być klonowany
+
+// PROBLEMY Z KLASYCZNYM SINGLETON:
+public class ClassicSingleton {
+    private static volatile ClassicSingleton instance;
+    private ClassicSingleton() { }
+
+    public static ClassicSingleton getInstance() {
+        if (instance == null) {
+            synchronized (ClassicSingleton.class) {
+                if (instance == null) {
+                    instance = new ClassicSingleton();
+                }
+            }
+        }
+        return instance;
+    }
+    // Problemy: serializacja tworzy nowy egzemplarz, refleksja może wywołać konstruktor
+}
+</code></pre>
+
+<hr>
+
+<h2>10. Serializacja enumów</h2>
+
+<h3>Pytanie 150 — jak Java serializuje enum?</h3>
+
+<pre><code class="language-java">enum Status { ACTIVE, INACTIVE }
+
+// Podczas serializacji obiektu zawierającego enum:
+class User implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
+    private String name;
+    private Status status;
+    // ...
+}
+
+// Java SERIALIZUJE TYLKO NAZWĘ stałej enum (np. "ACTIVE")
+// Podczas DESERIALIZACJI Java wywołuje Status.valueOf("ACTIVE")
+// Gwarantuje to, że po deserializacji zawsze dostajemy TEN SAM egzemplarz stałej
+
+// ✅ Enum jest BEZPIECZNY dla serializacji — nie tworzy nowych instancji
+// (w przeciwieństwie do zwykłych klas Serializable)
+
+// Przykład problemowy (nie dotyczy enum, ale ważny kontekst):
+// Zwykły Singleton może dostać zduplikowane instancje przez deserializację
+// Enum tego problemu NIE MA
+
+// Zmiana kolejności stałych po serializacji:
+// Jeśli mamy: enum Status { ACTIVE, INACTIVE }
+// i po serializacji zmieniamy na: enum Status { INACTIVE, ACTIVE }
+// Deserializacja NADAL działa poprawnie — szuka po NAZWIE, nie ordinal
+// (to przewaga nad zwykłą serializacją przez ordinal())
+</code></pre>
+
+<hr>
+
+<h2>11. Enum a dziedziczenie — dlaczego niemożliwe?</h2>
+
+<h3>Pytanie 151 — dlaczego enum nie może dziedziczyć?</h3>
+
+<pre><code class="language-java">enum Color { RED, GREEN, BLUE }
+
+// ❌ NIEMOŻLIWE — enum nie może dziedziczyć po innym enum:
+// enum ExtendedColor extends Color { YELLOW, PURPLE } // BŁĄD KOMPILACJI
+
+// ❌ NIEMOŻLIWE — klasa nie może dziedziczyć po enum:
+// class MyColor extends Color { } // BŁĄD KOMPILACJI
+
+// ❌ NIEMOŻLIWE — enum nie może dziedziczyć po zwykłej klasie:
+// enum Color extends SomeClass { } // BŁĄD KOMPILACJI
+
+// Powód: Kompilator niejawnie dodaje "extends java.lang.Enum&lt;Color&gt;"
+// Java nie pozwala na dziedziczenie po więcej niż jednej klasie
+
+// ✅ MOŻLIWE — enum może IMPLEMENTOWAĆ interfejsy:
+interface Colored {
+    String getHexCode();
+}
+
+enum Color implements Colored {
+    RED("#FF0000"),
+    GREEN("#00FF00"),
+    BLUE("#0000FF");
+
+    private final String hex;
+    Color(String hex) { this.hex = hex; }
+
+    @Override
+    public String getHexCode() { return hex; }
+}
+
+// Alternatywa dla dziedziczenia enum — kompozycja:
+enum BasicColor { RED, GREEN, BLUE }
+enum ExtendedColor {
+    RED(BasicColor.RED), GREEN(BasicColor.GREEN), BLUE(BasicColor.BLUE),
+    YELLOW(null), PURPLE(null);
+
+    private final BasicColor basic;
+    ExtendedColor(BasicColor basic) { this.basic = basic; }
+    public boolean isBasic() { return basic != null; }
+}
+</code></pre>
+
+<hr>
+
+<h2>12. Porównywanie enumów — == vs equals()</h2>
+
+<h3>Pytanie 152 — == czy equals() dla enum?</h3>
+
+<pre><code class="language-java">enum Status { ACTIVE, INACTIVE }
+
+Status s1 = Status.ACTIVE;
+Status s2 = Status.ACTIVE;
+
+// ✅ == jest BEZPIECZNY i ZALECANY dla enum:
+System.out.println(s1 == s2);         // true — to ten sam obiekt!
+System.out.println(s1.equals(s2));    // true — equals() enum używa == wewnętrznie
+
+// Dlaczego == jest bezpieczne?
+// JVM gwarantuje że każda stała enum ma JEDEN egzemplarz (singleton pattern)
+// s1 i s2 wskazują na ten sam obiekt w pamięci
+
+// Porównanie z null:
+Status s3 = null;
+// ❌ NIEBEZPIECZNE — equals() z null zwraca false, ale:
+// s3.equals(Status.ACTIVE) — NullPointerException!
+System.out.println(s3 == Status.ACTIVE); // false — bezpieczne
+// System.out.println(s3.equals(Status.ACTIVE)); // ❌ NullPointerException!
+
+// Bezpieczne porównanie z null:
+System.out.println(Status.ACTIVE.equals(s3)); // false — bezpieczne, bo wywołujemy na non-null
+
+// CompareTo — porównuje według ordinal():
+Status.ACTIVE.compareTo(Status.INACTIVE); // ujemne — ACTIVE (0) &lt; INACTIVE (1)
+Status.INACTIVE.compareTo(Status.ACTIVE); // dodatnie — INACTIVE (1) &gt; ACTIVE (0)
+</code></pre>
+
+<strong>KLUCZOWE:</strong> Dla enum zawsze używaj <code>==</code> zamiast <code>equals()</code> — jest bezpieczniejsze (nie rzuca NPE gdy wywołane na zmiennej) i komunikuje intencję (identyczność, nie równość).
+
+<hr>
+
+<h2>13. Enum — zaawansowane wzorce</h2>
+
+<h3>Pytanie 153 — enum z logiką biznesową</h3>
+
+<pre><code class="language-java">// Wzorzec State Machine z enum:
+enum TrafficLight {
+    RED {
+        @Override
+        public TrafficLight next() { return GREEN; }
+    },
+    GREEN {
+        @Override
+        public TrafficLight next() { return YELLOW; }
+    },
+    YELLOW {
+        @Override
+        public TrafficLight next() { return RED; }
+    };
+
+    public abstract TrafficLight next();
+}
+
+// Użycie:
+TrafficLight light = TrafficLight.RED;
+light = light.next(); // GREEN
+light = light.next(); // YELLOW
+light = light.next(); // RED — cykl
+
+// Wzorzec Dispatch Table z enum:
+enum MathOp {
+    ADD {
+        @Override public int apply(int a, int b) { return a + b; }
+    },
+    SUB {
+        @Override public int apply(int a, int b) { return a - b; }
+    },
+    MUL {
+        @Override public int apply(int a, int b) { return a * b; }
+    };
+
+    public abstract int apply(int a, int b);
+}
+
+// Zamiast if-else lub switch — czyste OOP:
+String opName = "ADD";
+MathOp op = MathOp.valueOf(opName);
+System.out.println(op.apply(5, 3)); // 8
+</code></pre>
+
+<hr>
+
+<h2>14. Enum — inicjalizacja i ładowanie klas</h2>
+
+<h3>Pytanie 154 — kiedy stałe enum są inicjalizowane?</h3>
+
+<pre><code class="language-java">enum Config {
+    INSTANCE;
+
+    private final String connectionString;
+    private final int timeout;
+
+    Config() {
+        System.out.println("Config enum initialized");
+        // Inicjalizacja przy pierwszym użyciu klasy enum
+        this.connectionString = "jdbc:postgresql://localhost/mydb";
+        this.timeout = 30;
+    }
+
+    public String getConnectionString() { return connectionString; }
+    public int getTimeout() { return timeout; }
+}
+
+// Inicjalizacja następuje LENIWIE — przy pierwszym dostępie do klasy enum:
+System.out.println("Before access");
+Config.INSTANCE.getConnectionString(); // "Config enum initialized" wypisane tu
+System.out.println("After access");
+
+// WAŻNE:
+// - Inicjalizacja jest THREAD-SAFE — JVM gwarantuje
+// - Stałe są inicjalizowane w kolejności deklaracji
+// - Konstruktor enum jest zawsze private lub package-private
+// - Nie można wywołać konstruktora enum przez refleksję (EnumConstantNotPresentException)
+</code></pre>
+
+<hr>
+
+<h2>15. Enum a refleksja</h2>
+
+<h3>Pytanie 155 — inspekcja enum przez refleksję</h3>
+
+<pre><code class="language-java">enum Planet { MERCURY, VENUS, EARTH, MARS }
+
+Class&lt;Planet&gt; clazz = Planet.class;
+
+// Sprawdzenie czy to enum:
+System.out.println(clazz.isEnum()); // true
+
+// Pobranie wszystkich stałych przez refleksję:
+Planet[] constants = clazz.getEnumConstants();
+for (Planet p : constants) {
+    System.out.println(p.name() + " ordinal=" + p.ordinal());
+}
+
+// Sprawdzenie czy pole jest stałą enum:
+java.lang.reflect.Field[] fields = clazz.getDeclaredFields();
+for (java.lang.reflect.Field f : fields) {
+    if (f.isEnumConstant()) {
+        System.out.println("Enum constant: " + f.getName());
+    }
+}
+
+// Próba tworzenia enum przez refleksję — NIEMOŻLIWE:
+try {
+    java.lang.reflect.Constructor&lt;Planet&gt; constructor = 
+        clazz.getDeclaredConstructor(String.class, int.class);
+    constructor.setAccessible(true);
+    // constructor.newInstance("JUPITER", 4); // ❌ IllegalArgumentException
+} catch (Exception e) {
+    System.out.println("Cannot create enum by reflection: " + e.getMessage());
+}
+</code></pre>
+
+<hr>
+
+<h2>16. EnumSet i EnumMap — szczegółowe operacje</h2>
+
+<h3>Pytanie 156 — zaawansowane operacje na EnumSet i EnumMap</h3>
+
+<pre><code class="language-java">enum Permission { READ, WRITE, EXECUTE, DELETE, ADMIN }
+
+// EnumSet — operacje zbiorowe:
+EnumSet&lt;Permission&gt; userPerms = EnumSet.of(Permission.READ, Permission.WRITE);
+EnumSet&lt;Permission&gt; adminPerms = EnumSet.allOf(Permission.class);
+
+// Sprawdzenie czy userPerms jest podzbiorem adminPerms:
+adminPerms.containsAll(userPerms); // true — wszystkie uprawnienia usera są w admin
+
+// Dodanie uprawnień:
+userPerms.addAll(EnumSet.of(Permission.EXECUTE));
+
+// Usunięcie uprawnień:
+adminPerms.removeAll(EnumSet.of(Permission.DELETE));
+
+// Iteracja — zawsze w kolejności deklaracji, niezależnie od kolejności dodawania:
+EnumSet&lt;Permission&gt; mixed = EnumSet.of(Permission.EXECUTE, Permission.READ, Permission.ADMIN);
+mixed.forEach(System.out::println); // READ, EXECUTE, ADMIN — w kolejności deklaracji!
+
+// EnumMap — szczegółowe użycie:
+EnumMap&lt;Permission, String&gt; permDescriptions = new EnumMap&lt;&gt;(Permission.class);
+permDescriptions.put(Permission.READ, "Can read files");
+permDescriptions.put(Permission.WRITE, "Can write files");
+permDescriptions.put(Permission.EXECUTE, "Can execute programs");
+
+// getOrDefault:
+String desc = permDescriptions.getOrDefault(Permission.ADMIN, "No description");
+System.out.println(desc); // "No description" — brak ADMIN w mapie
+
+// computeIfAbsent:
+permDescriptions.computeIfAbsent(Permission.DELETE, k -&gt; "Can delete files");
+
+// EnumMap vs HashMap dla kluczy enum:
+// EnumMap jest szybszy, zajmuje mniej pamięci
+// HashMapjest bardziej ogólny, nie wymaga enum
+</code></pre>
+
+<hr>
+
+<h2>17. Enum a generyki</h2>
+
+<h3>Pytanie 157 — enum z parametrami generycznymi</h3>
+
+<pre><code class="language-java">// Enum NIE może mieć parametrów generycznych:
+// ❌ enum Pair&lt;T&gt; { FIRST, SECOND } // BŁĄD KOMPILACJI
+
+// Ale interfejs implementowany przez enum MOŻE:
+interface TypedEnum&lt;T&gt; {
+    T getValue();
+}
+
+// Obejście przez interfejs:
+enum Configuration implements TypedEnum&lt;String&gt; {
+    HOST("localhost"),
+    PORT("8080"),
+    PATH("/api");
+
+    private final String value;
+    Configuration(String value) { this.value = value; }
+
+    @Override
+    public String getValue() { return value; }
+}
+
+// Metoda generyczna pracująca z enum:
+static &lt;E extends Enum&lt;E&gt;&gt; E findByName(Class&lt;E&gt; enumClass, String name) {
+    return Arrays.stream(enumClass.getEnumConstants())
+                 .filter(e -&gt; e.name().equalsIgnoreCase(name))
+                 .findFirst()
+                 .orElseThrow(() -&gt; new IllegalArgumentException("No enum: " + name));
+}
+
+// Użycie:
+Day day = findByName(Day.class, "monday"); // Day.MONDAY (case insensitive)
+</code></pre>
+
+<hr>
+
+<h2>18. Enum — ordinal() i niebezpieczeństwa</h2>
+
+<h3>Pytanie 158 — dlaczego nie używać ordinal() w logice?</h3>
+
+<pre><code class="language-java">// ❌ ZŁE — używanie ordinal() jako indeksu lub wartości biznesowej:
+enum Medal { GOLD, SILVER, BRONZE }
+
+// Problem: ordinal zależy od kolejności deklaracji
+// Jeśli dodamy PLATINUM przed GOLD:
+// PLATINUM.ordinal() = 0, GOLD.ordinal() = 1 — ZMIENIŁO SIĘ!
+
+// ❌ Niebezpieczny kod:
+int[] medalPoints = {100, 50, 25};
+Medal medal = Medal.GOLD;
+int points = medalPoints[medal.ordinal()]; // zależy od kolejności deklaracji!
+
+// ✅ BEZPIECZNE — własne pole z wartością:
+enum MedalSafe {
+    GOLD(100),
+    SILVER(50),
+    BRONZE(25),
+    PLATINUM(150); // dodanie na końcu lub w środku NIE psuje logiki
+
+    private final int points;
+    MedalSafe(int points) { this.points = points; }
+    public int getPoints() { return points; }
+}
+
+int safePoints = MedalSafe.GOLD.getPoints(); // zawsze 100, niezależnie od kolejności
+
+// Jedyne legalne użycie ordinal() to struktury danych wewnątrz samego JDK
+// (np. EnumSet/EnumMap używają ordinal() do indeksowania bitmapy/tablicy)
+</code></pre>
+
+<hr>
+
+<h2>19. Enum — switch expression i wyczerpanie</h2>
+
+<h3>Pytanie 159 — kompilator sprawdza wyczerpanie switch dla enum</h3>
+
+<pre><code class="language-java">enum Coin { PENNY, NICKEL, DIME, QUARTER }
+
+// Switch expression MUSI obsłużyć wszystkie wartości enum:
+int value = switch (coin) {
+    case PENNY   -&gt; 1;
+    case NICKEL  -&gt; 5;
+    case DIME    -&gt; 10;
+    case QUARTER -&gt; 25;
+    // Brak default — OK, bo wszystkie stałe są pokryte
+};
+
+// Jeśli brakuje case — BŁĄD KOMPILACJI:
+// int bad = switch (coin) {
+//     case PENNY -&gt; 1;
+//     case NICKEL -&gt; 5;
+//     // brak DIME i QUARTER — ❌ błąd
+// };
+
+// ✅ Można użyć default jako "catch all":
+int withDefault = switch (coin) {
+    case PENNY -&gt; 1;
+    default -&gt; -1; // dla NICKEL, DIME, QUARTER
+};
+
+// Tradycyjny switch — NIE weryfikuje wyczerpania:
+switch (coin) {
+    case PENNY:
+        System.out.println("1 cent");
+        break;
+    // Brak innych case — kompiluje się, ale niepełne
+}
+</code></pre>
+
+<hr>
+
+<h2>20. Enum — podsumowanie i pułapki egzaminacyjne</h2>
+
+<h3>Pytanie 160 — kluczowe fakty i pułapki</h3>
+
+<pre><code class="language-java">// PUŁAPKI egzaminacyjne:
+
+// 1. Konstruktor enum jest niejawnie private — nie możesz pisać public:
+enum E {
+    A, B;
+    // E() { } // ✅ OK — niejawnie private
+    // public E() { } // ❌ BŁĄD — modyfikator public niedozwolony
+    // protected E() { } // ❌ BŁĄD — modyfikator protected niedozwolony
+}
+
+// 2. Enum może mieć abstract methods TYLKO jeśli każda stała je implementuje:
+enum WithAbstract {
+    X { @Override int val() { return 1; } },
+    Y { @Override int val() { return 2; } };
+    abstract int val();
+}
+
+// 3. Stałe enum są inicjalizowane statycznie — static initializer może nie być potrzebny:
+enum Singleton {
+    INSTANCE; // konstruktor wywoływany raz
+}
+
+// 4. equals() dla enum używa == wewnętrznie — zawsze preferuj ==:
+System.out.println(Status.ACTIVE == Status.ACTIVE);       // true
+System.out.println(Status.ACTIVE.equals(Status.ACTIVE));  // true (ale używa ==)
+
+// 5. Enum nie może być generic:
+// enum Box&lt;T&gt; { ... } // ❌ BŁĄD KOMPILACJI
+
+// 6. Stałe enum NIE mogą być lokalne (wewnątrz metody):
+// void method() { enum Local { A, B } } // ❌ BŁĄD przed Java 16
+// Od Java 16+ lokalne enum są dozwolone (jak lokalne rekordy)
+
+// 7. Stała enum NIE jest null — jeśli nie znajdziesz stałej valueOf() rzuca wyjątek:
+try {
+    Day invalid = Day.valueOf("INVALID"); // ❌ IllegalArgumentException
+} catch (IllegalArgumentException e) {
+    System.out.println("Caught: " + e.getMessage());
+}
+
+// 8. Porządek compareTo() = porządek ordinal():
+Day.MONDAY.compareTo(Day.FRIDAY); // ujemny (MONDAY=0 &lt; FRIDAY=4)
+Day.SUNDAY.compareTo(Day.MONDAY); // dodatni (SUNDAY=6 &gt; MONDAY=0)
+</code></pre>
+
+<strong>Podsumowanie kluczowych zasad:</strong>
+
+<table>
+<tr><th>Temat</th><th>Zasada</th></tr>
+<tr><td>Dziedziczenie</td><td>Enum niejawnie <code>extends Enum&lt;E&gt;</code>, nie może dziedziczyć innych klas</td></tr>
+<tr><td>Implementacja</td><td>Enum MOŻE implementować interfejsy</td></tr>
+<tr><td>Konstruktor</td><td>Zawsze <code>private</code> (lub package-private), nigdy <code>public</code>/<code>protected</code></td></tr>
+<tr><td><code>ordinal()</code></td><td>Pozycja 0-based — nie używaj do logiki biznesowej!</td></tr>
+<tr><td><code>name()</code> vs <code>toString()</code></td><td><code>name()</code> zawsze zwraca nazwę stałej, <code>toString()</code> można nadpisać</td></tr>
+<tr><td><code>valueOf()</code></td><td>Case-sensitive, rzuca <code>IllegalArgumentException</code> dla nieznanej nazwy</td></tr>
+<tr><td><code>==</code></td><td>Bezpieczny i zalecany dla porównania enum (singleton pattern)</td></tr>
+<tr><td>Serializacja</td><td>Bezpieczna — JVM serializuje nazwę, nie obiekt</td></tr>
+<tr><td><code>EnumSet</code>/<code>EnumMap</code></td><td>Wydajniejsze od <code>HashSet</code>/<code>HashMap</code> dla kluczy enum</td></tr>
+<tr><td>Abstract methods</td><td>Każda stała MUSI implementować — tworzy anonimową podklasę</td></tr>
+</table>
+
+</body>
+</html>

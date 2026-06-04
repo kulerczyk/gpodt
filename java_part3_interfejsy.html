@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>java part3 interfejsy</title>
+  <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #24292e;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 48px;
+  }
+  h1 { font-size: 2em; border-bottom: 2px solid #e1e4e8; padding-bottom: 10px; margin: 24px 0 16px; color: #1a1a2e; }
+  h2 { font-size: 1.5em; border-bottom: 1px solid #e1e4e8; padding-bottom: 6px; margin: 28px 0 12px; color: #2d4a7a; }
+  h3 { font-size: 1.2em; margin: 20px 0 8px; color: #3d6b9e; }
+  h4 { font-size: 1em; margin: 16px 0 6px; color: #555; font-weight: 600; }
+  p { margin: 8px 0; }
+  code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 12.5px;
+    background: #f0f3f6;
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: #c7254e;
+  }
+  pre {
+    background: #1e1e2e;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 14px 0;
+    border-left: 4px solid #7c3aed;
+  }
+  pre code {
+    background: none;
+    color: #cdd6f4;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+  th {
+    background: #7c3aed;
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #e1e4e8;
+  }
+  tr:nth-child(even) td { background: #f8f9ff; }
+  ul, ol { padding-left: 24px; margin: 8px 0; }
+  li { margin: 4px 0; }
+  hr { border: none; border-top: 2px solid #e1e4e8; margin: 28px 0; }
+  blockquote {
+    border-left: 4px solid #7c3aed;
+    background: #f5f0ff;
+    padding: 10px 16px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+    color: #4a3080;
+  }
+  strong { color: #1a1a2e; }
+  @media print {
+    body { padding: 20px 28px; font-size: 12px; }
+    pre { page-break-inside: avoid; }
+    h2, h3 { page-break-after: avoid; }
+    table { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<h1>Przewodnik egzaminacyjny Java — Część 3: Interfejsy</h1>
+<h2>(pytania 61–100)</h2>
+
+<hr>
+
+<h2>1. Podstawowe zasady interfejsów — fundament koncepcji</h2>
+
+<h3>Pytanie 61 — czym jest interfejs i co gwarantuje?</h3>
+
+<p>
+Interfejs w Javie to <strong>kontrakt</strong> — deklaracja zestawu metod, które klasa implementująca musi dostarczyć. Interfejs definiuje <em>co</em> obiekt potrafi robić, nie <em>jak</em> to robi.
+</p>
+
+<strong>Kluczowe zasady (od Java 8+):</strong>
+
+<pre><code class="language-java">public interface Drawable {
+    // Stała — niejawnie public static final
+    int MAX_SIZE = 1000; // kompilator traktuje to jak: public static final int MAX_SIZE = 1000;
+
+    // Metoda abstrakcyjna — niejawnie public abstract
+    void draw(); // kompilator traktuje to jak: public abstract void draw();
+
+    // Metoda default (Java 8) — ma implementację
+    default void drawWithBorder() {
+        System.out.println("Drawing with border...");
+        draw(); // wywołuje abstrakcyjną metodę — polimorfizm!
+    }
+
+    // Metoda statyczna (Java 8) — należy do interfejsu, nie do implementujących klas
+    static Drawable createDefault() {
+        return () -&gt; System.out.println("Default drawable");
+    }
+
+    // Metoda prywatna (Java 9) — helper dla default i static
+    private void logDraw() {
+        System.out.println("Logging draw operation");
+    }
+}
+</code></pre>
+
+<strong>WAŻNE — co kompilator dodaje niejawnie:</strong>
+
+<table>
+<tr><th>Deklaracja w interfejsie</th><th>Co kompilator widzi</th></tr>
+<tr><td><code>void doSomething()</code></td><td><code>public abstract void doSomething()</code></td></tr>
+<tr><td><code>int VALUE = 42</code></td><td><code>public static final int VALUE = 42</code></td></tr>
+<tr><td><code>default void method()</code></td><td><code>public default void method()</code></td></tr>
+<tr><td><code>static void helper()</code></td><td><code>public static void helper()</code></td></tr>
+<tr><td><code>private void priv()</code></td><td><code>private void priv()</code> (Java 9+, nie jest <code>abstract</code>)</td></tr>
+</table>
+
+<hr>
+
+<h2>2. Metody default — Java 8 revolution</h2>
+
+<h3>Pytanie 62 — czym są metody default i po co je wprowadzono?</h3>
+
+<p>
+Metody <code>default</code> zostały wprowadzone w Java 8 głównie po to, by <strong>ewolucja istniejących interfejsów nie łamała kompatybilności wstecznej</strong>. Przed Java 8, dodanie nowej metody do publicznego interfejsu wymagało aktualizacji wszystkich implementacji.
+</p>
+
+<pre><code class="language-java">public interface Collection&lt;E&gt; {
+    // Przed Java 8: dodanie tej metody złamałoby MILIONY implementacji
+    // Od Java 8: default — istniejące implementacje nie muszą nic zmieniać
+    default Stream&lt;E&gt; stream() {
+        return StreamSupport.stream(spliterator(), false);
+    }
+
+    default void forEach(Consumer&lt;? super E&gt; action) {
+        Objects.requireNonNull(action);
+        for (E t : this) {
+            action.accept(t);
+        }
+    }
+}
+</code></pre>
+
+<strong>Zasady metod default:</strong>
+
+<pre><code class="language-java">interface Greeter {
+    String getName();
+
+    default String greet() {
+        return "Hello, " + getName() + "!"; // może wywoływać abstrakcyjne metody
+    }
+
+    default String greetFormally() {
+        return "Good day, " + getName() + ".";
+    }
+}
+
+class FormalGreeter implements Greeter {
+    private String name;
+
+    FormalGreeter(String name) { this.name = name; }
+
+    @Override
+    public String getName() { return name; }
+
+    // greetFormally() jest dziedziczone — możemy nie nadpisywać
+    // Ale MOŻEMY nadpisać jeśli chcemy:
+    @Override
+    public String greetFormally() {
+        return "Esteemed " + getName() + ", greetings.";
+    }
+}
+</code></pre>
+
+<strong>Kiedy nadpisać metodę default?</strong>
+<ol>
+<li>Gdy domyślna implementacja jest nieoptymalna dla konkretnej klasy.</li>
+<li>Gdy istnieje konflikt (dwa interfejsy dają tę samą metodę default).</li>
+<li>Gdy semantycznie klasa powinna zachowywać się inaczej.</li>
+</ol>
+
+<hr>
+
+<h2>3. Metody statyczne w interfejsach</h2>
+
+<h3>Pytanie 63 — metody static w interfejsach — zasady i ograniczenia</h3>
+
+<strong>KLUCZOWE:</strong> Metody statyczne w interfejsach <strong>NIE są dziedziczone</strong> przez klasy implementujące ani przez subinterfejsy. Można je wywoływać <strong>tylko przez nazwę interfejsu</strong>.
+
+<pre><code class="language-java">interface MathOperations {
+    static int add(int a, int b) { return a + b; }
+    static int multiply(int a, int b) { return a * b; }
+
+    int calculate(int a, int b); // abstrakcyjna
+}
+
+class Calculator implements MathOperations {
+    @Override
+    public int calculate(int a, int b) { return a + b; }
+
+    void example() {
+        MathOperations.add(1, 2);     // ✅ OK — przez nazwę interfejsu
+        // this.add(1, 2);            // ❌ BŁĄD — metody static interfejsu nie są dziedziczone
+        // Calculator.add(1, 2);      // ❌ BŁĄD — nie jest dostępna przez nazwę klasy
+    }
+}
+
+// Wywołanie:
+int result = MathOperations.add(3, 4); // ✅ jedyny poprawny sposób
+</code></pre>
+
+<strong>Porównanie: metoda statyczna interfejsu vs klasy:</strong>
+
+<pre><code class="language-java">interface I {
+    static void staticMethod() { System.out.println("I.staticMethod"); }
+}
+
+class C implements I {
+    // C.staticMethod() — BŁĄD! Nie ma dostępu do statycznej metody interfejsu przez klasę
+}
+
+// Użycie:
+I.staticMethod(); // ✅ jedyny sposób
+</code></pre>
+
+<hr>
+
+<h2>4. Metody prywatne w interfejsach (Java 9)</h2>
+
+<h3>Pytanie 64 — metody private w interfejsach — po co?</h3>
+
+<p>
+Metody prywatne (Java 9) rozwiązują problem <strong>duplikacji kodu</strong> między metodami <code>default</code>. Przed Java 9 nie było możliwości ekstrakcji wspólnej logiki z kilku metod <code>default</code> bez eksponowania tej logiki jako <code>public</code>.
+</p>
+
+<pre><code class="language-java">interface Logger {
+    void log(String message);
+
+    default void logInfo(String msg) {
+        log(format("INFO", msg));  // reużywa prywatnej metody
+    }
+
+    default void logWarning(String msg) {
+        log(format("WARN", msg));  // reużywa prywatnej metody
+    }
+
+    default void logError(String msg) {
+        log(format("ERROR", msg)); // reużywa prywatnej metody
+    }
+
+    // Prywatna metoda helper — dostępna tylko wewnątrz tego interfejsu
+    private String format(String level, String msg) {
+        return "[" + level + "] " + java.time.LocalTime.now() + " - " + msg;
+    }
+}
+</code></pre>
+
+<strong>Zasady metod prywatnych:</strong>
+<ul>
+<li>Muszą mieć ciało (implementację).</li>
+<li>Nie mogą być <code>abstract</code>.</li>
+<li>Nie są dziedziczone przez klasy implementujące ani subinterfejsy.</li>
+<li>Mogą być wywołane tylko przez metody <code>default</code> lub inne <code>private</code> metody tego interfejsu.</li>
+<li>Mogą być <code>private static</code> — wtedy dostępne tylko z metod <code>static</code> interfejsu.</li>
+</ul>
+
+<pre><code class="language-java">interface Validator {
+    boolean validate(String input);
+
+    default boolean validateAndLog(String input) {
+        boolean result = validate(input);
+        logResult(input, result); // wywołanie prywatnej
+        return result;
+    }
+
+    private void logResult(String input, boolean result) {
+        System.out.println("Validated '" + input + "': " + result);
+    }
+
+    // Prywatna STATYCZNA — może być wywołana z metody static
+    static Validator nonEmpty() {
+        return input -&gt; {
+            logStaticHelper("nonEmpty", input); // wywołanie private static
+            return input != null &amp;&amp; !input.isEmpty();
+        };
+    }
+
+    private static void logStaticHelper(String type, String input) {
+        System.out.println("Creating " + type + " validator for: " + input);
+    }
+}
+</code></pre>
+
+<hr>
+
+<h2>5. Interfejs a klasa abstrakcyjna — kiedy co wybrać?</h2>
+
+<h3>Pytanie 65 — fundamentalne porównanie</h3>
+
+<p>
+To jedno z <strong>najczęstszych pytań egzaminacyjnych</strong>. Rozumiej różnice głęboko:
+</p>
+
+<table>
+<tr><th>Cecha</th><th>Interfejs</th><th>Klasa abstrakcyjna</th></tr>
+<tr><td>Pola instancyjne</td><td>❌ Tylko <code>public static final</code></td><td>✅ Dowolne</td></tr>
+<tr><td>Konstruktory</td><td>❌ Brak</td><td>✅ Tak</td></tr>
+<tr><td>Wielokrotne dziedziczenie</td><td>✅ Klasa może implementować wiele</td><td>❌ Tylko jedna klasa bazowa</td></tr>
+<tr><td>Modyfikatory metod</td><td><code>public</code> (domyślnie), <code>private</code> (Java 9)</td><td>Dowolne (<code>private</code>, <code>protected</code>, <code>public</code>)</td></tr>
+<tr><td>Stan (state)</td><td>❌ Nie przechowuje stanu</td><td>✅ Może mieć stan przez pola</td></tr>
+<tr><td>Użycie</td><td>"potrafi coś" (can-do)</td><td>"jest czymś" (is-a)</td></tr>
+<tr><td><code>abstract</code> słowo kluczowe</td><td>Nie potrzebne (niejawne)</td><td>Wymagane dla klasy i metod</td></tr>
+</table>
+
+<pre><code class="language-java">// KIEDY interfejs: modelowanie zachowań niezwiązanych hierarchią
+interface Flyable {
+    void fly();
+    default String getStatus() { return "Flying"; }
+}
+
+interface Swimmable {
+    void swim();
+}
+
+// Duck może latać I pływać — wielokrotna implementacja
+class Duck implements Flyable, Swimmable {
+    @Override public void fly() { System.out.println("Duck flies"); }
+    @Override public void swim() { System.out.println("Duck swims"); }
+}
+
+// KIEDY klasa abstrakcyjna: wspólny stan, konstruktory, template method
+abstract class Vehicle {
+    private final String brand; // STAN — tylko klasa abstrakcyjna może to mieć
+    private int speed = 0;
+
+    protected Vehicle(String brand) { // konstruktor z parametrem
+        this.brand = brand;
+    }
+
+    // Template method
+    public final void start() {
+        performPreStartCheck();
+        accelerate();
+        System.out.println(brand + " started at " + speed + " km/h");
+    }
+
+    protected abstract void performPreStartCheck();
+    protected abstract void accelerate();
+
+    public String getBrand() { return brand; }
+}
+</code></pre>
+
+<strong>Zasada wyboru:</strong>
+<ul>
+<li>Użyj <strong>interfejsu</strong> gdy definiujesz kontrakt, który mogą spełnić niezwiązane klasy.</li>
+<li>Użyj <strong>klasy abstrakcyjnej</strong> gdy masz stan do współdzielenia, potrzebujesz konstruktorów z parametrami lub chcesz wzorca Template Method z chronionymi krokami.</li>
+</ul>
+
+<hr>
+
+<h2>6. Wielokrotna implementacja interfejsów</h2>
+
+<h3>Pytanie 66 — implementacja wielu interfejsów jednocześnie</h3>
+
+<pre><code class="language-java">interface Printable {
+    void print();
+}
+
+interface Saveable {
+    void save(String path);
+}
+
+interface Loadable {
+    void load(String path);
+}
+
+// Klasa implementuje TRZY interfejsy jednocześnie
+class Document implements Printable, Saveable, Loadable {
+    private String content;
+
+    Document(String content) { this.content = content; }
+
+    @Override
+    public void print() {
+        System.out.println("Printing: " + content);
+    }
+
+    @Override
+    public void save(String path) {
+        System.out.println("Saving to: " + path);
+    }
+
+    @Override
+    public void load(String path) {
+        System.out.println("Loading from: " + path);
+    }
+}
+
+// Polimorfizm — ta sama klasa, różne widoki:
+Document doc = new Document("Hello");
+Printable p = doc;   // widok jako Printable
+Saveable s = doc;    // widok jako Saveable
+Loadable l = doc;    // widok jako Loadable
+
+p.print();           // wywołuje Document.print()
+</code></pre>
+
+<strong>WAŻNE:</strong> Klasa może <strong>dziedziczyć po jednej klasie</strong> i jednocześnie <strong>implementować wiele interfejsów</strong>:
+
+<pre><code class="language-java">abstract class AbstractEditor {
+    protected String content = "";
+    public abstract void edit();
+}
+
+interface Printable { void print(); }
+interface Exportable { void export(String format); }
+
+class TextEditor extends AbstractEditor implements Printable, Exportable {
+    @Override public void edit() { content = "edited"; }
+    @Override public void print() { System.out.println(content); }
+    @Override public void export(String format) { System.out.println("Exporting as " + format); }
+}
+</code></pre>
+
+<hr>
+
+<h2>7. Konflikt metod default z dwóch interfejsów</h2>
+
+<h3>Pytanie 67 — jak Java rozwiązuje konflikty metod default?</h3>
+
+<p>
+To jeden z <strong>najważniejszych</strong> tematów egzaminacyjnych związanych z interfejsami. Gdy dwa interfejsy dostarczają metodę <code>default</code> o tej samej sygnaturze, klasa implementująca <strong>musi</strong> jawnie rozwiązać konflikt.
+</p>
+
+<pre><code class="language-java">interface A {
+    default String greet() {
+        return "Hello from A";
+    }
+}
+
+interface B {
+    default String greet() {
+        return "Hello from B";
+    }
+}
+
+// ❌ BŁĄD KOMPILACJI — klasa C dziedziczy dwie sprzeczne implementacje default
+// class C implements A, B { } // błąd!
+
+// ✅ POPRAWNIE — klasa MUSI nadpisać greet() i rozwiązać konflikt
+class C implements A, B {
+    @Override
+    public String greet() {
+        // Opcja 1: własna implementacja
+        return "Hello from C";
+    }
+}
+
+class D implements A, B {
+    @Override
+    public String greet() {
+        // Opcja 2: delegacja do konkretnego interfejsu przez InterfaceName.super.method()
+        return A.super.greet(); // ✅ wybieramy implementację z A
+    }
+}
+
+class E implements A, B {
+    @Override
+    public String greet() {
+        // Opcja 3: kombinacja obu
+        return A.super.greet() + " and " + B.super.greet();
+    }
+}
+</code></pre>
+
+<strong>Zasady rozwiązywania konfliktów (priorytet):</strong>
+
+<ol>
+<li><strong>Klasa wygrywa nad interfejsem</strong> — jeśli klasa (lub jej nadklasa) definiuje metodę, ta implementacja wygrywa nad metodami <code>default</code> interfejsów.</li>
+<li><strong>Bardziej specyficzny interfejs wygrywa</strong> — jeśli interfejs B rozszerza interfejs A i oba mają metodę <code>default</code>, wygrywa implementacja z B.</li>
+<li><strong>Jawne rozwiązanie wymagane</strong> — gdy żadna z powyższych reguł nie rozstrzyga, klasa musi jawnie nadpisać metodę.</li>
+</ol>
+
+<pre><code class="language-java">interface Base {
+    default String info() { return "Base"; }
+}
+
+interface Derived extends Base {
+    @Override
+    default String info() { return "Derived"; } // bardziej specyficzny — wygrywa
+}
+
+class MyClass implements Base, Derived {
+    // NIE musi nadpisywać info() — Derived.info() wygrywa (bardziej specyficzne)
+    // Wywołanie: new MyClass().info() → "Derived"
+}
+
+// Reguła 1: klasa wygrywa nad interfejsem
+class ParentClass {
+    public String info() { return "ParentClass"; }
+}
+
+class ChildClass extends ParentClass implements Base {
+    // ParentClass.info() wygrywa nad Base.info() — klasa &gt; interfejs
+    // Nie trzeba nadpisywać
+}
+</code></pre>
+
+<hr>
+
+<h2>8. Dziedziczenie interfejsów</h2>
+
+<h3>Pytanie 68 — interface extends interface</h3>
+
+<p>
+Interfejs może rozszerzać <strong>jeden lub więcej</strong> innych interfejsów:
+</p>
+
+<pre><code class="language-java">interface Animal {
+    String getName();
+    void makeSound();
+}
+
+interface Pet extends Animal {
+    String getOwner();
+
+    // Może dodawać nowe metody abstrakcyjne
+    default void greetOwner() {
+        System.out.println(getName() + " greets " + getOwner()); // reużywa z Animal
+    }
+}
+
+interface DomesticAnimal extends Animal, Pet {
+    // Rozszerza DWIE interfejsy jednocześnie!
+    void beVaccinated();
+}
+
+// Klasa implementująca DomesticAnimal musi zaimplementować:
+// - getName() i makeSound() z Animal
+// - getOwner() z Pet
+// - beVaccinated() z DomesticAnimal
+class Dog implements DomesticAnimal {
+    private String name, owner;
+
+    Dog(String name, String owner) {
+        this.name = name;
+        this.owner = owner;
+    }
+
+    @Override public String getName() { return name; }
+    @Override public void makeSound() { System.out.println("Woof!"); }
+    @Override public String getOwner() { return owner; }
+    @Override public void beVaccinated() { System.out.println("Vaccinated!"); }
+    // greetOwner() jest dziedziczone z Pet
+}
+</code></pre>
+
+<strong>WAŻNE:</strong> Gdy interfejs dziedziczy po innym interfejsie i oba mają metodę <code>default</code> o tej samej sygnaturze, implementacja z bardziej specyficznego (dziedziczącego) interfejsu wygrywa.
+
+<hr>
+
+<h2>9. Interfejsy funkcyjne (@FunctionalInterface)</h2>
+
+<h3>Pytanie 69 — co to jest interfejs funkcyjny?</h3>
+
+<strong>Interfejs funkcyjny</strong> to interfejs posiadający <strong>dokładnie jedną metodę abstrakcyjną</strong> (SAM — Single Abstract Method). Mogą mieć dowolną liczbę metod <code>default</code> i <code>static</code>.
+
+<pre><code class="language-java">@FunctionalInterface
+interface Calculator {
+    int calculate(int a, int b); // jedyna metoda abstrakcyjna
+
+    // Metody default są OK — nie naruszają @FunctionalInterface
+    default Calculator andThen(Calculator after) {
+        return (a, b) -&gt; after.calculate(this.calculate(a, b), 0);
+    }
+
+    // Metody statyczne też są OK
+    static Calculator add() { return (a, b) -&gt; a + b; }
+}
+
+// Użycie z lambdą — bo to interfejs funkcyjny:
+Calculator add = (a, b) -&gt; a + b;
+Calculator multiply = (a, b) -&gt; a * b;
+
+System.out.println(add.calculate(3, 4));      // 7
+System.out.println(multiply.calculate(3, 4)); // 12
+</code></pre>
+
+<strong>Adnotacja <code>@FunctionalInterface</code>:</strong>
+<ul>
+<li>Jest <strong>opcjonalna</strong> — kompilator sam wykryje interfejs funkcyjny.</li>
+<li>Gdy ją dodasz, kompilator <strong>weryfikuje</strong> że interfejs ma dokładnie jedną metodę abstrakcyjną.</li>
+<li>Jeśli interfejs dziedziczy metodę <code>Object</code> (np. <code>equals</code>, <code>hashCode</code>) — to <strong>nie liczy się</strong> jako metoda abstrakcyjna.</li>
+</ul>
+
+<pre><code class="language-java">@FunctionalInterface
+interface Transformer&lt;T&gt; {
+    T transform(T input); // jedyna metoda abstrakcyjna
+
+    // equals pochodzi z Object — nie narusza @FunctionalInterface
+    @Override
+    boolean equals(Object obj);
+
+    // BŁĄD — dodanie drugiej abstrakcyjnej łamie @FunctionalInterface:
+    // void doSomethingElse(); // ❌ błąd kompilacji z @FunctionalInterface
+}
+</code></pre>
+
+<hr>
+
+<h2>10. Marker Interfaces</h2>
+
+<h3>Pytanie 70 — interfejsy znacznikowe (marker interfaces)</h3>
+
+<p>
+Marker interface to interfejs <strong>bez żadnych metod</strong> — służy tylko jako "etykieta" informująca JVM lub frameworki o specjalnych właściwościach klasy.
+</p>
+
+<pre><code class="language-java">// java.io.Serializable — klasyczny marker interface
+public interface Serializable {
+    // BRAK METOD — to jest właśnie marker interface
+}
+
+// java.lang.Cloneable — marker interface
+public interface Cloneable {
+    // BRAK METOD
+}
+
+// Użycie:
+class Employee implements java.io.Serializable {
+    private String name;
+    private int id;
+    // JVM wie, że Employee można serializować dzięki Serializable
+}
+
+// Sprawdzanie przez instanceof:
+Employee emp = new Employee();
+if (emp instanceof Serializable) {
+    // można serializować
+    ObjectOutputStream oos = new ObjectOutputStream(...);
+    oos.writeObject(emp);
+}
+</code></pre>
+
+<strong>Marker interface vs adnotacja:</strong>
+
+<table>
+<tr><th>Aspekt</th><th>Marker Interface</th><th>Adnotacja</th></tr>
+<tr><td>Sprawdzanie w runtime</td><td><code>instanceof</code></td><td>Refleksja</td></tr>
+<tr><td>Dziedziczenie</td><td>✅ Automatyczne (podklasy też "mają" marker)</td><td>❌ Nie jest dziedziczona (chyba że <code>@Inherited</code>)</td></tr>
+<tr><td>Typowanie</td><td>✅ Można używać jako typ</td><td>❌ Nie jest typem</td></tr>
+<tr><td>Czytelność</td><td>Powiązane z typem klasy</td><td>Metadane separowane od kodu</td></tr>
+</table>
+
+<hr>
+
+<h2>11. Comparable vs Comparator</h2>
+
+<h3>Pytanie 71 — Comparable i Comparator — kiedy co?</h3>
+
+<strong><code>Comparable&lt;T&gt;</code></strong> — naturalne porządkowanie, implementowane <strong>wewnątrz</strong> klasy:
+
+<pre><code class="language-java">public interface Comparable&lt;T&gt; {
+    int compareTo(T other);
+    // Kontrakt: ujemny gdy this &lt; other, 0 gdy equal, dodatni gdy this &gt; other
+}
+
+class Student implements Comparable&lt;Student&gt; {
+    private String name;
+    private double gpa;
+
+    Student(String name, double gpa) {
+        this.name = name;
+        this.gpa = gpa;
+    }
+
+    @Override
+    public int compareTo(Student other) {
+        // Sortuj po GPA malejąco
+        return Double.compare(other.gpa, this.gpa);
+    }
+}
+
+List&lt;Student&gt; students = new ArrayList&lt;&gt;();
+students.add(new Student("Alice", 3.8));
+students.add(new Student("Bob", 3.5));
+Collections.sort(students); // używa compareTo() — natural ordering
+</code></pre>
+
+<strong><code>Comparator&lt;T&gt;</code></strong> — zewnętrzne, niestandardowe porządkowanie:
+
+<pre><code class="language-java">public interface Comparator&lt;T&gt; {
+    int compare(T o1, T o2);
+    // Wiele metod default: reversed(), thenComparing(), etc.
+}
+
+class Student {
+    String name;
+    double gpa;
+    int age;
+    // ...
+}
+
+// Różne sposoby sortowania bez modyfikowania Student:
+Comparator&lt;Student&gt; byName = Comparator.comparing(s -&gt; s.name);
+Comparator&lt;Student&gt; byGpaDesc = Comparator.comparingDouble((Student s) -&gt; s.gpa).reversed();
+Comparator&lt;Student&gt; byNameThenGpa = Comparator.comparing((Student s) -&gt; s.name)
+                                               .thenComparingDouble(s -&gt; s.gpa);
+
+List&lt;Student&gt; students = new ArrayList&lt;&gt;();
+students.sort(byName);           // sortuj po imieniu
+students.sort(byGpaDesc);        // sortuj po GPA malejąco
+students.sort(byNameThenGpa);    // sortuj po imieniu, a potem po GPA
+</code></pre>
+
+<strong>KLUCZOWA różnica:</strong>
+
+<table>
+<tr><th>Aspekt</th><th>Comparable</th><th>Comparator</th></tr>
+<tr><td>Lokalizacja</td><td>Wewnątrz klasy (<code>implements Comparable</code>)</td><td>Zewnętrzna klasa/lambda</td></tr>
+<tr><td>Ilość porządkowań</td><td>Jedno (naturalne)</td><td>Nieograniczona</td></tr>
+<tr><td>Modyfikacja klasy</td><td>✅ Wymagana</td><td>❌ Nie potrzeba</td></tr>
+<tr><td>Zastosowanie</td><td>Naturalne sortowanie (Integer, String)</td><td>Elastyczne, niestandardowe sortowanie</td></tr>
+</table>
+
+<hr>
+
+<h2>12. Stałe w interfejsach</h2>
+
+<h3>Pytanie 72 — stałe (public static final) w interfejsach</h3>
+
+<p>
+Każde pole zadeklarowane w interfejsie jest <strong>niejawnie</strong> <code>public static final</code>:
+</p>
+
+<pre><code class="language-java">interface NetworkConstants {
+    int PORT = 8080;               // kompilator: public static final int PORT = 8080
+    String HOST = "localhost";     // kompilator: public static final String HOST = ...
+    int TIMEOUT_MS = 5000;         // kompilator: public static final int TIMEOUT_MS = ...
+}
+
+class NetworkClient implements NetworkConstants {
+    void connect() {
+        // Dostęp do stałych z interfejsu — przez implement:
+        System.out.println("Connecting to " + HOST + ":" + PORT);
+        // Lub przez nazwę interfejsu:
+        System.out.println(NetworkConstants.PORT);
+    }
+}
+</code></pre>
+
+<strong>UWAGA — antywzorzec "Constant Interface":</strong>
+
+<p>
+Implementowanie interfejsu TYLKO po to, by mieć dostęp do stałych bez kwalifikatora — to <strong>antywzorzec</strong>. Lepszym rozwiązaniem jest klasa <code>final</code> z prywatnym konstruktorem lub <code>enum</code>:
+</p>
+
+<pre><code class="language-java">// ❌ ANTYWZORZEC — klasa implementuje interfejs tylko dla stałych
+class BadClient implements NetworkConstants {
+    void doSomething() {
+        System.out.println(PORT); // zaśmiecanie przestrzeni nazw klasy
+    }
+}
+
+// ✅ LEPIEJ — statyczny import
+import static com.example.NetworkConstants.*;
+class GoodClient {
+    void doSomething() {
+        System.out.println(PORT); // jasne skąd pochodzi
+    }
+}
+</code></pre>
+
+<hr>
+
+<h2>13. Sealed Interfaces (Java 17)</h2>
+
+<h3>Pytanie 73 — zapieczętowane interfejsy</h3>
+
+<code>sealed</code> interfejsy (stabilna funkcja w Java 17) ograniczają które klasy/interfejsy mogą je implementować lub rozszerzać:
+
+<pre><code class="language-java">// Definicja sealed interface — tylko wymienione typy mogą go implementować
+public sealed interface Shape permits Circle, Rectangle, Triangle {
+    double area();
+    double perimeter();
+}
+
+// Każdy dozwolony implementator musi być jednym z trzech:
+// - final (nie można po nim dziedziczyć)
+// - sealed (dalsze ograniczenie hierarchii)
+// - non-sealed (otwarte na dowolne rozszerzenie)
+
+public final class Circle implements Shape {
+    private final double radius;
+
+    Circle(double radius) { this.radius = radius; }
+
+    @Override
+    public double area() { return Math.PI * radius * radius; }
+
+    @Override
+    public double perimeter() { return 2 * Math.PI * radius; }
+}
+
+public non-sealed class Rectangle implements Shape {
+    // non-sealed — każdy może teraz dziedziczyć po Rectangle
+    private final double width, height;
+
+    Rectangle(double width, double height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    @Override
+    public double area() { return width * height; }
+
+    @Override
+    public double perimeter() { return 2 * (width + height); }
+}
+
+// Dzięki sealed — wyczerpujące pattern matching (Java 21):
+double describe(Shape s) {
+    return switch (s) {
+        case Circle c -&gt; c.area();
+        case Rectangle r -&gt; r.area();
+        case Triangle t -&gt; t.area();
+        // Kompilator wie, że to wszystkie możliwe typy — brak default potrzebny
+    };
+}
+</code></pre>
+
+<strong>Korzyści <code>sealed</code>:</strong>
+<ul>
+<li>Kompilator zna wszystkie możliwe implementacje.</li>
+<li>Umożliwia <strong>wyczerpujące</strong> wyrażenia <code>switch</code> (pattern matching) bez <code>default</code>.</li>
+<li>Hierarchia jest <strong>zamknięta</strong> — biblioteka ma pełną kontrolę.</li>
+<li>Łączy zalety <code>enum</code> (zamknięty zbiór) z elastycznością klas.</li>
+</ul>
+
+<hr>
+
+<h2>14. Interfejs a polimorfizm</h2>
+
+<h3>Pytanie 74 — polimorfizm przez interfejsy</h3>
+
+<pre><code class="language-java">interface Animal {
+    String makeSound();
+    default String describe() {
+        return "I am an animal that says: " + makeSound();
+    }
+}
+
+class Dog implements Animal {
+    @Override
+    public String makeSound() { return "Woof"; }
+}
+
+class Cat implements Animal {
+    @Override
+    public String makeSound() { return "Meow"; }
+}
+
+class Duck implements Animal {
+    @Override
+    public String makeSound() { return "Quack"; }
+    
+    @Override
+    public String describe() {
+        return "I am a duck: " + makeSound(); // nadpisuje default
+    }
+}
+
+// Polimorfizm przez interfejs:
+List&lt;Animal&gt; animals = List.of(new Dog(), new Cat(), new Duck());
+animals.forEach(a -&gt; System.out.println(a.describe()));
+// Dog → "I am an animal that says: Woof" (default z interfejsu)
+// Cat → "I am an animal that says: Meow" (default z interfejsu)
+// Duck → "I am a duck: Quack" (nadpisane)
+</code></pre>
+
+<strong>Late binding działa tak samo przez interfejsy jak przez klasy:</strong>
+
+<pre><code class="language-java">Animal a = new Dog(); // referencja typu interfejsu, obiekt konkretny
+a.makeSound(); // wywołuje Dog.makeSound() — dynamiczne wiązanie
+</code></pre>
+
+<hr>
+
+<h2>15. instanceof i sprawdzanie typów</h2>
+
+<h3>Pytanie 75 — instanceof z interfejsami</h3>
+
+<pre><code class="language-java">interface Flyable { void fly(); }
+interface Swimmable { void swim(); }
+
+class Duck implements Flyable, Swimmable {
+    @Override public void fly() { System.out.println("Duck flies"); }
+    @Override public void swim() { System.out.println("Duck swims"); }
+}
+
+class Eagle implements Flyable {
+    @Override public void fly() { System.out.println("Eagle flies"); }
+}
+
+Object obj = new Duck();
+
+System.out.println(obj instanceof Flyable);   // true — Duck implementuje Flyable
+System.out.println(obj instanceof Swimmable); // true — Duck implementuje Swimmable
+System.out.println(obj instanceof Duck);      // true — to jest Duck
+System.out.println(obj instanceof Eagle);     // false — Duck nie jest Eagle
+</code></pre>
+
+<strong>Pattern matching z instanceof (Java 16+):</strong>
+
+<pre><code class="language-java">void processAnimal(Object obj) {
+    if (obj instanceof Flyable f) {
+        // f jest już rzutowane i dostępne jako Flyable
+        f.fly();
+    }
+    if (obj instanceof Duck duck) {
+        duck.fly();
+        duck.swim();
+    }
+}
+</code></pre>
+
+<strong>WAŻNE:</strong> <code>instanceof</code> zwraca <code>true</code> dla wszystkich interfejsów które klasa implementuje, włącznie z interfejsami które implementuje przez dziedziczenie:
+
+<pre><code class="language-java">interface Base { }
+interface Extended extends Base { }
+
+class MyClass implements Extended { }
+
+MyClass obj = new MyClass();
+System.out.println(obj instanceof Extended); // true — bezpośrednia implementacja
+System.out.println(obj instanceof Base);     // true — przez Extended (pośrednia)
+</code></pre>
+
+<hr>
+
+<h2>16. Interfejsy a dziedziczenie po Object</h2>
+
+<h3>Pytanie 76 — metody Object a interfejsy</h3>
+
+<p>
+Każda klasa w Javie dziedziczy po <code>Object</code>. Interfejs <strong>nie</strong> dziedziczy po <code>Object</code>, ale może deklarować metody które są w <code>Object</code>:
+</p>
+
+<pre><code class="language-java">interface Displayable {
+    // Można deklarować metody Object — ale to nie czyni ich "abstrakcyjnymi"
+    // w sensie wymogu implementacji (każdy obiekt ma je z Object)
+    @Override
+    String toString(); // deklaracja — ale implementacja pochodzi z Object
+
+    @Override
+    boolean equals(Object obj); // j.w.
+
+    void display(); // to jest jedyna prawdziwa metoda abstrakcyjna
+}
+
+// Klasa implementuje Displayable — musi tylko zaimplementować display()
+// toString() i equals() są już w Object, więc nie trzeba ich implementować
+class Box implements Displayable {
+    private int value;
+    Box(int value) { this.value = value; }
+
+    @Override
+    public void display() { System.out.println("Box(" + value + ")"); }
+    // toString() dziedziczone z Object — spełnia kontrakt Displayable
+}
+</code></pre>
+
+<strong>Konsekwencja dla @FunctionalInterface:</strong>
+
+<p>
+Metody odziedziczone z <code>Object</code> (<code>toString</code>, <code>equals</code>, <code>hashCode</code>, itp.) <strong>nie liczą się</strong> jako metody abstrakcyjne przy weryfikacji <code>@FunctionalInterface</code>.
+</p>
+
+<hr>
+
+<h2>17. Rozszerzanie interfejsu przez inny interfejs z metodami default</h2>
+
+<h3>Pytanie 77 — dziedziczenie i override metod default</h3>
+
+<pre><code class="language-java">interface Vehicle {
+    String getType();
+
+    default String describe() {
+        return "Vehicle of type: " + getType();
+    }
+}
+
+interface ElectricVehicle extends Vehicle {
+    int getBatteryLevel();
+
+    // Nadpisanie metody default z nadinterfejsu
+    @Override
+    default String describe() {
+        return "Electric vehicle: " + getType() + ", battery: " + getBatteryLevel() + "%";
+    }
+
+    default void charge() {
+        System.out.println("Charging...");
+    }
+}
+
+class Tesla implements ElectricVehicle {
+    @Override
+    public String getType() { return "Sedan"; }
+
+    @Override
+    public int getBatteryLevel() { return 85; }
+    // describe() dziedziczone z ElectricVehicle (bardziej specyficzne)
+    // charge() dziedziczone z ElectricVehicle
+}
+
+Tesla t = new Tesla();
+t.describe(); // "Electric vehicle: Sedan, battery: 85%"
+</code></pre>
+
+<hr>
+
+<h2>18. Interfejs a anonimowe implementacje</h2>
+
+<h3>Pytanie 78 — klasy anonimowe implementujące interfejsy</h3>
+
+<p>
+Przed Javą 8 (lambdami), interfejsy funkcyjne były implementowane przez <strong>klasy anonimowe</strong>:
+</p>
+
+<pre><code class="language-java">interface Sorter {
+    int compare(int a, int b);
+}
+
+// Stary styl — klasa anonimowa
+Sorter ascending = new Sorter() {
+    @Override
+    public int compare(int a, int b) {
+        return Integer.compare(a, b);
+    }
+};
+
+// Nowy styl Java 8 — lambda (krótszy zapis)
+Sorter ascendingLambda = (a, b) -&gt; Integer.compare(a, b);
+// Jeszcze krócej — method reference:
+Sorter ascendingRef = Integer::compare;
+
+// Klasa anonimowa może mieć stan (lambda nie może):
+int threshold = 5;
+Sorter complexSorter = new Sorter() {
+    private int callCount = 0; // stan w klasie anonimowej ✅
+
+    @Override
+    public int compare(int a, int b) {
+        callCount++;
+        if (Math.abs(a - b) &lt; threshold) return 0; // captured effectively final
+        return Integer.compare(a, b);
+    }
+};
+</code></pre>
+
+<hr>
+
+<h2>19. Interfejsy jako typy parametrów i zwracane typy</h2>
+
+<h3>Pytanie 79 — interfejsy w sygnaturach metod</h3>
+
+<p>
+Używanie interfejsów jako typów (zamiast konkretnych klas) to <strong>programowanie do interfejsu</strong> — kluczowa zasada OOP:
+</p>
+
+<pre><code class="language-java">interface DataStore {
+    void save(String key, String value);
+    String get(String key);
+}
+
+class InMemoryStore implements DataStore {
+    private Map&lt;String, String&gt; store = new HashMap&lt;&gt;();
+    @Override public void save(String k, String v) { store.put(k, v); }
+    @Override public String get(String k) { return store.get(k); }
+}
+
+class DatabaseStore implements DataStore {
+    @Override public void save(String k, String v) { /* baza danych */ }
+    @Override public String get(String k) { return /* baza danych */ null; }
+}
+
+// ✅ DOBRA PRAKTYKA — parametr jako interfejs
+class UserService {
+    private final DataStore store; // typ interfejsu, nie konkretnej implementacji
+
+    UserService(DataStore store) { // wstrzykiwanie zależności
+        this.store = store;
+    }
+
+    public void saveUser(String id, String name) {
+        store.save(id, name);
+    }
+}
+
+// Można podmienić implementację bez zmiany UserService:
+UserService service1 = new UserService(new InMemoryStore());
+UserService service2 = new UserService(new DatabaseStore());
+</code></pre>
+
+<hr>
+
+<h2>20. Interfejsy a typy generyczne</h2>
+
+<h3>Pytanie 80 — interfejsy z parametrami typów</h3>
+
+<pre><code class="language-java">interface Repository&lt;T, ID&gt; {
+    T findById(ID id);
+    List&lt;T&gt; findAll();
+    void save(T entity);
+    void deleteById(ID id);
+}
+
+class User {
+    int id;
+    String name;
+    User(int id, String name) { this.id = id; this.name = name; }
+}
+
+// Implementacja z konkretnymi typami:
+class UserRepository implements Repository&lt;User, Integer&gt; {
+    private Map&lt;Integer, User&gt; storage = new HashMap&lt;&gt;();
+
+    @Override
+    public User findById(Integer id) { return storage.get(id); }
+
+    @Override
+    public List&lt;User&gt; findAll() { return new ArrayList&lt;&gt;(storage.values()); }
+
+    @Override
+    public void save(User user) { storage.put(user.id, user); }
+
+    @Override
+    public void deleteById(Integer id) { storage.remove(id); }
+}
+</code></pre>
+
+<hr>
+
+<h2>21. Interfejs z wieloma metodami default — diamond problem w interfejsach</h2>
+
+<h3>Pytanie 81 — zaawansowany diamond problem</h3>
+
+<pre><code class="language-java">interface A {
+    default String name() { return "A"; }
+}
+
+interface B extends A {
+    @Override
+    default String name() { return "B"; }
+}
+
+interface C extends A {
+    @Override
+    default String name() { return "C"; }
+}
+
+// Implementując B i C — Java nie wie które name() wybrać!
+// B.name() czy C.name()? Obie nadpisują A.name()
+// ❌ BŁĄD KOMPILACJI bez jawnego nadpisania:
+class D implements B, C {
+    @Override
+    public String name() {
+        // Musimy jawnie wybrać lub dostarczyć własną implementację
+        return B.super.name(); // lub C.super.name() lub własna implementacja
+    }
+}
+
+// Test:
+D d = new D();
+d.name(); // "B" — bo wybraliśmy B.super.name()
+</code></pre>
+
+<hr>
+
+<h2>22. Interfejsy wewnętrzne (nested interfaces)</h2>
+
+<h3>Pytanie 82 — interfejs zagnieżdżony w klasie lub interfejsie</h3>
+
+<pre><code class="language-java">class LinkedList&lt;E&gt; {
+    // Interfejs zagnieżdżony wewnątrz klasy — niejawnie public static
+    public interface Node&lt;T&gt; {
+        T getValue();
+        Node&lt;T&gt; getNext();
+    }
+
+    // Prywatna implementacja wewnętrzna
+    private static class NodeImpl&lt;T&gt; implements Node&lt;T&gt; {
+        T value;
+        Node&lt;T&gt; next;
+
+        NodeImpl(T value) { this.value = value; }
+
+        @Override public T getValue() { return value; }
+        @Override public Node&lt;T&gt; getNext() { return next; }
+    }
+}
+
+// Interfejsy mogą zawierać inne interfejsy:
+interface OuterInterface {
+    interface InnerInterface {
+        void doSomething();
+        // Niejawnie: public static — można używać bez instancji OuterInterface
+    }
+
+    void outerMethod();
+}
+
+// Implementacja:
+class MyClass implements OuterInterface, OuterInterface.InnerInterface {
+    @Override public void outerMethod() { }
+    @Override public void doSomething() { }
+}
+</code></pre>
+
+<hr>
+
+<h2>23. Interfejsy a refleksja</h2>
+
+<h3>Pytanie 83 — sprawdzanie interfejsów przez refleksję</h3>
+
+<pre><code class="language-java">interface Printable { void print(); }
+interface Saveable { void save(); }
+
+class Document implements Printable, Saveable {
+    @Override public void print() { }
+    @Override public void save() { }
+}
+
+// Refleksja:
+Class&lt;?&gt; clazz = Document.class;
+
+// Pobierz wszystkie interfejsy implementowane bezpośrednio:
+Class&lt;?&gt;[] interfaces = clazz.getInterfaces();
+for (Class&lt;?&gt; iface : interfaces) {
+    System.out.println(iface.getName()); // Printable, Saveable
+}
+
+// Sprawdź czy klasa implementuje interfejs:
+System.out.println(Printable.class.isAssignableFrom(Document.class)); // true
+
+// Sprawdź czy typ jest interfejsem:
+System.out.println(Printable.class.isInterface()); // true
+System.out.println(Document.class.isInterface());  // false
+</code></pre>
+
+<hr>
+
+<h2>24. Interfejsy a serializacja</h2>
+
+<h3>Pytanie 84 — Serializable jako marker interface w praktyce</h3>
+
+<pre><code class="language-java">import java.io.*;
+
+// Serializable jest marker interface — brak metod
+class Config implements Serializable {
+    private static final long serialVersionUID = 1L; // zalecane dla stabilności
+    
+    private String host;
+    private int port;
+    private transient String password; // transient — nie będzie serializowane
+
+    Config(String host, int port, String password) {
+        this.host = host;
+        this.port = port;
+        this.password = password;
+    }
+}
+
+// Serializacja i deserializacja:
+Config config = new Config("localhost", 8080, "secret123");
+
+// Zapis do pliku:
+try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("config.ser"))) {
+    oos.writeObject(config);
+}
+
+// Odczyt z pliku:
+try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("config.ser"))) {
+    Config loaded = (Config) ois.readObject();
+    // loaded.password będzie null — pole transient
+}
+</code></pre>
+
+<hr>
+
+<h2>25. Interfejsy funkcyjne z wyjątkami</h2>
+
+<h3>Pytanie 85 — obsługa wyjątków sprawdzanych (checked) w interfejsach funkcyjnych</h3>
+
+<p>
+Standardowe interfejsy funkcyjne (np. <code>Runnable</code>, <code>Consumer</code>) <strong>nie deklarują</strong> wyjątków sprawdzanych. To problem gdy chcemy używać metod rzucających <code>IOException</code> itp.:
+</p>
+
+<pre><code class="language-java">@FunctionalInterface
+interface ThrowingConsumer&lt;T&gt; {
+    void accept(T t) throws Exception; // deklaracja checked exception
+}
+
+// Własny interfejs funkcyjny z checked exception:
+@FunctionalInterface
+interface IOAction&lt;T&gt; {
+    void execute(T input) throws IOException;
+}
+
+// Użycie:
+IOAction&lt;String&gt; fileWriter = filename -&gt; {
+    Files.writeString(Path.of(filename), "content"); // może rzucić IOException
+};
+
+// Wrapper — opakowuje ThrowingConsumer w Consumer&lt;T&gt;:
+static &lt;T&gt; Consumer&lt;T&gt; wrap(ThrowingConsumer&lt;T&gt; throwing) {
+    return t -&gt; {
+        try {
+            throwing.accept(t);
+        } catch (Exception e) {
+            throw new RuntimeException(e); // checked → unchecked
+        }
+    };
+}
+
+// Użycie wrappera:
+List&lt;String&gt; files = List.of("a.txt", "b.txt");
+files.forEach(wrap(file -&gt; Files.delete(Path.of(file))));
+</code></pre>
+
+<hr>
+
+<h2>26. Interfejsy a dziedziczenie — rozszerzenie hierarchii</h2>
+
+<h3>Pytanie 86 — interfejs rozszerza interfejs, dodaje metody</h3>
+
+<pre><code class="language-java">interface Readable {
+    String read();
+}
+
+interface Writable {
+    void write(String data);
+}
+
+// ReadWritable rozszerza DWIE interfejsy — interfejs może
+interface ReadWritable extends Readable, Writable {
+    // Dziedziczy read() i write(data)
+    default void copyTo(Writable destination) {
+        destination.write(this.read()); // reużywa obu metod
+    }
+}
+
+class FileStream implements ReadWritable {
+    private String content = "";
+
+    @Override public String read() { return content; }
+    @Override public void write(String data) { content += data; }
+}
+
+FileStream source = new FileStream();
+FileStream dest = new FileStream();
+source.write("Hello");
+source.copyTo(dest); // "Hello" skopiowane do dest
+</code></pre>
+
+<hr>
+
+<h2>27. Interfejsy a typy wyliczeniowe (enum implements interface)</h2>
+
+<h3>Pytanie 87 — enum implementujący interfejs</h3>
+
+<pre><code class="language-java">interface Describable {
+    String getDescription();
+}
+
+enum Planet implements Describable {
+    MERCURY(3.303e+23, 2.4397e6),
+    VENUS(4.869e+24, 6.0518e6),
+    EARTH(5.976e+24, 6.37814e6);
+
+    private final double mass;   // w kilogramach
+    private final double radius; // w metrach
+
+    Planet(double mass, double radius) {
+        this.mass = mass;
+        this.radius = radius;
+    }
+
+    @Override
+    public String getDescription() {
+        return name() + ": mass=" + mass + ", radius=" + radius;
+    }
+
+    // Polimorfizm przez interfejs:
+    static double totalMass(Describable[] planets) {
+        // pobiea opis każdej planety
+        return Arrays.stream(Planet.values()).mapToDouble(p -&gt; p.mass).sum();
+    }
+}
+
+// Polimorfizm:
+Describable d = Planet.EARTH;
+System.out.println(d.getDescription()); // wywołuje Planet.EARTH.getDescription()
+</code></pre>
+
+<hr>
+
+<h2>28. Interfejsy a Java Memory Model</h2>
+
+<h3>Pytanie 88 — interfejsy a widoczność wątków</h3>
+
+<p>
+Stałe interfejsu (<code>public static final</code>) są <strong>stałymi czasu kompilacji</strong> — ich wartości są wbudowywane bezpośrednio w bytecode, co eliminuje problemy z widocznością między wątkami:
+</p>
+
+<pre><code class="language-java">interface Constants {
+    int TIMEOUT = 1000; // wbudowane w bytecode (compile-time constant)
+    // Każdy wątek widzi TIMEOUT = 1000 — brak problemu widoczności
+}
+
+// Porównaj z polem statycznym klasy (nie compile-time constant):
+class Config {
+    public static volatile int timeout = 1000; // wymaga volatile dla widoczności między wątkami
+}
+</code></pre>
+
+<hr>
+
+<h2>29. Hierarchia interfejsów w Java Collections Framework</h2>
+
+<h3>Pytanie 89 — interfejsy w kolekcjach</h3>
+
+<pre><code class="language-">Iterable&lt;E&gt;
+└── Collection&lt;E&gt;
+    ├── List&lt;E&gt;
+    │   ├── ArrayList (klasa)
+    │   └── LinkedList (klasa)
+    ├── Set&lt;E&gt;
+    │   ├── HashSet (klasa)
+    │   ├── SortedSet&lt;E&gt;
+    │   │   └── NavigableSet&lt;E&gt;
+    │   │       └── TreeSet (klasa)
+    │   └── LinkedHashSet (klasa)
+    └── Queue&lt;E&gt;
+        ├── Deque&lt;E&gt;
+        │   ├── ArrayDeque (klasa)
+        │   └── LinkedList (klasa)
+        └── PriorityQueue (klasa)
+
+Map&lt;K,V&gt;
+├── SortedMap&lt;K,V&gt;
+│   └── NavigableMap&lt;K,V&gt;
+│       └── TreeMap (klasa)
+├── HashMap (klasa)
+└── LinkedHashMap (klasa)
+</code></pre>
+
+<hr>
+
+<h2>30. Kontrakt equals() i hashCode() — interfejs Comparable i kontrakt spójności</h2>
+
+<h3>Pytanie 90 — kontrakt compareTo() a equals()</h3>
+
+<p>
+Silna rekomendacja (choć nie wymagana przez kompilator):
+</p>
+<code>(x.compareTo(y) == 0)</code> powinno być równoznaczne z <code>x.equals(y)</code>
+
+<pre><code class="language-java">class Temperature implements Comparable&lt;Temperature&gt; {
+    private final double celsius;
+
+    Temperature(double celsius) { this.celsius = celsius; }
+
+    @Override
+    public int compareTo(Temperature other) {
+        return Double.compare(this.celsius, other.celsius);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Temperature)) return false;
+        Temperature other = (Temperature) obj;
+        return Double.compare(this.celsius, other.celsius) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Double.hashCode(celsius);
+    }
+}
+
+// Spójność:
+Temperature t1 = new Temperature(100.0);
+Temperature t2 = new Temperature(100.0);
+System.out.println(t1.compareTo(t2) == 0); // true
+System.out.println(t1.equals(t2));          // true ✅ spójność zachowana
+</code></pre>
+
+<hr>
+
+<h2>31. Interfejsy a inicjalizacja stałych</h2>
+
+<h3>Pytanie 91 — inicjalizacja stałych w interfejsach</h3>
+
+<p>
+Stałe w interfejsach muszą być zainicjalizowane w miejscu deklaracji (nie ma konstruktora!):
+</p>
+
+<pre><code class="language-java">interface Config {
+    // ✅ OK — inicjalizacja w miejscu deklaracji
+    int TIMEOUT = 30_000;
+
+    // ✅ OK — wyrażenie obliczeniowe
+    long MAX_SIZE = 1024L * 1024L * 100L; // 100 MB
+
+    // ✅ OK — wywołanie metody statycznej
+    String VERSION = System.getProperty("app.version", "1.0.0");
+
+    // ❌ BŁĄD — brak inicjalizacji (nie ma konstruktora gdzie to ustawić)
+    // int UNINITIALIZED; // błąd kompilacji
+}
+</code></pre>
+
+<hr>
+
+<h2>32. Interfejsy a typy prymitywne</h2>
+
+<h3>Pytanie 92 — interfejsy nie mogą mieć pól instancyjnych prymitywnych</h3>
+
+<pre><code class="language-java">interface Wrong {
+    // ❌ Wszystkie pola są public static final — nie możesz mieć "stanu"
+    int x = 0; // to jest STAŁA, nie pole instancyjne
+}
+
+// Jeśli chcesz interfejsu z getterem/setterem dla wartości:
+interface HasPosition {
+    int getX();
+    int getY();
+    void setX(int x); // implementacja może trzymać stan
+    void setY(int y);
+}
+
+class Point implements HasPosition {
+    private int x, y; // stan jest w KLASIE, nie w interfejsie
+
+    @Override public int getX() { return x; }
+    @Override public int getY() { return y; }
+    @Override public void setX(int x) { this.x = x; }
+    @Override public void setY(int y) { this.y = y; }
+}
+</code></pre>
+
+<hr>
+
+<h2>33. Interfejsy a lambda — konwersja</h2>
+
+<h3>Pytanie 93 — automatyczna konwersja lambda do interfejsu funkcyjnego</h3>
+
+<p>
+Lambda może być przypisana do <strong>dowolnego interfejsu funkcyjnego</strong> o zgodnej sygnaturze:
+</p>
+
+<pre><code class="language-java">// Różne interfejsy funkcyjne o tej samej sygnaturze (String) -&gt; void:
+interface Printer { void print(String s); }
+interface Displayer { void display(String s); }
+interface Shower { void show(String s); }
+
+// Ta sama lambda pasuje do wszystkich:
+Printer p = s -&gt; System.out.println(s);
+Displayer d = s -&gt; System.out.println(s);
+Shower sh = s -&gt; System.out.println(s);
+
+// Kontekst determinuje typ:
+void process(Printer printer) { printer.print("Hello"); }
+process(s -&gt; System.out.println(s)); // lambda staje się Printer
+
+// Rzutowanie explicite gdy kontekst niejednoznaczny:
+process((Printer) s -&gt; System.out.println(s)); // jawne wskazanie interfejsu
+</code></pre>
+
+<hr>
+
+<h2>34. Implementacja interfejsu przez klasę abstrakcyjną — częściowa implementacja</h2>
+
+<h3>Pytanie 94 — klasa abstrakcyjna i częściowa implementacja interfejsu</h3>
+
+<pre><code class="language-java">interface FullService {
+    void methodA();
+    void methodB();
+    void methodC();
+    void methodD();
+}
+
+// Klasa abstrakcyjna implementuje TYLKO część — resztę pozostawia podklasom:
+abstract class PartialService implements FullService {
+    @Override
+    public void methodA() {
+        System.out.println("Default A implementation");
+    }
+
+    @Override
+    public void methodB() {
+        System.out.println("Default B implementation");
+    }
+
+    // methodC() i methodD() NIE są zaimplementowane — podklasy muszą je dostarczyć
+    // Nie trzeba ich nawet deklarować jako abstract — są dziedziczone z interfejsu
+}
+
+class ConcreteService extends PartialService {
+    @Override
+    public void methodC() { System.out.println("C"); }
+
+    @Override
+    public void methodD() { System.out.println("D"); }
+    // methodA() i methodB() dziedziczone z PartialService
+}
+</code></pre>
+
+<hr>
+
+<h2>35. Interfejsy a wstrzykiwanie zależności</h2>
+
+<h3>Pytanie 95 — interfejsy jako klucz do loose coupling</h3>
+
+<pre><code class="language-java">interface NotificationService {
+    void sendNotification(String recipient, String message);
+}
+
+class EmailNotificationService implements NotificationService {
+    @Override
+    public void sendNotification(String recipient, String message) {
+        System.out.println("Sending email to " + recipient + ": " + message);
+    }
+}
+
+class SMSNotificationService implements NotificationService {
+    @Override
+    public void sendNotification(String recipient, String message) {
+        System.out.println("Sending SMS to " + recipient + ": " + message);
+    }
+}
+
+// OrderService zależy od interfejsu, nie od konkretnej implementacji:
+class OrderService {
+    private final NotificationService notifier;
+
+    // Wstrzykiwanie przez konstruktor — dependency injection
+    OrderService(NotificationService notifier) {
+        this.notifier = notifier;
+    }
+
+    void placeOrder(String customerId, String product) {
+        // Logika zamówienia...
+        notifier.sendNotification(customerId, "Order placed: " + product);
+    }
+}
+
+// Elastyczne użycie:
+OrderService emailService = new OrderService(new EmailNotificationService());
+OrderService smsService = new OrderService(new SMSNotificationService());
+</code></pre>
+
+<hr>
+
+<h2>36. Interfejsy a kontrowersje — kiedy NIE używać interfejsów</h2>
+
+<h3>Pytanie 96 — pułapki przy projektowaniu interfejsów</h3>
+
+<pre><code class="language-java">// ❌ ZŁA PRAKTYKA — interfejs z metodami, które nie mają sensu dla wszystkich implementacji:
+interface Animal {
+    void eat();
+    void fly();  // Nie każde zwierzę lata!
+    void swim(); // Nie każde zwierzę pływa!
+}
+
+// ✅ LEPIEJ — Interface Segregation Principle (ISP):
+interface Eatable { void eat(); }
+interface Flyable { void fly(); }
+interface Swimmable { void swim(); }
+
+class Dog implements Eatable, Swimmable { // Pies je i pływa, ale nie lata
+    @Override public void eat() { }
+    @Override public void swim() { }
+}
+
+class Eagle implements Eatable, Flyable { // Orzeł je i lata, ale nie pływa
+    @Override public void eat() { }
+    @Override public void fly() { }
+}
+
+class Duck implements Eatable, Flyable, Swimmable { // Kaczka je, lata i pływa
+    @Override public void eat() { }
+    @Override public void fly() { }
+    @Override public void swim() { }
+}
+</code></pre>
+
+<hr>
+
+<h2>37. Interfejsy — zaawansowane pytania egzaminacyjne</h2>
+
+<h3>Pytanie 97 — co się dzieje gdy klasa dziedziczy metodę i implementuje interfejs z tą samą metodą?</h3>
+
+<strong>Reguła: Klasa (dziedziczona metoda) wygrywa nad interfejsem (metoda default)</strong>
+
+<pre><code class="language-java">interface Greeter {
+    default String greet() { return "Hello from interface"; }
+}
+
+class BaseGreeter {
+    public String greet() { return "Hello from class"; }
+}
+
+class MyGreeter extends BaseGreeter implements Greeter {
+    // greet() z BaseGreeter wygrywa nad default z Greeter
+    // NIE ma konfliktu — reguła "klasa wygrywa"
+}
+
+MyGreeter g = new MyGreeter();
+System.out.println(g.greet()); // "Hello from class" — nie "Hello from interface"
+</code></pre>
+
+<h3>Pytanie 98 — czy interfejs może dziedziczyć po Object?</h3>
+
+<pre><code class="language-java">// Interfejsy NIE dziedziczą po Object — Object jest klasą, a interfejsy nie są klasami
+// Ale każdy obiekt implementujący interfejs ma metody Object (toString, equals, hashCode)
+// bo każdy obiekt dziedziczy po Object przez łańcuch klas
+
+interface MyInterface {
+    // Możesz DEKLAROWAĆ metody z Object, ale to nie jest dziedziczenie:
+    String toString(); // deklaracja bez implementacji — nie jest dziedziczona z Object
+    boolean equals(Object obj);
+    int hashCode();
+}
+</code></pre>
+
+<h3>Pytanie 99 — co się skompiluje, a co nie?</h3>
+
+<pre><code class="language-java">interface I {
+    void method();
+}
+
+abstract class AC implements I {
+    // ✅ Nie musi implementować method() — jest abstrakcyjna
+}
+
+// ❌ Błąd — konkretna klasa nie implementuje method()
+// class Concrete implements I { } // BŁĄD
+
+// ✅ OK — implementuje method()
+class Concrete implements I {
+    @Override
+    public void method() { }
+}
+
+// ✅ OK — klasa anonimowa implementuje method()
+I anonymousImpl = new I() {
+    @Override
+    public void method() { System.out.println("Anonymous"); }
+};
+</code></pre>
+
+<h3>Pytanie 100 — interfejsy w wyrażeniach switch (Java 21+)</h3>
+
+<pre><code class="language-java">sealed interface Expr permits Num, Add, Mul {}
+record Num(int value) implements Expr {}
+record Add(Expr left, Expr right) implements Expr {}
+record Mul(Expr left, Expr right) implements Expr {}
+
+// Pattern matching w switch z sealed interface:
+int eval(Expr expr) {
+    return switch (expr) {
+        case Num n -&gt; n.value();
+        case Add a -&gt; eval(a.left()) + eval(a.right());
+        case Mul m -&gt; eval(m.left()) * eval(m.right());
+        // Kompilator wie, że to wszystkie przypadki (sealed!) — brak default potrzebny
+    };
+}
+
+// Użycie:
+Expr expression = new Add(new Num(3), new Mul(new Num(4), new Num(5)));
+System.out.println(eval(expression)); // 3 + (4 * 5) = 23
+</code></pre>
+
+<hr>
+
+<h2>Podsumowanie kluczowych zasad — ściągawka egzaminacyjna</h2>
+
+<h3>Najważniejsze fakty o interfejsach:</h3>
+
+<ol>
+<li><strong>Niejawne modyfikatory</strong>: metody są <code>public abstract</code>, pola są <code>public static final</code>.</li>
+<li><strong>Java 8</strong>: dodano <code>default</code> i <code>static</code> metody.</li>
+<li><strong>Java 9</strong>: dodano <code>private</code> i <code>private static</code> metody.</li>
+<li><strong>Java 17</strong>: dodano <code>sealed</code> interfejsy.</li>
+<li><strong>Konflikt default</strong>: klasa musi nadpisać i użyć <code>InterfaceName.super.method()</code>.</li>
+<li><strong>Klasa wygrywa</strong>: dziedziczona metoda z klasy wygrywa nad <code>default</code> z interfejsu.</li>
+<li><strong>Bardziej specyficzny wygrywa</strong>: <code>interface B extends A</code> — implementacja z <code>B</code> wygrywa.</li>
+<li><strong>Metody statyczne interfejsu</strong> nie są dziedziczone przez implementujące klasy.</li>
+<li><strong>@FunctionalInterface</strong>: dokładnie jedna metoda abstrakcyjna (metody Object się nie liczą).</li>
+<li><strong>Sealed interface</strong>: <code>permits</code> ogranicza implementatorów; <code>final</code>/<code>sealed</code>/<code>non-sealed</code>.</li>
+</ol>
+
+<h3>Tabela wszystkich typów metod w interfejsie:</h3>
+
+<table>
+<tr><th>Typ</th><th>Java</th><th>Implementacja</th><th>Dziedziczenie</th><th>Dostęp</th></tr>
+<tr><td><code>abstract</code></td><td>1.0</td><td>Wymagana w klasie</td><td>✅ Tak</td><td><code>public</code></td></tr>
+<tr><td><code>default</code></td><td>8</td><td>W interfejsie</td><td>✅ Tak (można nadpisać)</td><td><code>public</code></td></tr>
+<tr><td><code>static</code></td><td>8</td><td>W interfejsie</td><td>❌ Nie</td><td><code>public</code></td></tr>
+<tr><td><code>private</code></td><td>9</td><td>W interfejsie</td><td>❌ Nie</td><td><code>private</code></td></tr>
+<tr><td><code>private static</code></td><td>9</td><td>W interfejsie</td><td>❌ Nie</td><td><code>private</code></td></tr>
+</table>
+
+</body>
+</html>
