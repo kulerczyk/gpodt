@@ -7,7 +7,7 @@ import TestMode from './pages/TestMode';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/gpodt">
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
