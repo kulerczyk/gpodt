@@ -19,9 +19,7 @@ export default function StudyMode() {
     return (
       <div className="text-center py-20">
         <p className="text-gray-500">Kategoria nie znaleziona.</p>
-        <button onClick={() => navigate('/study')} className="mt-4 text-violet-600 hover:underline">
-          Wróć
-        </button>
+        <button onClick={() => navigate('/study')} className="mt-4 text-violet-600 hover:underline">Wróć</button>
       </div>
     );
   }
@@ -32,23 +30,23 @@ export default function StudyMode() {
 function CategoryPicker() {
   const navigate = useNavigate();
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Fiszki – wybierz kategorię</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">Kliknij na kartę pytania, aby zobaczyć odpowiedź i wyjaśnienie</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-1">Fiszki – wybierz kategorię</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">Kliknij kartę, aby zobaczyć odpowiedź i wyjaśnienie</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {CATEGORIES.map(cat => (
           <button
             key={cat.id}
             onClick={() => navigate(`/study/${cat.id}`)}
-            className="text-left bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 hover:border-violet-400 dark:hover:border-violet-600 transition-all hover:shadow-md group"
+            className="text-left bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 active:scale-95 transition-all hover:border-violet-400 dark:hover:border-violet-600 hover:shadow-md group"
           >
-            <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${cat.color} flex items-center justify-center text-lg mb-3`}>
+            <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${cat.color} flex items-center justify-center text-base mb-2`}>
               {cat.icon}
             </div>
-            <div className="font-semibold text-gray-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400">{cat.name}</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{cat.questionCount} pytań</div>
+            <div className="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-violet-600 dark:group-hover:text-violet-400 leading-tight">{cat.name}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{cat.questionCount} pyt.</div>
           </button>
         ))}
       </div>
@@ -93,23 +91,29 @@ function FlashcardDeck({
   };
 
   const progress = (currentIndex + 1) / questions.length;
+  const studiedCount = questions.filter(q => isStudied(q.id)).length;
+
+  // compact pagination: show max 7 dots + ellipsis concept via slicing
+  const totalDots = questions.length;
+  const MAX_DOTS = 9;
+  const showDots = totalDots <= MAX_DOTS;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
         <button
           onClick={() => navigate('/study')}
-          className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="p-2.5 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-95 min-w-[44px] min-h-[44px] flex items-center justify-center"
         >
           ←
         </button>
-        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${category.color} flex items-center justify-center text-sm`}>
+        <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${category.color} flex items-center justify-center text-sm flex-shrink-0`}>
           {category.icon}
         </div>
-        <div>
-          <h1 className="font-bold text-gray-900 dark:text-white">{category.name}</h1>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{currentIndex + 1} / {questions.length}</p>
+        <div className="flex-1 min-w-0">
+          <h1 className="font-bold text-gray-900 dark:text-white text-sm truncate">{category.name}</h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{currentIndex + 1}/{questions.length} · {studiedCount} przejrzanych</p>
         </div>
       </div>
 
@@ -125,31 +129,31 @@ function FlashcardDeck({
       <div
         key={key}
         className="flip-card cursor-pointer select-none"
-        style={{ height: '320px' }}
+        style={{ minHeight: '280px' }}
         onClick={flip}
       >
-        <div className={`flip-card-inner w-full h-full ${isFlipped ? 'flipped' : ''}`}>
+        <div className={`flip-card-inner w-full ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '280px' }}>
           {/* Front */}
-          <div className="flip-card-front w-full h-full bg-white dark:bg-gray-900 rounded-2xl border-2 border-gray-200 dark:border-gray-800 p-6 flex flex-col shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
+          <div className="flip-card-front w-full bg-white dark:bg-gray-900 rounded-2xl border-2 border-gray-200 dark:border-gray-800 p-5 flex flex-col shadow-sm active:scale-[0.99] transition-transform" style={{ minHeight: '280px' }}>
+            <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Pytanie {current.id}</span>
               {studied && <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">✓ Przejrzane</span>}
             </div>
             <div className="flex-1 flex items-center justify-center">
-              <p className="text-center text-gray-800 dark:text-gray-200 leading-relaxed font-medium">
+              <p className="text-center text-gray-800 dark:text-gray-200 leading-relaxed font-medium text-sm sm:text-base">
                 {current.question}
               </p>
             </div>
-            <div className="text-center text-xs text-gray-400 mt-4">Kliknij, aby zobaczyć odpowiedź</div>
+            <div className="text-center text-xs text-gray-400 mt-3">👆 Dotknij, aby zobaczyć odpowiedź</div>
           </div>
 
           {/* Back */}
-          <div className="flip-card-back w-full h-full bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/50 dark:to-purple-950/50 rounded-2xl border-2 border-violet-200 dark:border-violet-800 p-6 flex flex-col shadow-sm overflow-y-auto">
+          <div className="flip-card-back w-full bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/50 dark:to-purple-950/50 rounded-2xl border-2 border-violet-200 dark:border-violet-800 p-5 flex flex-col shadow-sm overflow-y-auto" style={{ minHeight: '280px' }}>
             <div className="mb-3">
               <span className="text-xs font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-wider">Odpowiedź</span>
             </div>
             <div className="mb-3">
-              <div className="bg-violet-100 dark:bg-violet-900/40 rounded-lg p-3">
+              <div className="bg-violet-100 dark:bg-violet-900/40 rounded-xl p-3">
                 <span className="font-bold text-violet-700 dark:text-violet-300 uppercase text-sm mr-2">
                   {current.correctAnswer.toUpperCase()}.
                 </span>
@@ -173,7 +177,7 @@ function FlashcardDeck({
           {current.answers.map(ans => (
             <div
               key={ans.id}
-              className={`flex gap-2 p-2 rounded-lg text-sm ${
+              className={`flex gap-2 p-2.5 rounded-lg text-sm ${
                 ans.id === current.correctAnswer
                   ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-200'
                   : 'text-gray-600 dark:text-gray-400'
@@ -182,7 +186,7 @@ function FlashcardDeck({
               <span className={`font-bold flex-shrink-0 ${ans.id === current.correctAnswer ? 'text-emerald-600' : 'text-gray-400'}`}>
                 {ans.id.toUpperCase()}.
               </span>
-              <span>{ans.text}</span>
+              <span className="leading-relaxed">{ans.text}</span>
             </div>
           ))}
         </div>
@@ -193,31 +197,38 @@ function FlashcardDeck({
         <button
           onClick={prev}
           disabled={currentIndex === 0}
-          className="px-4 py-2 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          className="px-4 py-3 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform min-h-[44px]"
         >
           ← Poprzednie
         </button>
 
-        <div className="flex gap-1">
-          {questions.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goTo(i)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                i === currentIndex
-                  ? 'bg-violet-500 w-4'
-                  : isStudied(questions[i].id)
-                  ? 'bg-emerald-400 dark:bg-emerald-600'
-                  : 'bg-gray-300 dark:bg-gray-700'
-              }`}
-            />
-          ))}
-        </div>
+        {/* Compact progress indicator */}
+        {showDots ? (
+          <div className="flex gap-1 overflow-hidden">
+            {questions.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                className={`rounded-full transition-all flex-shrink-0 ${
+                  i === currentIndex
+                    ? 'bg-violet-500 w-4 h-2'
+                    : isStudied(questions[i].id)
+                    ? 'bg-emerald-400 dark:bg-emerald-600 w-2 h-2'
+                    : 'bg-gray-300 dark:bg-gray-700 w-2 h-2'
+                }`}
+              />
+            ))}
+          </div>
+        ) : (
+          <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+            {currentIndex + 1} / {questions.length}
+          </span>
+        )}
 
         <button
           onClick={next}
           disabled={currentIndex === questions.length - 1}
-          className="px-4 py-2 rounded-xl bg-violet-600 text-white font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-violet-700 transition-colors"
+          className="px-4 py-3 rounded-xl bg-violet-600 text-white font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform min-h-[44px]"
         >
           Następne →
         </button>

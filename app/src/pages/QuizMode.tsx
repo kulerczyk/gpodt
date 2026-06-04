@@ -34,34 +34,32 @@ export default function QuizMode() {
 function QuizPicker() {
   const navigate = useNavigate();
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Quiz – wybierz tryb</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">4 odpowiedzi do wyboru, tylko jedna jest poprawna</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-1">Quiz – wybierz tryb</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">4 odpowiedzi, tylko jedna jest poprawna</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <button
-          onClick={() => navigate('/quiz/all')}
-          className="text-left bg-gradient-to-br from-violet-500 to-purple-600 text-white rounded-xl p-5 hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-md"
-        >
-          <div className="text-2xl mb-2">📚</div>
-          <div className="font-bold">Wszystkie 299 pytań</div>
-          <div className="text-sm opacity-80 mt-1">Kompletny quiz ze wszystkich kategorii</div>
-        </button>
-      </div>
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Albo wybierz kategorię:</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <button
+        onClick={() => navigate('/quiz/all')}
+        className="w-full text-left bg-gradient-to-br from-violet-500 to-purple-600 text-white rounded-xl p-5 active:scale-[0.98] transition-transform shadow-md"
+      >
+        <div className="text-2xl mb-1">📚</div>
+        <div className="font-bold text-base">Wszystkie 299 pytań</div>
+        <div className="text-sm opacity-80 mt-0.5">Kompletny quiz ze wszystkich kategorii</div>
+      </button>
+      <h2 className="text-base font-semibold text-gray-900 dark:text-white">Albo wybierz kategorię:</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {CATEGORIES.map(cat => (
           <button
             key={cat.id}
             onClick={() => navigate(`/quiz/${cat.id}`)}
-            className="text-left bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 hover:border-violet-400 dark:hover:border-violet-600 transition-all hover:shadow-md group"
+            className="text-left bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 active:scale-95 transition-all hover:border-violet-400 dark:hover:border-violet-600 hover:shadow-md group"
           >
-            <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${cat.color} flex items-center justify-center text-sm mb-2`}>
+            <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${cat.color} flex items-center justify-center text-base mb-2`}>
               {cat.icon}
             </div>
-            <div className="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-violet-600 dark:group-hover:text-violet-400">{cat.name}</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">{cat.questionCount} pytań</div>
+            <div className="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-violet-600 dark:group-hover:text-violet-400 leading-tight">{cat.name}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{cat.questionCount} pyt.</div>
           </button>
         ))}
       </div>
@@ -132,14 +130,28 @@ function QuizGame({
   const progress = (currentIndex + 1) / questions.length;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => navigate('/quiz')} className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">←</button>
-        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${category.color} flex items-center justify-center text-sm`}>{category.icon}</div>
-        <div>
-          <h1 className="font-bold text-gray-900 dark:text-white text-sm">{category.name}</h1>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{currentIndex + 1} / {questions.length} • {correctCount} poprawnych</p>
+        <button
+          onClick={() => navigate('/quiz')}
+          className="p-2.5 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-95 min-w-[44px] min-h-[44px] flex items-center justify-center"
+        >
+          ←
+        </button>
+        <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${category.color} flex items-center justify-center text-sm flex-shrink-0`}>
+          {category.icon}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h1 className="font-bold text-gray-900 dark:text-white text-sm truncate">{category.name}</h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{currentIndex + 1}/{questions.length} · {correctCount} poprawnych</p>
+        </div>
+        <div className={`text-sm font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
+          currentIndex === 0 ? 'bg-gray-100 dark:bg-gray-800 text-gray-500'
+          : correctCount / currentIndex >= 0.6 ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
+          : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+        }`}>
+          {currentIndex === 0 ? '—' : `${Math.round((correctCount / currentIndex) * 100)}%`}
         </div>
       </div>
 
@@ -149,22 +161,22 @@ function QuizGame({
       </div>
 
       {/* Question */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
-        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Pytanie {current.id}</div>
-        <p className="text-gray-900 dark:text-white font-medium leading-relaxed">{current.question}</p>
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
+        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Pytanie {current.id}</div>
+        <p className="text-gray-900 dark:text-white font-medium leading-relaxed text-sm sm:text-base">{current.question}</p>
       </div>
 
       {/* Answers */}
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {current.answers.map(ans => {
-          let style = 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-800 dark:text-gray-200 hover:border-violet-400 dark:hover:border-violet-600 hover:bg-violet-50 dark:hover:bg-violet-950/30';
+          let style = 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-800 dark:text-gray-200 active:scale-[0.98] hover:border-violet-400 dark:hover:border-violet-600';
           if (phase === 'answer') {
             if (ans.id === current.correctAnswer) {
               style = 'bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-400 dark:border-emerald-600 text-emerald-800 dark:text-emerald-200';
             } else if (ans.id === selected) {
               style = 'bg-red-50 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-800 dark:text-red-200';
             } else {
-              style = 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-500 opacity-60';
+              style = 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-400 dark:text-gray-600 opacity-60';
             }
           }
 
@@ -173,16 +185,12 @@ function QuizGame({
               key={ans.id}
               onClick={() => handleAnswer(ans.id)}
               disabled={phase === 'answer'}
-              className={`w-full text-left px-4 py-3 rounded-xl text-sm transition-all ${style} flex gap-3 items-start`}
+              className={`w-full text-left px-4 py-3.5 rounded-xl text-sm transition-all ${style} flex gap-3 items-start min-h-[52px]`}
             >
-              <span className="font-bold flex-shrink-0 uppercase">{ans.id}.</span>
-              <span className="leading-relaxed">{ans.text}</span>
-              {phase === 'answer' && ans.id === current.correctAnswer && (
-                <span className="ml-auto text-emerald-600 dark:text-emerald-400 flex-shrink-0">✓</span>
-              )}
-              {phase === 'answer' && ans.id === selected && ans.id !== current.correctAnswer && (
-                <span className="ml-auto text-red-500 flex-shrink-0">✗</span>
-              )}
+              <span className="font-bold flex-shrink-0 uppercase mt-0.5">{ans.id}.</span>
+              <span className="leading-relaxed flex-1">{ans.text}</span>
+              {phase === 'answer' && ans.id === current.correctAnswer && <span className="ml-auto text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5">✓</span>}
+              {phase === 'answer' && ans.id === selected && ans.id !== current.correctAnswer && <span className="ml-auto text-red-500 flex-shrink-0 mt-0.5">✗</span>}
             </button>
           );
         })}
@@ -196,12 +204,11 @@ function QuizGame({
         </div>
       )}
 
-      {/* Next button */}
       {phase === 'answer' && (
         <div className="flex justify-end animate-slide-up">
           <button
             onClick={handleNext}
-            className="px-6 py-2.5 rounded-xl bg-violet-600 text-white font-medium text-sm hover:bg-violet-700 transition-colors shadow-sm"
+            className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-violet-600 text-white font-semibold text-sm active:scale-[0.98] hover:bg-violet-700 transition-colors shadow-sm min-h-[52px]"
           >
             {currentIndex < questions.length - 1 ? 'Następne pytanie →' : 'Zakończ quiz'}
           </button>
@@ -212,15 +219,10 @@ function QuizGame({
 }
 
 function QuizResults({ score, total, pct, onRestart, onHome }: {
-  score: number;
-  total: number;
-  pct: number;
-  onRestart: () => void;
-  onHome: () => void;
+  score: number; total: number; pct: number; onRestart: () => void; onHome: () => void;
 }) {
   const emoji = pct >= 80 ? '🎉' : pct >= 60 ? '👍' : pct >= 40 ? '📚' : '💪';
   const message = pct >= 80 ? 'Świetny wynik!' : pct >= 60 ? 'Dobry wynik!' : pct >= 40 ? 'Jest nad czym popracować' : 'Wróć do fiszek i spróbuj ponownie';
-
   return (
     <div className="max-w-md mx-auto text-center space-y-6 py-10">
       <div className="text-6xl">{emoji}</div>
@@ -229,11 +231,11 @@ function QuizResults({ score, total, pct, onRestart, onHome }: {
         <div className="text-gray-500 dark:text-gray-400 mt-1">{score} / {total} poprawnych odpowiedzi</div>
         <div className="text-lg font-medium text-gray-700 dark:text-gray-300 mt-2">{message}</div>
       </div>
-      <div className="flex gap-3 justify-center">
-        <button onClick={onHome} className="px-5 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button onClick={onHome} className="flex-1 py-3 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium text-sm active:scale-95 transition-transform">
           Wybierz inny quiz
         </button>
-        <button onClick={onRestart} className="px-5 py-2 rounded-xl bg-violet-600 text-white font-medium text-sm hover:bg-violet-700 transition-colors">
+        <button onClick={onRestart} className="flex-1 py-3 rounded-xl bg-violet-600 text-white font-medium text-sm active:scale-95 transition-transform">
           Spróbuj ponownie
         </button>
       </div>
