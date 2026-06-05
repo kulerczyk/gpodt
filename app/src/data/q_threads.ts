@@ -463,7 +463,7 @@ export const THREADS_QUESTIONS: Question[] = [
     answers: [
       { id: 'a', text: 'Thread.yield() zwalnia posiadane monitory podobnie jak wait().' },
       { id: 'b', text: 'Thread.yield() NIE zwalnia żadnych monitorów – jedynie sygnalizuje schedulerowi, że bieżący wątek jest gotowy ustąpić procesora innemu wątkowi o takim samym lub wyższym priorytecie. Monitory pozostają zajęte.' },
-      { id: 'c', text: 'Thread.yield() jest space equals Thread.sleep(0).' },
+      { id: 'c', text: 'Thread.yield() jest równoważne Thread.sleep(0).' },
       { id: 'd', text: 'Thread.yield() blokuje wątek na 1ms.' },
     ],
     correctAnswer: 'b',
