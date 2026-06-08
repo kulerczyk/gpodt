@@ -87,7 +87,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 108, categoryId: 'lambdy',
-    question: 'Który pakiet Javy zawiera standardowe interfejsy funkcyjne takie jak Predicate, Function, Consumer i Supplier?',
+    question: 'Który z pakietów Javy zawiera standardowe interfejsy funkcyjne takie jak Predicate, Function, Consumer i Supplier?',
     answers: [
       { id: 'a', text: 'java.lang.functional' },
       { id: 'b', text: 'java.util.function' },
@@ -231,7 +231,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 120, categoryId: 'lambdy',
-    question: 'Rozważając projektowanie API, który argument najsilniej przemawia za stosowaniem interfejsów funkcyjnych jako parametrów metod zamiast konkretnych klas z jedną metodą?',
+    question: 'Rozważając aspekty projektowania API, który argument najsilniej przemawia za stosowaniem interfejsów funkcyjnych jako parametrów metod zamiast konkretnych klas z jedną metodą?',
     answers: [
       { id: 'a', text: 'Interfejsy funkcyjne są wydajniejsze w czasie wykonania niż konkretne klasy z jedną metodą, ponieważ JVM stosuje specjalne optymalizacje invokedynamic redukujące narzut wywołań wirtualnych.' },
       { id: 'b', text: 'Interfejsy funkcyjne umożliwiają przekazywanie lambd, referencji do metod i klas anonimowych – elastyczność i czytelność API; oddzielają zachowanie od implementacji.' },
@@ -255,7 +255,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 122, categoryId: 'lambdy',
-    question: 'Dlaczego wyrażenie lambda może korzystać ze zmiennych lokalnych otaczającej metody tylko wtedy, gdy są one "effectively final"?',
+    question: 'Analizując cykl życia zmiennych, dlaczego wyrażenie lambda może korzystać ze zmiennych lokalnych otaczającej metody tylko wtedy, gdy są one "effectively final"?',
     answers: [
       { id: 'a', text: 'To ograniczenie stylistyczne Javy wprowadzone dla spójności z językami czysto funkcyjnymi. W innych językach JVM (Kotlin, Scala) mutowalne zmienne w zamknięciach są dozwolone dzięki wrapping w tablicę jednoelementową.' },
       { id: 'b', text: 'Lambda może być wykonana po zakończeniu metody (np. w innym wątku). Zmienna lokalna jest na stosie i zniknie. JVM przechwytuje kopię wartości. Mutowalność tej kopii stworzyłaby iluzję współdzielenia stanu, prowadząc do wyścigów danych.' },
@@ -267,7 +267,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 123, categoryId: 'lambdy',
-    question: 'Który z poniższych mechanizmów jest prawidłowy w przypadku wystąpienia wyjątku checked wewnątrz wyrażenia lambda przypisanego do interfejsu Consumer?',
+    question: 'Dokonując ewaluacji obsługi wyjątków, który z poniższych mechanizmów jest prawidłowy w przypadku wystąpienia wyjątku typu "checked" wewnątrz wyrażenia lambda przypisanego do interfejsu Consumer?',
     answers: [
       { id: 'a', text: 'Checked exceptions w lambdzie są automatycznie konwertowane na odpowiadający im unchecked odpowiednik (np. IOException na UncheckedIOException) przez mechanizm LambdaMetafactory w czasie bootstrap.' },
       { id: 'b', text: 'Należy obsłużyć checked exception wewnątrz lambdy (try-catch) lub stworzyć własny interfejs funkcyjny deklarujący throws.' },
@@ -279,7 +279,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 124, categoryId: 'lambdy',
-    question: 'Porównując referencję do metody w formacie "obiekt::metoda" i analogicznego wyrażenia lambda, jaka jest główna różnica w procesie ewaluacji obiektu docelowego?',
+    question: 'Porównując zachowanie referencji do metody w formacie "obiekt::metoda" oraz analogicznego wyrażenia lambda, jaka jest główna różnica w procesie ewaluacji obiektu docelowego?',
     answers: [
       { id: 'a', text: 'Brak różnicy – oba mechanizmy ewaluują obiekt docelowy w tym samym momencie i za każdym razem dają identyczne wyniki niezależnie od zmian stanu otoczenia po ich utworzeniu.' },
       { id: 'b', text: 'W referencji "obiekt::metoda" obiekt docelowy jest ewaluowany w momencie tworzenia referencji; w lambdzie "() -> obiekt.metoda()" obiekt jest ewaluowany przy każdym wywołaniu.' },
@@ -291,7 +291,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 125, categoryId: 'lambdy',
-    question: 'W jakiej sytuacji użycie wyrażenia lambda może spowodować utrzymanie obiektu w pamięci dłużej niż zakładano?',
+    question: 'Ewaluując potencjalne wycieki pamięci w aplikacjach Java, w jakiej sytuacji użycie wyrażenia lambda może spowodować utrzymanie obiektu w pamięci dłużej niż zakładano?',
     answers: [
       { id: 'a', text: 'Lambda zawsze trzyma silną referencję do klasy zewnętrznej przez niejawny parametr this generowany przez kompilator, co systematycznie uniemożliwia zebranie otaczającego obiektu przez Garbage Collector.' },
       { id: 'b', text: 'Jeśli lambda przechwytuje referencję do obiektu (np. this lub pola klasy zewnętrznej) i jest przechowywana w kolekcji lub przekazywana gdzieś dalej, przechwycony obiekt nie może być zebrany przez GC dopóki lambda żyje.' },
@@ -303,7 +303,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 126, categoryId: 'lambdy',
-    question: 'Analizując strukturę interfejsów, który z poniższych warunków musi zostać spełniony, aby dany interfejs mógł być uznany za interfejs funkcyjny?',
+    question: 'Analizując strukturę interfejsów, który z poniższych warunków musi zostać spełniony, aby dany interfejs mógł być uznany za interfejs funkcyjny w architekturze Java?',
     answers: [
       { id: 'a', text: 'Interfejs musi posiadać adnotację @FunctionalInterface i jawnie rozszerzać jeden z interfejsów z pakietu java.util.function, takich jak Function, Predicate lub Consumer.' },
       { id: 'b', text: 'Interfejs musi posiadać dokładnie jedną metodę abstrakcyjną (SAM), niezależnie od liczby metod default, static, private.' },
@@ -315,7 +315,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 127, categoryId: 'lambdy',
-    question: 'Dlaczego użycie wyrażeń lambda jest bardziej optymalne w czasie uruchamiania niż tradycyjne klasy anonimowe wewnętrzne?',
+    question: 'Ewaluując wydajność mechanizmów Javy, dlaczego użycie wyrażeń lambda jest bardziej optymalne w czasie uruchamiania niż tradycyjne anonimowe klasy wewnętrzne?',
     answers: [
       { id: 'a', text: 'Lambdy są zawsze szybsze niż klasy anonimowe we wszystkich scenariuszach i zastosowaniach, ponieważ JVM stosuje dla nich specjalną ścieżkę wykonania omijającą wirtualną tabelę metod (vtable).' },
       { id: 'b', text: 'Klasy anonimowe wymagają załadowania pliku .class dla każdej klasy anonimowej; lambdy używają invokedynamic i LambdaMetafactory – klasa jest generowana leniowo w czasie wykonania, redukując liczbę plików .class i czas ładowania.' },
@@ -327,7 +327,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 128, categoryId: 'lambdy',
-    question: 'W jakim przypadku zastosowanie wyrażenia lambda stwarza potencjalne zagrożenie w środowisku współbieżnym?',
+    question: 'Analizując bezpieczeństwo wielowątkowe aplikacji, w jakim przypadku zastosowanie wyrażenia lambda stwarza potencjalne zagrożenie w środowisku współbieżnym?',
     answers: [
       { id: 'a', text: 'Zawsze – lambdy z definicji nie są thread-safe i każde ich użycie w środowisku wielowątkowym wymaga zewnętrznej synchronizacji za pomocą synchronized lub klas z pakietu java.util.concurrent.' },
       { id: 'b', text: 'Gdy lambda przechwytuje mutowalny stan współdzielony (np. pole klasy zewnętrznej lub element kolekcji) i jest wykonywana równolegle przez wiele wątków bez synchronizacji.' },
@@ -339,7 +339,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 129, categoryId: 'lambdy',
-    question: 'Porównując procesy kompozycji funkcji z interfejsem Function, jaka jest kluczowa różnica architektoniczna między metodami compose oraz andThen?',
+    question: 'Porównując procesy kompozycji funkcji z wykorzystaniem interfejsu Function, jaka jest kluczowa różnica architektoniczna pomiędzy metodami compose oraz andThen?',
     answers: [
       { id: 'a', text: 'compose jest dostępne wyłącznie w interfejsie BiFunction dla złożeń dwuargumentowych; andThen jest wyłączną metodą interfejsu Function dla jednokierunkowego pipeline jednokrokowych transformacji.' },
       { id: 'b', text: 'andThen tworzy pipeline f→g (left-to-right execution); compose tworzy pipeline g→f (right-to-left, matematyczna notacja złożenia). f.andThen(g).apply(x) = g(f(x)), f.compose(g).apply(x) = f(g(x)).' },
@@ -351,7 +351,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 130, categoryId: 'lambdy',
-    question: 'Jak kompilator rozwiązuje konflikt, gdy wyrażenie lambda jest przekazywane do przeciążonej metody, a struktura lambdy pasuje do dwóch różnych interfejsów funkcyjnych?',
+    question: 'W procesie kompilacji kodu, jak kompilator rozwiązuje konflikt, gdy wyrażenie lambda jest przekazywane do przeciążonej metody, a struktura lambdy pasuje do dwóch różnych interfejsów funkcyjnych?',
     answers: [
       { id: 'a', text: 'Kompilator wybiera metodę z bardziej szczegółowym (narrow) interfejsem funkcyjnym stosując algorytm most-specific method lookup zgodny ze specyfikacją JLS §15.12.2.' },
       { id: 'b', text: 'Błąd kompilacji – niejednoznaczne wywołanie (ambiguous method call). Programista musi jawnie rzutować lambdę na właściwy typ.' },
@@ -363,7 +363,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 131, categoryId: 'lambdy',
-    question: 'Jakie restrykcje muszą być spełnione, aby instancja wyrażenia lambda mogła zostać poddana standardowemu procesowi serializacji w Javie?',
+    question: 'Analizując możliwości sieciowe, jakie restrykcje muszą być spełnione, aby instancja wyrażenia lambda mogła zostać poddana standardowemu procesowi serializacji w Javie?',
     answers: [
       { id: 'a', text: 'Lambda jest automatycznie serializowalna jeśli implementowany interfejs funkcyjny jest serializowalny i wszystkie przechwycone zmienne lokalne mają typy implementujące Serializable.' },
       { id: 'b', text: 'Lambda jest serializowalna gdy implementowany interfejs rozszerza Serializable, ale Java jawnie odradza serializację lambd (brak gwarancji stabilności między wersjami JVM).' },
@@ -375,7 +375,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 132, categoryId: 'lambdy',
-    question: 'Z jakiego powodu zdecydowano się na wprowadzenie odrębnego interfejsu BinaryOperator zamiast korzystania wyłącznie z ogólnego BiFunction?',
+    question: 'Ewaluując hierarchię pakietu java.util.function, z jakiego powodu zdecydowano się na wprowadzenie odrębnego interfejsu BinaryOperator zamiast korzystania wyłącznie z ogólnego BiFunction?',
     answers: [
       { id: 'a', text: 'BinaryOperator posiada dodatkowe metody statyczne identity() i minBy()/maxBy() nieobecne w BiFunction, które umożliwiają tworzenie neutralnych elementów dla operacji Stream.reduce().' },
       { id: 'b', text: 'BinaryOperator<T> to specjalizacja BiFunction<T,T,T> gdy wszystkie typy (oba argumenty i wynik) są tego samego typu. Redukuje nadmiarowe powtórzenie typu i wyraża intencję "operacja na tym samym typie".' },
@@ -387,7 +387,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 133, categoryId: 'lambdy',
-    question: 'Dlaczego wewnątrz wyrażenia lambda dozwolona jest modyfikacja pól instancyjnych klasy otaczającej, podczas gdy zmiana zmiennych lokalnych metody jest zabroniona?',
+    question: 'Analizując semantykę języka, dlaczego wewnątrz wyrażenia lambda dozwolona jest modyfikacja pól instancyjnych klasy otaczającej, podczas gdy zmiana zmiennych lokalnych metody jest zabroniona?',
     answers: [
       { id: 'a', text: 'Pola instancji są z natury thread-safe dzięki modelowi pamięci Java (JMM), który gwarantuje atomowość odczytów i zapisów dla wszystkich typów referencyjnych, natomiast zmienne lokalne nie mają takich gwarancji.' },
       { id: 'b', text: 'Zmienne lokalne istnieją na stosie wątku i mogą zniknąć po zakończeniu metody; lambda przechwytuje ich kopię. Mutowanie kopii byłoby mylące. Pola instancji są na stercie, żyją tak długo jak obiekt – lambda może je bezpiecznie modyfikować (ale thread-safety leży po stronie programisty).' },
@@ -399,7 +399,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 134, categoryId: 'lambdy',
-    question: 'Dlaczego zaleca się przekazywanie instancji Suppliera w bibliotekach logujących zamiast bezpośrednio konkatenowanych stringów?',
+    question: 'Oceniając optymalizacje wydajności przy użyciu interfejsu Supplier, dlaczego zaleca się przekazywanie instancji Suppliera w bibliotekach logujących zamiast bezpośrednio konkatenowanych stringów?',
     answers: [
       { id: 'a', text: 'Supplier jest wydajniejszy niż String przy budowaniu wiadomości, ponieważ JVM optymalizuje wywołania get() przez inlining, eliminując narzut tworzenia obiektu StringBuilder przy konkatenacji.' },
       { id: 'b', text: 'Lazy evaluation: Supplier.get() jest wywoływany tylko gdy wiadomość faktycznie jest logowana (np. gdy poziom DEBUG jest włączony). Konkatenacja stringa zawsze się wykonuje, nawet gdy log jest wyłączony.' },
@@ -411,7 +411,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 135, categoryId: 'lambdy',
-    question: 'Jaki jest główny architektoniczny cel istnienia specjalizowanych interfejsów funkcyjnych takich jak IntPredicate czy DoubleFunction?',
+    question: 'Dokonując analizy pakietu java.util.function, jaki jest główny architektoniczny cel istnienia specjalizowanych interfejsów funkcyjnych takich jak IntPredicate czy DoubleFunction?',
     answers: [
       { id: 'a', text: 'Lepsza czytelność kodu przez wyraźne nazwy wskazujące typ argumentu – IntPredicate jasno komunikuje że test odbywa się na int, co eliminuje potrzebę czytania generycznych parametrów typu.' },
       { id: 'b', text: 'Unikanie autoboxingu/unboxingu dla typów prymitywnych. Predicate<Integer> wymaga boxing (int→Integer); IntPredicate.test(int) działa bezpośrednio na prymitywie, co eliminuje narzut GC i poprawia wydajność.' },
@@ -435,7 +435,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 137, categoryId: 'lambdy',
-    question: 'Jakie konsekwencje niesie za sobą usunięcie adnotacji @FunctionalInterface znad interfejsu posiadającego jedną metodę abstrakcyjną?',
+    question: 'W kontekście projektowania własnych bibliotek, jakie konsekwencje niesie za sobą usunięcie adnotacji @FunctionalInterface znad interfejsu posiadającego jedną metodę abstrakcyjną?',
     answers: [
       { id: 'a', text: 'Interfejs traci status interfejsu funkcyjnego i kompilator odrzuca każde użycie lambdy lub referencji do metody w miejscach oczekujących tego interfejsu jako parametru lub zmiennej.' },
       { id: 'b', text: 'Brak efektu funkcjonalnego – interfejs nadal jest SAM i działa z lambdami. Traci się tylko weryfikację kompilatora chroniącą przed przypadkowym dodaniem drugiej metody abstrakcyjnej.' },
@@ -447,7 +447,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 138, categoryId: 'lambdy',
-    question: 'W jaki sposób obecność metod domyślnych w interfejsie wpływa na wyrażenia lambda?',
+    question: 'Analizując strukturę klasycznych interfejsów w nowszych wersjach Javy, w jaki sposób obecność metod domyślnych w interfejsie wpływa na wyrażenia lambda?',
     answers: [
       { id: 'a', text: 'Każda metoda default w interfejsie funkcyjnym wyklucza możliwość użycia lambdy – interfejs z metodami default traci status SAM i wymaga implementacji przez klasę anonimową lub konkretną.' },
       { id: 'b', text: 'Metody default nie wpływają na zdolność interfejsu do przyjmowania lambd. Interfejs pozostaje SAM (Single Abstract Method) niezależnie od liczby metod default.' },
@@ -459,7 +459,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 139, categoryId: 'lambdy',
-    question: 'Co stanie się podczas weryfikacji syntaktycznej, jeżeli parametr wyrażenia lambda otrzyma tę samą nazwę, co zmienna lokalna zadeklarowana w metodzie przed deklaracją tej lambdy?',
+    question: 'Ewaluując zasady widoczności zakresu, co stanie się podczas weryfikacji syntaktycznej, jeżeli parametr wyrażenia lambda otrzyma tę samą nazwę, co zmienna lokalna zadeklarowana w metodzie przed deklaracją tejże lambdy?',
     answers: [
       { id: 'a', text: 'Lambda shaduje zmienną lokalną – parametr lambdy jest używany wewnątrz jej ciała, a oryginalna zmienna metody pozostaje dostępna poza lambdą bez żadnych konfliktów nazw.' },
       { id: 'b', text: 'Błąd kompilacji – lambda nie tworzy własnego zakresu, więc parametr o tej samej nazwie co zmienna lokalna to redeclaracja w tym samym zakresie.' },
@@ -471,7 +471,7 @@ export const LAMBDAS_QUESTIONS: Question[] = [
   },
   {
     id: 140, categoryId: 'lambdy',
-    question: 'W jaki sposób mechanizm Javy decyduje, który konkretnie konstruktor ma zostać faktycznie wywołany przy referencji do konstruktora postaci Klasa::new?',
+    question: 'Zastanawiając się nad zastosowaniem referencji do konstruktora postaci Klasa::new, w jaki sposób mechanizm Javy decyduje, który konkretnie konstruktor obiektowy ma zostać faktycznie wywołany?',
     answers: [
       { id: 'a', text: 'Zawsze wywoływany jest konstruktor bezparametrowy niezależnie od kontekstu przypisania, a jeśli klasa nie posiada konstruktora bezparametrowego, JVM rzuca NoSuchMethodException w czasie wykonania.' },
       { id: 'b', text: 'Kompilator określa właściwy konstruktor na podstawie sygnatury metody abstrakcyjnej interfejsu funkcyjnego (target type) do którego przypisywana jest referencja Klasa::new.' },

@@ -243,7 +243,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 240, categoryId: 'stream-api',
-    question: 'Podczas projektowania ciągu przetwarzania danych z wieloma operacjami pośrednimi, jak środowisko uruchomieniowe zarządza ich wykonaniem w kontekście leniwej ewaluacji?',
+    question: 'Kiedy projektujemy ciąg przetwarzania danych z wykorzystaniem wielu operacji pośrednich, w jaki sposób środowisko uruchomieniowe zarządza ich wykonaniem w kontekście leniwej ewaluacji?',
     answers: [
       { id: 'a', text: 'Każda operacja pośrednia wykonuje się na pełnym zbiorze danych, zanim przejdzie do następnej.' },
       { id: 'b', text: 'JVM scala operacje pośrednie (fusion) i przetwarza każdy element przez cały pipeline za jednym razem, zamiast tworzyć pośrednie kolekcje. Optymalizacje: loop fusion i short-circuit.' },
@@ -255,7 +255,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 241, categoryId: 'stream-api',
-    question: 'Podczas przetwarzania strumienia w trybie równoległym programista dodaje elementy bezpośrednio do zewnętrznej standardowej listy. Jaki będzie główny skutek takiego podejścia?',
+    question: 'Podczas przetwarzania strumienia w trybie równoległym programista decyduje się na dodawanie elementów bezpośrednio do zewnętrznej, standardowej listy zdefiniowanej wcześniej. Jaki będzie główny skutek takiego podejścia?',
     answers: [
       { id: 'a', text: 'Nie ma żadnych problemów – parallel stream jest thread-safe.' },
       { id: 'b', text: 'Race condition: ArrayList nie jest thread-safe. Równoległe operacje add() mogą prowadzić do uszkodzenia struktury listy, utraty elementów lub ArrayIndexOutOfBoundsException.' },
@@ -267,7 +267,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 242, categoryId: 'stream-api',
-    question: 'W systemie wykorzystano generator tworzący nieskończony strumień danych wejściowych. W jaki sposób należy go prawidłowo przetworzyć, aby uniknąć zawieszenia aplikacji?',
+    question: 'W systemie wykorzystano generator tworzący nieskończony strumień danych wejściowych. W jaki sposób należy go prawidłowo przetworzyć, aby uniknąć zawieszenia się całej aplikacji?',
     answers: [
       { id: 'a', text: 'Nieskończony strumień automatycznie się zatrzymuje po przetworzeniu 1000 elementów.' },
       { id: 'b', text: 'Należy zastosować operację short-circuit: limit(n), takeWhile(predicate), findFirst() lub findAny() – które zatrzymają przetwarzanie po spełnieniu warunku.' },
@@ -279,7 +279,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 243, categoryId: 'stream-api',
-    question: 'Analizujesz kod, w którym należy pobrać dziesięć pierwszych elementów spełniających warunek z ogromnego zbioru danych. Jak kolejność naładowania limitu i filtrowania wpływa na proces?',
+    question: 'Analizujesz kod, w którym należy pobrać dziesięć pierwszych elementów spełniających określony, trudny do obliczenia warunek z ogromnego zbioru danych. Jak kolejność nakładania limitu i filtrowania wpływa na proces?',
     answers: [
       { id: 'a', text: 'Kolejność nie ma znaczenia – wynik jest identyczny.' },
       { id: 'b', text: 'filter().limit(10): filtruj elementy i zatrzymaj gdy 10 spełni warunek (optymalnie). limit(10).filter(): weź tylko 10 elementów i filtruj (może zwrócić <10 pasujących).' },
@@ -291,7 +291,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 244, categoryId: 'stream-api',
-    question: 'Dlaczego używanie transformacji (map) do modyfikowania stanu globalnego aplikacji jest błędem architektonicznym?',
+    question: 'Operacje transformacji elementów w strumieniu projektuje się zazwyczaj jako funkcje czyste, pozbawione efektów ubocznych. Dlaczego używanie transformacji do modyfikowania stanu globalnego aplikacji jest błędem architektonicznym?',
     answers: [
       { id: 'a', text: 'map() nie może modyfikować zmiennych zewnętrznych – błąd kompilacji.' },
       { id: 'b', text: 'Operacje pośrednie powinny być funkcjami czystymi (pure functions) bez efektów ubocznych. Modyfikacja globalnego stanu: uniemożliwia bezpieczne równoległość, komplikuje debugging, narusza zasadę least surprise i może powodować race conditions.' },
@@ -303,7 +303,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 245, categoryId: 'stream-api',
-    question: 'Wykonano operację agregującą na strumieniu, a następnie w kolejnej linii kodu podjęto próbę ponownego przefiltrowania tej samej referencji. Jaki będzie tego efekt?',
+    question: 'Wykonano operację agregującą na strumieniu użytkowników, która zwróciła ich sumę. Następnie w kolejnej linii kodu, korzystając z tej samej referencji do strumienia, podjęto próbę jego ponownego przefiltrowania. Jaki będzie tego efekt?',
     answers: [
       { id: 'a', text: 'Strumień "resetuje się" i filtruje od początku.' },
       { id: 'b', text: 'IllegalStateException: "stream has already been operated upon or closed". Strumień jest jednorazowy.' },
@@ -315,7 +315,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 246, categoryId: 'stream-api',
-    question: 'W procesie redukowania strumienia liczbowego do pojedynczej wartości wykorzystywany jest parametr tożsamości (identity). Jaką pełni on rolę z punktu widzenia niezawodności operacji?',
+    question: 'W procesie sprowadzania strumienia liczbowego do pojedynczej wartości (redukcji) wykorzystywany jest parametr tożsamości. Jaką pełni on rolę z punktu widzenia projektowania niezawodnej operacji?',
     answers: [
       { id: 'a', text: 'Identity przyspiesza operację reduce o 50%.' },
       { id: 'b', text: 'Identity to wartość neutralna dla operacji (0 dla dodawania, 1 dla mnożenia). Gwarantuje że reduce(identity, op) zawsze zwraca wynik (nie Optional) – nawet dla pustego strumienia zwraca identity.' },
@@ -327,7 +327,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 247, categoryId: 'stream-api',
-    question: 'Podczas integracji danych z systemów zewnętrznych otrzymujesz obiekty, z których każdy zawiera kolekcję sub-elementów. Chcesz otrzymać płaską strukturę wszystkich sub-elementów. Czym pod kątem działania różni się mapowanie płaskie od standardowego?',
+    question: 'Podczas integracji danych z systemów zewnętrznych otrzymujesz obiekty, z których każdy zawiera kolekcję sub-elementów. Chcesz otrzymać płaską strukturę wszystkich sub-elementów. Czym pod kątem działania różni się tutaj mapowanie płaskie od standardowego?',
     answers: [
       { id: 'a', text: 'flatMap() jest szybszy od map() dla kolekcji.' },
       { id: 'b', text: 'map(order -> order.getItems()) → Stream<List<Item>> (zagnieżdżony). flatMap(order -> order.getItems().stream()) → Stream<Item> (spłaszczony). flatMap "wchodzi" do każdej pod-kolekcji i łączy wszystkie w jeden strumień.' },
@@ -339,7 +339,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 248, categoryId: 'stream-api',
-    question: 'Chcesz zarejestrować w logach bieżący stan przetwarzanych elementów, ale nie możesz ingerować w zwracany wynik. Jakiej operacji najlepiej użyć?',
+    question: 'Zidentyfikowano nietypowy błąd występujący w środku złożonych operacji strumieniowych. Chcesz zarejestrować w logach bieżący stan przetwarzanych elementów, ale nie możesz ingerować w zwracany wynik. Jakiej operacji najlepiej użyć?',
     answers: [
       { id: 'a', text: 'forEach() – terminalna operacja do logowania.' },
       { id: 'b', text: 'peek(Consumer) – pośrednia operacja wywołująca efekt uboczny (logowanie) bez modyfikacji elementu.' },
@@ -363,7 +363,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 250, categoryId: 'stream-api',
-    question: 'W aplikacji przetwarzającej transakcje uruchomiono wielowątkowe wyszukiwanie konkretnego warunku. Dlaczego wyszukanie absolutnie pierwszego elementu jest mniej optymalne od znalezienia jakiegokolwiek pasującego?',
+    question: 'W aplikacji przetwarzającej transakcje uruchomiono wielowątkowe wyszukiwanie konkretnego warunku. Pod kątem mechanizmów wewnętrznych, dlaczego zadanie wyszukania absolutnie pierwszego elementu jest mniej optymalne od znalezienia jakiegokolwiek pasującego?',
     answers: [
       { id: 'a', text: 'findFirst() jest zawsze wolniejszy od findAny().' },
       { id: 'b', text: 'findFirst() w parallel stream musi koordynować wątki by zachować encounter order – wątek przetwarzający późniejszy element musi czekać na wyniki wcześniejszych wątków. findAny() zwraca natychmiast gdy ANY wątek znajdzie pasujący element.' },
@@ -375,7 +375,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 251, categoryId: 'stream-api',
-    question: 'Przetwarzasz miliony odczytów z czujników wyrażonych jako liczby całkowite. Decydujesz się na dedykowane strumienie dla typów prostych zamiast klasycznych strumieni obiektowych. Co uzyskujesz dzięki tej zmianie?',
+    question: 'Przetwarzasz miliony odczytów z czujników wyrażonych w postaci liczb całkowitych. Jako inżynier optymalizujący zużycie RAMu decydujesz się na dedykowane strumienie dla typów prostych zamiast klasycznych strumieni obiektowych. Co uzyskujesz dzięki tej zmianie?',
     answers: [
       { id: 'a', text: 'Dostęp do operacji na String.' },
       { id: 'b', text: 'Eliminację autoboxingu/unboxingu (int zamiast Integer): mniej alokacji na stercie, mniej presji na GC, lepsze cache locality, specjalne operacje statystyczne (sum(), average(), summaryStatistics()).' },
@@ -387,7 +387,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 252, categoryId: 'stream-api',
-    question: 'Zasilasz mechanizm strumieniowy używając standardowej nieuporzadkowanej kolekcji zapewniającej unikalność (zbiór). W jaki sposób wpłynie to na zachowanie operacji zależnych od położenia w sekwencji?',
+    question: 'Zasilasz mechanizm strumieniowy używając standardowej, nieuporządkowanej kolekcji, w której elementy zapewniają unikalność (zbiór). W jaki sposób wpłynie to na zachowanie operacji zależnych od położenia w sekwencji, takich jak ograniczanie wielkości strumienia?',
     answers: [
       { id: 'a', text: 'HashSet jako źródło gwarantuje posortowane wyniki.' },
       { id: 'b', text: 'HashSet nie ma encounter order – operacje zależne od kolejności (limit(), skip(), findFirst()) dają nieprzewidywalne wyniki zależne od hashCode i implementacji. Wyniki mogą różnić się między uruchomieniami.' },
@@ -399,7 +399,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 253, categoryId: 'stream-api',
-    question: 'Podczas projektowania modułu wyciągającego skrajne parametry, używasz wbudowanych funkcji wyluskujących wartość maksymalną. Dlaczego te metody nie zwracają od razu szukanego typu danych, lecz używają specjalnej klasy zamykającej wynik?',
+    question: 'Podczas projektowania modułu wyciągającego skrajne parametry narzędzi statystycznych, wykorzystujesz wbudowane funkcje wyluskujące wartość maksymalną. Dlaczego te metody nie zwracają od razu szukanego typu danych, lecz wykorzystują specjalną klasę zamykającą wynik (opakowanie)?',
     answers: [
       { id: 'a', text: 'Ze względu na wydajność – Optional jest szybszy.' },
       { id: 'b', text: 'Strumień może być pusty – nie istnieje sensowna wartość "brak maksimum". Optional<T> wyraża tę możliwość i zmusza programistę do obsługi przypadku braku wyniku, zamiast zwracać null (NullPointerException trap).' },
@@ -423,7 +423,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 255, categoryId: 'stream-api',
-    question: 'Budując mapę powiązań słownikowych między ID a obiektem, algorytm napotyka drugi identyczny klucz. Co wydarzy się jeśli użyto standardowego Collectors.toMap() bez dodatkowych argumentów?',
+    question: 'Wykorzystujesz mechanizm kolektora do zbudowania mapy powiązań słownikowych między ID a obiektem. Wskutek błędu w danych źródłowych, algorytm klasyfikujący napotyka drugi, identyczny klucz w ramach obecnego potoku przetwarzania. Co wydarzy się jeśli użyto standardowego, podstawowego kolektora dla map bez dodatkowych argumentów?',
     answers: [
       { id: 'a', text: 'Drugi element nadpisze pierwszy.' },
       { id: 'b', text: 'Zostanie rzucony wyjątek IllegalStateException: "Duplicate key [klucz]".' },
@@ -447,7 +447,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 257, categoryId: 'stream-api',
-    question: 'Implementujesz mechanizm autoryzacji sprawdzający, czy wszystkie role w liście roszczeń użytkownika spełniają wymogi systemowe używając wbudowanej funkcji "czy wszystkie pasują". W wyniku błędu architektonicznego strumień ról użytkownika okazuje się zupełnie pusty. Jak zareaguje ewaluator?',
+    question: 'Implementujesz mechanizm autoryzacji sprawdzający, czy wszystkie role w liście roszczeń użytkownika spełniają wymogi systemowe używając w tym celu wbudowanej funkcji "czy wszystkie pasują". W wyniku błędu architektonicznego strumień ról użytkownika okazuje się zupełnie pusty. Jak zareaguje ewaluator w takiej skrajnej sytuacji?',
     answers: [
       { id: 'a', text: 'Zwróci false – brak ról oznacza brak autoryzacji.' },
       { id: 'b', text: 'Zwróci true – allMatch() na pustym strumieniu to "vacuous truth" (prawda próżniowa). Brak elementów do sprawdzenia = żaden nie naruszył warunku.' },
@@ -459,7 +459,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 258, categoryId: 'stream-api',
-    question: 'Budujesz narzędzie agregujące tysiące zbiorów tekstowych używając pętli wywołującej statyczne łączenie strumieni (Stream.concat) iteracyjnie. Jakie ryzyko operacyjne ukrywa ta technika?',
+    question: 'Budujesz narzędzie agregujące tysiące mniejszych zbiorów tekstowych pochodzących od niezależnych klientów. Używasz pętli, która w każdej iteracji wywołuje wbudowaną funkcję statycznego łączenia strumieni na bieżącym i nowym pliku. Jakie ryzyko operacyjne ukrywa ta iteracyjna technika?',
     answers: [
       { id: 'a', text: 'Stream.concat() jest ograniczony do 2 strumieni łącznie.' },
       { id: 'b', text: 'Iteracyjne concat() tworzy głęboko zagnieżdżone pipelines: concat(concat(concat(s1, s2), s3), s4)... Przy tysiącach łączeń powstaje drzewo głębokości n – głęboka rekurencja przy ewaluacji może spowodować StackOverflowError.' },
@@ -471,7 +471,7 @@ export const STREAMS_QUESTIONS: Question[] = [
   },
   {
     id: 259, categoryId: 'stream-api',
-    question: 'W architekturze rozproszonych równoległych strumieni jeden z nich wywołuje w lambdzie powolne zapytania sieciowe REST ulegające częstemu opóźnieniu. Jaki systemowy efekt osiągnie ten wątek wobec całej maszynerii JVM?',
+    question: 'W rozproszonej architekturze systemu odpalono kilkanaście równoległych strumieni do skomplikowanej analizy lokalnych zasobów, lecz jeden z nich niespodziewanie wywołuje w lambda-wyrażeniu powolne zapytania sieciowe REST ulegające częstemu opóźnieniu. Jaki systemowy efekt osiągnie ten wątek wobec całej maszynerii JVM?',
     answers: [
       { id: 'a', text: 'Tylko ten jeden strumień zwolni; inne nie są dotknięte.' },
       { id: 'b', text: 'Powolny strumień blokuje wątek z ForkJoinPool.commonPool(). Ponieważ pool jest współdzielony przez całą JVM, zablokowane wątki mogą spowalniać lub blokować INNE niezwiązane parallel streams i operacje równoległe w tej samej JVM.' },

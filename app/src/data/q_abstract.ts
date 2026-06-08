@@ -75,7 +75,7 @@ export const ABSTRACT_QUESTIONS: Question[] = [
   },
   {
     id: 7, categoryId: 'klasy-abstrakcyjne',
-    question: 'Klasa abstrakcyjna Shape posiada metodę abstrakcyjną area() oraz metodę nieabstrakcyjną describe(). Metoda describe() wewnętrznie wywołuje area(). Jak nazywa się ten wzorzec projektowy i jaka jest jego główna korzyść?',
+    question: 'Rozważmy hierarchię klas, gdzie klasa abstrakcyjna Shape posiada metodę abstrakcyjną area() oraz metodę nieabstrakcyjną describe(). Metoda describe() wewnętrznie wywołuje area(). Jak nazywa się ten wzorzec projektowy i jaka jest jego główna korzyść?',
     answers: [
       { id: 'a', text: 'Wzorzec Strategy – pozwala wymieniać całe algorytmy w czasie wykonania bez konieczności modyfikowania kodu klienta.' },
       { id: 'b', text: 'Wzorzec Template Method – definiuje szkielet algorytmu w klasie bazowej, pozostawiając szczegóły podklasom.' },
@@ -171,7 +171,7 @@ export const ABSTRACT_QUESTIONS: Question[] = [
   },
   {
     id: 15, categoryId: 'klasy-abstrakcyjne',
-    question: 'Klasa abstrakcyjna Payment posiada metodę abstrakcyjną validate() i nieabstrakcyjną process(), która wywołuje validate() przed wykonaniem płatności. Klasa CreditCardPayment nadpisuje validate(). Klasa SecureCreditCardPayment dziedziczy po CreditCardPayment i nadpisuje validate(). Gdy wywołamy process() na obiekcie SecureCreditCardPayment, która validate() zostanie wywołana?',
+    question: 'Programista tworzy hierarchię klas dla systemu płatności. Klasa abstrakcyjna Payment posiada metodę abstrakcyjną validate() i nieabstrakcyjną process(), która wywołuje validate() przed wykonaniem płatności. Klasa CreditCardPayment nadpisuje validate(). Następnie klasa SecureCreditCardPayment dziedziczy po CreditCardPayment i nadpisuje validate(). Gdy wywołamy process() na obiekcie SecureCreditCardPayment, która validate() zostanie wywołana?',
     answers: [
       { id: 'a', text: 'validate() z klasy Payment (klasa bazowa definiuje process).' },
       { id: 'b', text: 'validate() z klasy CreditCardPayment, bo to pierwsza konkretna implementacja wywołana przez process().' },
@@ -195,7 +195,7 @@ export const ABSTRACT_QUESTIONS: Question[] = [
   },
   {
     id: 17, categoryId: 'klasy-abstrakcyjne',
-    question: 'W projekcie istnieje klasa abstrakcyjna Repository z metodą findById() abstrakcyjną. Dwie klasy dziedziczą po Repository. Programista chce dodać wspólną logikę cachowania wyników findById() bez modyfikowania klas potomnych. Które podejście z użyciem klasy abstrakcyjnej jest najbardziej odpowiednie?',
+    question: 'W projekcie istnieje klasa abstrakcyjna Repository z metodą findById() zadeklarowaną jako abstrakcyjną. Dwie klasy - UserRepository i ProductRepository - dziedziczą po Repository i implementują findById(). Programista chce dodać wspólną logikę cachowania wyników findById() bez modyfikowania klas potomnych. Które podejście z użyciem klasy abstrakcyjnej jest najbardziej odpowiednie?',
     answers: [
       { id: 'a', text: 'Zmienić findById() na nieabstrakcyjną z logiką cache, dodać nową metodę abstrakcyjną fetchById(), wywoływaną wewnętrznie przez findById().' },
       { id: 'b', text: 'Dodać logikę cache bezpośrednio do każdej klasy potomnej przez dziedziczenie protected, eliminując potrzebę zmian w klasie bazowej Repository.' },
@@ -207,7 +207,7 @@ export const ABSTRACT_QUESTIONS: Question[] = [
   },
   {
     id: 18, categoryId: 'klasy-abstrakcyjne',
-    question: 'Klasa abstrakcyjna AbstractTask implementuje interfejs Runnable (metodę run()) i oznacza run() jako abstrakcyjną. Klasa ConcreteTask dziedziczy po AbstractTask i implementuje run(). Programista przekazuje obiekt ConcreteTask do wątku Thread. Które stwierdzenie poprawnie opisuje tę sytuację?',
+    question: 'Klasa abstrakcyjna AbstractTask implementuje interfejs Runnable (z metodą run()) i oznacza run() jako abstrakcyjną. Klasa ConcreteTask dziedziczy po AbstractTask i implementuje run(). Programista przekazuje obiekt ConcreteTask do wątku Thread. Które stwierdzenie poprawnie opisuje tę sytuację?',
     answers: [
       { id: 'a', text: 'Błąd kompilacji – Thread nie akceptuje obiektów klas abstrakcyjnych ani ich bezpośrednich podklas jako argumentu konstruktora.' },
       { id: 'b', text: 'Kod działa poprawnie; ConcreteTask jest Runnable, więc Thread wywoła jego run().' },
@@ -219,7 +219,7 @@ export const ABSTRACT_QUESTIONS: Question[] = [
   },
   {
     id: 19, categoryId: 'klasy-abstrakcyjne',
-    question: 'Programista analizuje kod i stwierdza, że klasa abstrakcyjna ma 10 klas potomnych, z których 9 nadpisuje metodę calculateFee() identycznie, a jedna ma specyficzną implementację. Jakie jest najlepsze działanie refaktoryzacyjne?',
+    question: 'Programista analizuje kod i stwierdza, że klasa abstrakcyjna ma 10 klas potomnych, z których 9 nadpisuje metodę calculateFee() identycznie, a jedna ma specyficzną implementację. Jakie jest najlepsze działanie refaktoryzacyjne z punktu widzenia zasad projektowania?',
     answers: [
       { id: 'a', text: 'Pozostawić methodę abstrakcyjną – każda klasa potomna powinna mieć własną implementację dla zachowania zasady OCP.' },
       { id: 'b', text: 'Przenieść wspólną implementację do klasy abstrakcyjnej jako nieabstrakcyjną; jedyna wyjątkowa klasa nadpisze ją.' },
@@ -243,7 +243,7 @@ export const ABSTRACT_QUESTIONS: Question[] = [
   },
   {
     id: 21, categoryId: 'klasy-abstrakcyjne',
-    question: 'W klasie abstrakcyjnej zdefiniowano wyłącznie jeden, prywatny konstruktor. Jakie są konsekwencje architektoniczne takiej deklaracji?',
+    question: 'W klasie abstrakcyjnej zdefiniowano wyłącznie jeden, prywatny konstruktor. Jakie są konsekwencje architektoniczne takiej deklaracji dla tej klasy?',
     answers: [
       { id: 'a', text: 'Klasa jest bezużyteczna – nikt nie może po niej dziedziczyć ani jej instancjować w żadnym kontekście.' },
       { id: 'b', text: 'Tylko klasy wewnętrzne (inner classes) zdefiniowane w tej samej klasie mogą po niej dziedziczyć.' },
@@ -291,7 +291,7 @@ export const ABSTRACT_QUESTIONS: Question[] = [
   },
   {
     id: 25, categoryId: 'klasy-abstrakcyjne',
-    question: 'Projektant próbuje użyć modyfikatora synchronized w połączeniu z modyfikatorem abstract w deklaracji metody. Dlaczego kompilator Javy uzna to za błąd semantyczny?',
+    question: 'Projektant próbuje użyć modyfikatora synchronized w połączeniu z modyfikatorem abstract w deklaracji metody. Dlaczego kompilator Javy uzna to za poważny błąd semantyczny?',
     answers: [
       { id: 'a', text: 'synchronized wymaga konkretnego ciała metody do synchronizacji, podczas gdy abstract deklaruje brak ciała.' },
       { id: 'b', text: 'synchronized jest zarezerwowany wyłącznie dla metod konkretnych i bloków kodu, nigdy dla metod abstrakcyjnych ani interfejsów.' },
@@ -303,7 +303,7 @@ export const ABSTRACT_QUESTIONS: Question[] = [
   },
   {
     id: 26, categoryId: 'klasy-abstrakcyjne',
-    question: 'Wzorzec projektowy Template Method często wykorzystuje klasy abstrakcyjne. Jakie kombinacje modyfikatorów dostępu i dziedziczenia są w nim najczęściej stosowane?',
+    question: 'Wzorzec projektowy Template Method często wykorzystuje klasy abstrakcyjne. Jakie kombinacje modyfikatorów dostępu i dziedziczenia są w nim najczęściej stosowane na poziomie metod?',
     answers: [
       { id: 'a', text: 'Metoda szablonowa: public final; metody kroków: protected abstract lub protected z domyślną implementacją.' },
       { id: 'b', text: 'Metoda szablonowa: private final; metody kroków: protected abstract lub public bez ograniczeń dziedziczenia.' },
@@ -315,7 +315,7 @@ export const ABSTRACT_QUESTIONS: Question[] = [
   },
   {
     id: 27, categoryId: 'klasy-abstrakcyjne',
-    question: 'W klasie zadeklarowano zagnieżdżoną (nested) klasę abstrakcyjną z modyfikatorem private. Jakie ograniczenia nakłada to na użycie tej klasy?',
+    question: 'W klasie zadeklarowano zagnieżdżoną (nested) klasę abstrakcyjną, która posiada modyfikator private. Jakie ograniczenia nakłada to na użycie tej klasy w kodzie aplikacji?',
     answers: [
       { id: 'a', text: 'Prywatna klasa zagnieżdżona jest całkowicie bezużyteczna – nikt nie może jej używać w żadnym kontekście.' },
       { id: 'b', text: 'Tylko klasa zewnętrzna (enclosing class) i jej inne klasy zagnieżdżone mogą używać tej klasy.' },
@@ -411,7 +411,7 @@ export const ABSTRACT_QUESTIONS: Question[] = [
   },
   {
     id: 35, categoryId: 'klasy-abstrakcyjne',
-    question: 'Jak środowisko uruchomieniowe Javy interpretuje rzutowanie (casting) istniejącego obiektu na zdefiniowany typ klasy abstrakcyjnej?',
+    question: 'Jak środowisko uruchomieniowe Javy interpretuje rzutowanie (casting) instancji istniejącego obiektu na zdefiniowany typ klasy abstrakcyjnej?',
     answers: [
       { id: 'a', text: 'Błąd kompilacji – nie można rzutować obiektu na typ klasy abstrakcyjnej, bo takie typy są wykluczone ze sprawdzeń typów przez kompilator Javy.' },
       { id: 'b', text: 'Rzutowanie na typ abstrakcyjny jest dozwolone; JVM sprawdzi w czasie wykonania, czy obiekt jest faktycznie instancją podklasy danej klasy abstrakcyjnej.' },
@@ -447,7 +447,7 @@ export const ABSTRACT_QUESTIONS: Question[] = [
   },
   {
     id: 38, categoryId: 'klasy-abstrakcyjne',
-    question: 'Ograniczenie wielokrotnego dziedziczenia klas ma kluczowe uzasadnienie w projektowaniu maszyny wirtualnej Javy. Które ze stwierdzeń najlepiej oddaje tę przyczynę architektoniczną?',
+    question: 'Ograniczenie wielokrotnego dziedziczenia klas (w tym abstrakcyjnych) ma kluczowe uzasadnienie w projektowaniu maszyny wirtualnej Javy. Które ze stwierdzeń najlepiej oddaje tę przyczynę architektoniczną?',
     answers: [
       { id: 'a', text: 'Problem diamentu (diamond problem) – niejednoznaczność wyboru implementacji metody przy dziedziczeniu z dwóch klas posiadających tę samą metodę.' },
       { id: 'b', text: 'Ograniczenie pamięci – każda klasa zużywa zbyt dużo przestrzeni na stercie JVM, gdy dziedziczy jednocześnie po wielu klasach nadrzędnych.' },
@@ -471,7 +471,7 @@ export const ABSTRACT_QUESTIONS: Question[] = [
   },
   {
     id: 40, categoryId: 'klasy-abstrakcyjne',
-    question: 'Architekt decyduje się zadeklarować całą klasę z modyfikatorem final. Później próbuje dodać do niej metody oznaczone modyfikatorem abstract. Jaką ocenę wyda kompilator?',
+    question: 'Architekt decyduje się zadeklarować całą klasę z wykorzystaniem modyfikatora final. Później próbuje dodać do niej nowe metody oznaczone modyfikatorem abstract. Jaką ocenę wyda kompilator?',
     answers: [
       { id: 'a', text: 'Kompilacja przejdzie pomyślnie, ale abstract methods będą ignorowane i traktowane jak zwykłe metody bez implementacji.' },
       { id: 'b', text: 'Błąd kompilacji – klasa final nie może być abstract, bo te modyfikatory są wzajemnie sprzeczne.' },

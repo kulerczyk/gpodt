@@ -99,7 +99,7 @@ export const RECORDS_QUESTIONS: Question[] = [
   },
   {
     id: 49, categoryId: 'rekordy',
-    question: 'Deweloper twierdzi, że rekordy mogą powodować problemy z niektórymi bibliotekami serializacji. Które wyjaśnienie jest poprawne?',
+    question: 'Zespół używa biblioteki do serializacji i deserializacji JSON. Deweloper twierdzi, że rekordy mogą powodować problemy z niektórymi bibliotekami serializacji. Które wyjaśnienie jest poprawne?',
     answers: [
       { id: 'a', text: 'Rekordy nie są serializowalne – nie implementują interfejsu Serializable i nie mogą być serializowane.' },
       { id: 'b', text: 'Starsze biblioteki (jak Jackson bez odpowiedniej konfiguracji) oczekują bezparametrowego konstruktora i setterów, których rekordy nie mają. Nowsze wersje bibliotek obsługują rekordy natywnie.' },
@@ -111,7 +111,7 @@ export const RECORDS_QUESTIONS: Question[] = [
   },
   {
     id: 50, categoryId: 'rekordy',
-    question: 'Dlaczego w Javie nie istnieje wbudowana metoda withXxx() dla rekordów (w odróżnieniu od np. Kotlin data classes)?',
+    question: 'Deweloper analizuje dwa podejścia do tworzenia kopii rekordu z jedną zmienioną wartością. Dlaczego w Javie nie istnieje wbudowana metoda withXxx() dla rekordów (w odróżnieniu od np. Kotlin data classes)?',
     answers: [
       { id: 'a', text: 'Metoda withXxx() jest metodą przestarzałą usuniętą ze standardowej biblioteki Java przed finalną wersją rekordów.' },
       { id: 'b', text: 'Java Records były projektowane z naciskiem na minimalizm i spójność z istniejącym językiem; generowanie wielu metod withXxx() dla każdego komponentu znacząco rozszerzyłoby API i byłoby wieloznaczne przy nadpisywaniu komponentów.' },
@@ -123,7 +123,7 @@ export const RECORDS_QUESTIONS: Question[] = [
   },
   {
     id: 51, categoryId: 'rekordy',
-    question: 'Projektujesz domenę aplikacji z użyciem rekordów i potrzebujesz współdzielić część stanów pomiędzy wieloma różnymi strukturami danych. Jakie są rzeczywiste ograniczenia językowe w tym zakresie?',
+    question: 'Wyobraź sobie sytuację, w której projektujesz domenę aplikacji z użyciem rekordów i potrzebujesz współdzielić część stanów pomiędzy wieloma różnymi strukturami danych. Jakie są rzeczywiste ograniczenia językowe w tym zakresie?',
     answers: [
       { id: 'a', text: 'Rekordy mogą dziedziczyć po sobie nawzajem, co umożliwia współdzielenie stanu przez standardowe dziedziczenie komponentów.' },
       { id: 'b', text: 'Rekordy nie mogą dziedziczyć po sobie ani po klasach – wspólny stan można wyrazić przez interfejsy lub kompozycję (rekord jako komponent innego rekordu).' },
@@ -135,7 +135,7 @@ export const RECORDS_QUESTIONS: Question[] = [
   },
   {
     id: 52, categoryId: 'rekordy',
-    question: 'Podczas tworzenia instancji rekordu zachodzi potrzeba zwalidowania danych wejściowych oraz normalizacji ich wartości. Które stwierdzenie o konstruktorze kompaktowym jest prawdziwe?',
+    question: 'Podczas tworzenia instancji rekordu zachodzi potrzeba zwalidowania wprowadzanych danych wejściowych oraz ewentualnej normalizacji ich wartości bez zmiany pierwotnych typów. Które stwierdzenie o konstruktorze kompaktowym jest prawdziwe?',
     answers: [
       { id: 'a', text: 'Konstruktor kompaktowy musi ręcznie przypisać wartości do wszystkich pól rekordu za pomocą this.x = x.' },
       { id: 'b', text: 'Konstruktor kompaktowy wykonuje walidację/normalizację na parametrach, a przypisanie do pól (this.x = x) jest wykonywane automatycznie po zakończeniu bloku.' },
@@ -147,7 +147,7 @@ export const RECORDS_QUESTIONS: Question[] = [
   },
   {
     id: 53, categoryId: 'rekordy',
-    question: 'Otrzymujesz strumień danych z zewnętrznego systemu, który musi zostać zdeserializowany do struktury rekordu. W jakim stopniu mechanizm deserializacji gwarantuje zachowanie niezmienników zdefiniowanych w kodzie?',
+    question: 'Otrzymujesz strumień danych pochodzący z zewnętrznego systemu, który musi zostać zdeserializowany do struktury rekordu. W jakim stopniu mechanizm deserializacji gwarantuje zachowanie niezmienników zdefiniowanych w kodzie?',
     answers: [
       { id: 'a', text: 'Pełna gwarancja – deserializacja Java zawsze wywołuje konstruktor kanoniczny rekordu ze wszystkimi zdefiniowanymi walidacjami.' },
       { id: 'b', text: 'Brak gwarancji przy standardowej serializacji Java (ObjectInputStream może ominąć konstruktor), ale biblioteki JSON wywołują konstruktor kanoiczny.' },
@@ -159,7 +159,7 @@ export const RECORDS_QUESTIONS: Question[] = [
   },
   {
     id: 54, categoryId: 'rekordy',
-    question: 'Programista definiuje rekord lokalny wewnątrz ciała metody realizującej skomplikowany algorytm. W jaki sposób ten lokalny rekord wchodzi w interakcję ze zmiennymi otoczenia?',
+    question: 'Programista definiuje rekord lokalny wewnątrz ciała metody realizującej skomplikowany algorytm, aby tymczasowo grupować wyniki pośrednie. W jaki sposób ten lokalny rekord wchodzi w interakcję ze zmiennymi otoczenia?',
     answers: [
       { id: 'a', text: 'Lokalne rekordy mają pełny dostęp do wszystkich zmiennych metody, w tym mutowalnych, bez żadnych ograniczeń.' },
       { id: 'b', text: 'Lokalne rekordy są niejawnie statyczne i mogą odwoływać się tylko do effectively final zmiennych otoczenia (podobnie do lokalnych klas).' },
@@ -171,7 +171,7 @@ export const RECORDS_QUESTIONS: Question[] = [
   },
   {
     id: 55, categoryId: 'rekordy',
-    question: 'Jeden z komponentów nowo utworzonego rekordu przechowuje standardową listę elementów tekstowych (List<String>). Jakie są rzeczywiste gwarancje niemutowalności stanu dla całej instancji tak zdefiniowanego rekordu?',
+    question: 'Jeden z komponentów nowo utworzonego rekordu przechowuje standardową, wbudowaną w język listę elementów tekstowych. Jakie są rzeczywiste gwarancje niezmienności stanu dla całej instancji tak zdefiniowanego rekordu?',
     answers: [
       { id: 'a', text: 'Pełna niemutowalność – lista jest automatycznie kopiowana i zamrażana do wersji tylko do odczytu przez konstruktor rekordu.' },
       { id: 'b', text: 'Płytka niemutowalność – referencja do listy jest final (nie można jej podmienić), ale sama lista może być modyfikowana przez zewnętrzny kod posiadający referencję.' },
@@ -183,7 +183,7 @@ export const RECORDS_QUESTIONS: Question[] = [
   },
   {
     id: 56, categoryId: 'rekordy',
-    question: 'Zachodzi potrzeba zmodyfikowania domyślnego sposobu zwracania wartości przez akcesor rekordu. Programista decyduje się na ręczne nadpisanie automatycznie generowanej metody zwracającej wartość konkretnego komponentu. Jakie są tego skutki?',
+    question: 'Zachodzi potrzeba zmodyfikowania domyślnego sposobu zwracania wartości przez akcesor rekordu. Programista decyduje się na ręczne nadpisanie automatycznie generowanej metody zwracającej wartość konkretnego komponentu.',
     answers: [
       { id: 'a', text: 'Błąd kompilacji – akcesory rekordów są final i nie mogą być nadpisane przez programistę.' },
       { id: 'b', text: 'Akcesor można nadpisać; musi mieć tę samą sygnaturę (publiczna metoda o nazwie identycznej z komponentem). Własna implementacja zastąpi wygenerowaną.' },
@@ -195,7 +195,7 @@ export const RECORDS_QUESTIONS: Question[] = [
   },
   {
     id: 57, categoryId: 'rekordy',
-    question: 'Zespół tworzy framework do mapowania struktur obiektowych na format tekstowy i musi dynamicznie identyfikować struktury rekordowe oraz pobierać metadane o ich komponentach w czasie działania programu.',
+    question: 'Zespół tworzy uniwersalny framework do mapowania struktur obiektowych na format tekstowy i musi dynamicznie identyfikować struktury rekordowe oraz pobierać metadane o ich wewnętrznych komponentach w czasie działania programu.',
     answers: [
       { id: 'a', text: 'Nie jest to możliwe – rekordy nie udostępniają żadnych metadanych przez API refleksji Javy.' },
       { id: 'b', text: 'Należy użyć Class.isRecord() do identyfikacji rekordu, a następnie Class.getRecordComponents() do pobrania tablicy RecordComponent z nazwami i typami komponentów.' },
@@ -207,7 +207,7 @@ export const RECORDS_QUESTIONS: Question[] = [
   },
   {
     id: 58, categoryId: 'rekordy',
-    question: 'Na deklaracji pojedynczego komponentu w nagłówku rekordu została umieszczona standardowa adnotacja walidacyjna. W jaki sposób kompilator zarządza rozmieszczeniem tej adnotacji?',
+    question: 'Na deklaracji pojedynczego komponentu w nagłówku rekordu została umieszczona standardowa adnotacja walidacyjna wykorzystywana przez popularne narzędzia do mapowania. W jaki sposób kompilator zarządza rozmieszczeniem tej adnotacji?',
     answers: [
       { id: 'a', text: 'Adnotacja trafia wyłącznie na pole klasy generowane przez kompilator, ignorując parametr konstruktora i akcesor.' },
       { id: 'b', text: 'Adnotacja jest propagowana na wszystkie odpowiadające elementy: pole, parametr konstruktora kanonicznego i metodę akcesorową – jeśli typ adnotacji to dopuszcza (ElementType).' },
@@ -219,7 +219,7 @@ export const RECORDS_QUESTIONS: Question[] = [
   },
   {
     id: 59, categoryId: 'rekordy',
-    question: 'Architektura aplikacji wymaga owinięcia instancji danych w obiekt pośredniczący, który będzie monitorował czas dostępu. Biblioteka realizuje to przez dynamiczne generowanie klas potomnych w czasie działania programu.',
+    question: 'Architektura aplikacji wymaga owinięcia instancji danych w obiekt pośredniczący, który będzie monitorował czas dostępu do informacji. Wybrana biblioteka realizuje to zadanie poprzez dynamiczne generowanie klas potomnych w czasie działania programu.',
     answers: [
       { id: 'a', text: 'Rekordy doskonale nadają się do tego celu dzięki wbudowanemu polimorfizmowi i wsparciu dla dynamicznego proxy.' },
       { id: 'b', text: 'Rekordy są niejawnie final, więc dynamiczne generowanie podklas (np. przez CGLIB) jest niemożliwe – rekordy nie mogą być proxied w ten sposób.' },
@@ -231,7 +231,7 @@ export const RECORDS_QUESTIONS: Question[] = [
   },
   {
     id: 60, categoryId: 'rekordy',
-    question: 'Instancja rekordu posiada komponent będący tablicą liczb całkowitych. Ten sam obiekt rekordu jest jednocześnie odczytywany i modyfikowany przez wiele niezależnych wątków równolegle.',
+    question: 'Instancja rekordu posiada komponent, którym jest referencja do standardowej, wieloelementowej tablicy liczbowej. Ten sam obiekt rekordu jest jednocześnie odczytywany i modyfikowany przez wiele niezależnych procesów wykonywanych równolegle.',
     answers: [
       { id: 'a', text: 'Rekord jest automatycznie thread-safe, bo jest niemutowalny i nie wymaga żadnej synchronizacji.' },
       { id: 'b', text: 'Referencja do tablicy jest final (thread-safe pod względem referencji), ale zawartość tablicy jest mutowalna i dostęp z wielu wątków bez synchronizacji może prowadzić do wyścigów danych.' },

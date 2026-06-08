@@ -15,7 +15,7 @@ export const COLLECTIONS_QUESTIONS: Question[] = [
   },
   {
     id: 201, categoryId: 'kolekcje',
-    question: 'Jaki jest rzeczywisty efekt wywołania metody iterator.remove() na obiekcie Iterator pobranym z ArrayList podczas iteracji?',
+    question: 'Jaki jest rzeczywisty efekt wywołania metody iterator.remove() na obiekcie Iterator pobranym z kolekcji ArrayList podczas iteracji po tej kolekcji?',
     answers: [
       { id: 'a', text: 'Rzuca ConcurrentModificationException, bo iterator nie obsługuje usuwania.' },
       { id: 'b', text: 'Bezpiecznie usuwa ostatnio zwrócony przez next() element; nie powoduje ConcurrentModificationException.' },
@@ -123,7 +123,7 @@ export const COLLECTIONS_QUESTIONS: Question[] = [
   },
   {
     id: 210, categoryId: 'kolekcje',
-    question: 'W jakich dokładnie warunkach wewnętrzna struktura pojedynczego kubła (bucket) w HashMap zmieni się z listy wiązanej w zbalansowane drzewo czerwono-czarne?',
+    question: 'Weryfikacja mechanizmu optymalizacji kolizji w HashMapie (od Javy 8). Zewnętrzny system generuje klucze o bardzo słabej dystrybucji skrótów. W jakich dokładnie warunkach wewnętrzna struktura pojedynczego kubła (bucket) zmieni się z listy wiązanej w zbalansowane drzewo czerwono-czarne?',
     answers: [
       { id: 'a', text: 'Gdy całkowita liczba elementów w mapie przekroczy domyślny próg 16.' },
       { id: 'b', text: 'Gdy liczba elementów w jednym bucket przekroczy 8 (TREEIFY_THRESHOLD) ORAZ całkowita pojemność tablicy jest co najmniej 64 (MIN_TREEIFY_CAPACITY).' },
@@ -135,7 +135,7 @@ export const COLLECTIONS_QUESTIONS: Question[] = [
   },
   {
     id: 211, categoryId: 'kolekcje',
-    question: 'Architekt systemu narzucił użycie ArrayList zamiast LinkedList do przechowywania milionów obiektów, mimo że system często wstawia w środku kolekcji. Jaka cecha uzasadnia tę decyzję?',
+    question: 'Architekt nowoczesnego systemu rekomendacyjnego narzucił użycie ArrayList zamiast LinkedList do przechowywania milionów obiektów, pomimo faktu, że system często wstawia nowe elementy w środku kolekcji. Jaka cecha wewnętrzna architektury sprzętowej i wirtualnej maszyny uzasadnia tę z pozoru nielogiczną decyzję?',
     answers: [
       { id: 'a', text: 'ArrayList jest zawsze szybszy od LinkedList dla wszystkich operacji.' },
       { id: 'b', text: 'Cache locality: ArrayList przechowuje elementy w ciągłym obszarze pamięci, co skutkuje lepszym wykorzystaniem cache procesora. LinkedList wymaga dereferencji wskaźników (cache miss per element), co dominuje przy milionach elementów mimo O(n) przesunięć przy wstawianiu.' },
@@ -147,7 +147,7 @@ export const COLLECTIONS_QUESTIONS: Question[] = [
   },
   {
     id: 212, categoryId: 'kolekcje',
-    question: 'Deweloper umieścił niestandardowy obiekt w HashSet, a następnie zmienił pole uczestniczące w obliczaniu hashCode. Jak zachowa się struktura podczas sprawdzania obecności tego obiektu?',
+    question: 'Deweloper umieścił niestandardowy obiekt w kolekcji HashSet, a następnie za pomocą metody ustawiającej (setter) zmienił wartość pola, które brało czynny udział w obliczaniu skrótu (hash) dla tego obiektu. Jak zachowa się struktura podczas próby sprawdzenia obecności tego obiektu?',
     answers: [
       { id: 'a', text: 'HashSet automatycznie aktualizuje pozycję obiektu po zmianie hashCode.' },
       { id: 'b', text: 'contains(obj) zwróci false mimo że obiekt jest w zbiorze – hashCode wskaże inny bucket niż ten w którym obiekt faktycznie siedzi.' },
@@ -159,7 +159,7 @@ export const COLLECTIONS_QUESTIONS: Question[] = [
   },
   {
     id: 213, categoryId: 'kolekcje',
-    question: 'W jakim specyficznym scenariuszu użycie CopyOnWriteArrayList przyniesie mierzalne korzyści wydajnościowe w stosunku do standardowej synchronizacji?',
+    question: 'Analizujesz wąskie gardło w aplikacji wielowątkowej. Zauważasz, że w jednym z komponentów masowo wykorzystywana jest kolekcja CopyOnWriteArrayList. W jakim specyficznym scenariuszu użycie tej właśnie implementacji przyniesie mierzalne korzyści wydajnościowe w stosunku do standardowej synchronizacji?',
     answers: [
       { id: 'a', text: 'Gdy operacje zapisu są częstsze niż odczytu.' },
       { id: 'b', text: 'Gdy odczyty są dominujące (read-heavy workload), a zapisy rzadkie. Odczyty nie wymagają blokady; przy każdym zapisie tworzona jest kopia tablicy.' },
@@ -171,7 +171,7 @@ export const COLLECTIONS_QUESTIONS: Question[] = [
   },
   {
     id: 214, categoryId: 'kolekcje',
-    question: 'W jakich przypadkach logika działania IdentityHashMap wpływa na poprawność działania programu w porównaniu do standardowych implementacji?',
+    question: 'Dokonujesz przeglądu kodu i zauważasz użycie IdentityHashMap zamiast standardowej HashMapy. W jakich przypadkach logika działania tej specyficznej struktury wpływa na poprawność działania programu w porównaniu do standardowych implementacji?',
     answers: [
       { id: 'a', text: 'IdentityHashMap jest identyczna jak HashMap – to alias dla tej samej klasy.' },
       { id: 'b', text: 'IdentityHashMap używa == (tożsamość referencji) zamiast equals() dla porównywania kluczy. Przydatna gdy ten sam obiekt musi być traktowany jako inny klucz niż równy mu obiekt (np. przy serializacji, proxy, object graphs).' },
@@ -183,7 +183,7 @@ export const COLLECTIONS_QUESTIONS: Question[] = [
   },
   {
     id: 215, categoryId: 'kolekcje',
-    question: 'Które z poniższych działań stanowi ścisłą techniczną przyczynę rzucenia ConcurrentModificationException przez mechanizm obronny iteratora ArrayList?',
+    question: 'Wyjątek ConcurrentModificationException często zaskakuje początkujących programistów, szczególnie w aplikacjach jednowątkowych. Które z poniższych działań stanowi ścisłą techniczną przyczynę wyrzucenia tego błędu przez mechanizm obronny iteratora kolekcji ArrayList?',
     answers: [
       { id: 'a', text: 'Dodanie elementu do listy przez inny wątek podczas iteracji w tym wątku.' },
       { id: 'b', text: 'Zmiana wewnętrznego licznika modyfikacji (modCount) listy niezgodna z oczekiwanym przez iterator – wykrywane przez sprawdzanie modCount przy każdym next().' },
@@ -195,7 +195,7 @@ export const COLLECTIONS_QUESTIONS: Question[] = [
   },
   {
     id: 216, categoryId: 'kolekcje',
-    question: 'Projektujesz klasę wstawianą do TreeSet. Przesłaniasz compareTo() tak, aby zwracała zero gdy dwa obiekty mają ten sam identyfikator, ale zapominasz zaimplementować equals(). Co się wydarzy przy wstawieniu dwóch takich obiektów?',
+    question: 'Projektujesz klasę wstawianą do struktury TreeSet. Przesłaniasz metodę porównującą tak, aby zwracała zero, gdy dwa obiekty mają ten sam identyfikator, jednak zapominasz zaimplementować metodę odpowiadającą za ich logiczną równość. Co się wydarzy przy próbie wstawienia dwóch takich obiektów?',
     answers: [
       { id: 'a', text: 'TreeSet wstawi oba obiekty, bo equals() nie jest nadpisane.' },
       { id: 'b', text: 'TreeSet potraktuje obiekty jako równe (compareTo()==0) i wstawi tylko jeden – niezależnie od wyniku equals().' },
@@ -207,7 +207,7 @@ export const COLLECTIONS_QUESTIONS: Question[] = [
   },
   {
     id: 217, categoryId: 'kolekcje',
-    question: 'Które ze zjawisk precyzyjnie opisuje przewagę i celowość stosowania WeakHashMap pod kątem mechanizmu Garbage Collectora?',
+    question: 'Narzędzie do monitorowania pamięci wykazało użycie WeakHashMap w module zarządzania sesjami. Które ze zjawisk precyzyjnie opisuje przewagę i celowość stosowania tej struktury pod kątem mechanizmu odzyskiwania wolnej przestrzeni (Garbage Collectora)?',
     answers: [
       { id: 'a', text: 'WeakHashMap jest szybszy od HashMap ze względu na weak references.' },
       { id: 'b', text: 'Klucze WeakHashMap są przechowywane jako słabe referencje. Gdy klucz nie ma innych silnych referencji, GC może go zebrać. Wpis automatycznie znika z mapy, co zapobiega wyciekom pamięci.' },
@@ -219,7 +219,7 @@ export const COLLECTIONS_QUESTIONS: Question[] = [
   },
   {
     id: 218, categoryId: 'kolekcje',
-    question: 'Metoda zewnętrznej biblioteki zwraca widok kolekcji opakowany w unmodifiableList. W jakim stopniu dane zwrócone przez ten interfejs są faktycznie zabezpieczone przed niepożądaną ingerencją?',
+    question: 'Korzystasz z metody zewnętrznej biblioteki, która według dokumentacji zwraca widok kolekcji opakowany w unmodifiableList. Ewaluujesz z punktu widzenia bezpieczeństwa systemu, w jakim stopniu dane zwrócone przez ten interfejs są faktycznie zabezpieczone przed niepożądaną ingerencją?',
     answers: [
       { id: 'a', text: 'Dane są w pełni bezpieczne – nikt nie może ich zmienić.' },
       { id: 'b', text: 'Częściowe bezpieczeństwo: lista jest unmodifiable przez zwrócony widok (UnsupportedOperationException). Jednak oryginalna lista może być zmieniona przez bibliotekę lub inne referencje – widok odzwierciedla zmiany.' },
@@ -231,7 +231,7 @@ export const COLLECTIONS_QUESTIONS: Question[] = [
   },
   {
     id: 219, categoryId: 'kolekcje',
-    question: 'Używasz PriorityQueue do wyciągania elementów o najwyższym priorytecie. Sprawdzasz zawartość za pomocą domyślnego iteratora w pętli – dane nie są posortowane. Jaka jest tego przyczyna?',
+    question: 'Podczas optymalizacji algorytmu wyszukiwania ścieżki, użyłeś PriorityQueue w celu wyciągania elementów o najwyższym priorytecie. Jednak gdy sprawdzasz zawartość całej kolejki za pomocą domyślnego iteratora w pętli, zauważasz, że wyświetlane dane nie są poprawnie posortowane. Jaka jest tego przyczyna?',
     answers: [
       { id: 'a', text: 'PriorityQueue nie implementuje poprawnie interfejsu Iterable.' },
       { id: 'b', text: 'Iterator PriorityQueue iteruje po wewnętrznej tablicy kopca (heap array) w kolejności pamięci, nie w kolejności priorytetowej. Aby uzyskać posortowaną kolejność, trzeba używać poll() kolejno.' },

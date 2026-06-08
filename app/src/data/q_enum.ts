@@ -87,7 +87,7 @@ export const ENUM_QUESTIONS: Question[] = [
   },
   {
     id: 148, categoryId: 'enum',
-    question: 'Klasa EnumSet różni się od zwykłego HashSet dla typów wylicznikowych przede wszystkim tym, że:',
+    question: 'Klasa EnumSet, dostępna w pakiecie java.util, różni się od zwykłego HashSet dla typów wylicznikowych przede wszystkim tym, że:',
     answers: [
       { id: 'a', text: 'EnumSet nie implementuje interfejsu Set i nie może być używany jak kolekcja.' },
       { id: 'b', text: 'EnumSet jest implementowany jako bitmask (BitVector) – operacje set są wykonywane jako operacje bitowe, co zapewnia stałą złożoność O(1) i bardzo małe zużycie pamięci.' },
@@ -123,7 +123,7 @@ export const ENUM_QUESTIONS: Question[] = [
   },
   {
     id: 151, categoryId: 'enum',
-    question: 'Jak zachowa się JVM podczas deserializacji typu wylicznikowego, który posiada dodatkowe, modyfikowalne pola instancyjne zmienione w trakcie działania programu?',
+    question: 'Analizując proces serializacji w języku Java, jak zachowa się maszyna wirtualna (JVM) podczas deserializacji typu wylicznikowego, który posiada dodatkowe, modyfikowalne pola instancyjne zmienione w trakcie działania programu przed jego zapisaniem?',
     answers: [
       { id: 'a', text: 'Deserializacja przywróci pola do wartości zmodyfikowanych przed serializacją.' },
       { id: 'b', text: 'Deserializacja zwróci istniejącą instancję enum (przez name()), ignorując zmodyfikowane pola – modyfikacje są utracone.' },
@@ -135,7 +135,7 @@ export const ENUM_QUESTIONS: Question[] = [
   },
   {
     id: 152, categoryId: 'enum',
-    question: 'Dlaczego wykorzystanie typu wylicznikowego uznaje się za podejście najbezpieczniejsze architektonicznie do implementacji wzorca Singleton w środowisku wielowątkowym?',
+    question: 'Oceniając wady i zalety różnych implementacji wzorca projektowego Singleton w środowisku wielowątkowym, dlaczego wykorzystanie typu wylicznikowego uznaje się w Javie za podejście najbezpieczniejsze architektonicznie?',
     answers: [
       { id: 'a', text: 'Enum Singleton jest szybszy niż inne implementacje, bo nie wymaga synchronizacji.' },
       { id: 'b', text: 'JVM gwarantuje thread-safe inicjalizację stałych enum (class loading jest synchronized przez JVM), odporność na ataki serializacji (deserializacja zwraca istniejącą instancję) i ataki refleksji (enum nie można instantancjować refleksją).' },
@@ -147,7 +147,7 @@ export const ENUM_QUESTIONS: Question[] = [
   },
   {
     id: 153, categoryId: 'enum',
-    question: 'Wybierając strukturę danych do przechowywania zbioru elementów wylicznika w systemie o rygorystycznych wymaganiach wydajnościowych, decydujesz się na EnumSet. Jak wewnętrznie ewaluowana jest ta struktura dla wylicznika posiadającego 40 elementów?',
+    question: 'Wybierając optymalną strukturę danych do przechowywania zbioru elementów wylicznika w systemie o rygorystycznych wymaganiach wydajnościowych, decydujesz się na EnumSet. Jak wewnętrznie ewaluowana jest ta struktura dla wylicznika posiadającego 40 elementów?',
     answers: [
       { id: 'a', text: 'JumboEnumSet – używa tablicy long do reprezentacji bitowej dla każdego zakresu elementów.' },
       { id: 'b', text: 'RegularEnumSet – jedna długa liczba (long) jako bitmask; 40 elementów mieści się w 64 bitach.' },
@@ -159,7 +159,7 @@ export const ENUM_QUESTIONS: Question[] = [
   },
   {
     id: 154, categoryId: 'enum',
-    question: 'Student próbuje stworzyć typ wylicznikowy, który dziedziczy po klasie bazowej zawierającej wspólną logikę biznesową. Kompilator zgłasza błąd. Jaka fundamentalna zasada jest tego przyczyną?',
+    question: 'Rozpatrz problem rozszerzalności typów. Student próbuje stworzyć typ wylicznikowy, który dziedziczy po klasie bazowej zawierającej wspólną logikę biznesową, jednak kompilator zgłasza błąd. Jaka fundamentalna zasada działania kompilatora Javy jest tego przyczyną?',
     answers: [
       { id: 'a', text: 'Enum jest niejawnie final i nie może być rozszerzany przez żadną klasę.' },
       { id: 'b', text: 'Każdy enum niejawnie rozszerza java.lang.Enum, a Java nie wspiera wielokrotnego dziedziczenia klas. Enum nie może dziedziczyć po żadnej innej klasie.' },
@@ -183,7 +183,7 @@ export const ENUM_QUESTIONS: Question[] = [
   },
   {
     id: 156, categoryId: 'enum',
-    question: 'Podczas code review zauważasz, że typ wylicznikowy posiada modyfikowalne pola stanu oraz standardowe metody setter. Jakie jest największe zagrożenie architektoniczne?',
+    question: 'Dokonując ewaluacji jakości kodu (code review), zauważasz, że typ wylicznikowy posiada modyfikowalne pola stanu oraz standardowe metody typu setter. Jakie jest największe zagrożenie architektoniczne wynikające z takiego podejścia w aplikacji webowej?',
     answers: [
       { id: 'a', text: 'Modyfikowalne pola enum są nieefektywne wydajnościowo i zwiększają zużycie pamięci.' },
       { id: 'b', text: 'Stałe enum są singletonami – modyfikacja pola przez jeden fragment kodu zmienia stan dla wszystkich, co prowadzi do nieprzewidywalnych efektów ubocznych i problemów ze współbieżnością (brak thread-safety).' },
@@ -195,7 +195,7 @@ export const ENUM_QUESTIONS: Question[] = [
   },
   {
     id: 157, categoryId: 'enum',
-    question: 'Jak instrukcja switch wykorzystująca wyłącznie typ wylicznikowy zachowa się po rearanżacji kolejności elementów w kodzie źródłowym enum, jeśli moduł z switch nie zostanie zrekompilowany?',
+    question: 'Ewaluując zależności między modułami, zastanawiasz się, jak instrukcja switch wykorzystująca wyłącznie typ wylicznikowy zachowa się po rearanżacji kolejności elementów w kodzie źródłowym enuma, jeśli moduł zawierający instrukcję switch nie zostanie zrekompilowany. Jaki mechanizm chroni aplikację przed błędnym sterowaniem przepływem?',
     answers: [
       { id: 'a', text: 'Błędne sterowanie przepływem – switch używa ordinal do wyboru case i wartości się rozsynchronizują.' },
       { id: 'b', text: 'Poprawne działanie – switch używa nazwy stałej (name()), nie ordinal. Rekompilacja jednego modułu wystarczy.' },
@@ -207,7 +207,7 @@ export const ENUM_QUESTIONS: Question[] = [
   },
   {
     id: 158, categoryId: 'enum',
-    question: 'W architekturze parsera każdy element wylicznikowy (reprezentujący komendę) implementuje własną wersję metody abstrakcyjnej zdefiniowanej wewnątrz enum. W jaki sposób JVM traktuje te implementacje?',
+    question: 'Tworzycie architekturę parsera komend, w której każdy element typu wylicznikowego (reprezentujący komendę) implementuje własną wersję metody abstrakcyjnej zdefiniowanej wewnątrz tego enuma. W jaki sposób maszyna wirtualna Javy traktuje te indywidualne implementacje dla każdego z elementów?',
     answers: [
       { id: 'a', text: 'Każda stała enum staje się osobną klasą dziedziczącą po enum z nadpisaną metodą.' },
       { id: 'b', text: 'Kompilator generuje dla każdej stałej z własną implementacją anonimową klasę wewnętrzną dziedziczącą po enum.' },
@@ -219,7 +219,7 @@ export const ENUM_QUESTIONS: Question[] = [
   },
   {
     id: 159, categoryId: 'enum',
-    question: 'Badasz cykl życia instancji typu wylicznikowego. W jakich okolicznościach Garbage Collector usunie obiekty reprezentujące stałe wylicznika z pamięci?',
+    question: 'Dokonując analizy profilowania pamięci serwera aplikacji, badasz cykl życia instancji typu wylicznikowego. W jakich okolicznościach odśmiecacz pamięci (Garbage Collector) usunie obiekty reprezentujące konkretne elementy wylicznika z pamięci sterty (Heap)?',
     answers: [
       { id: 'a', text: 'GC usuwa stałe enum gdy nie są aktywnie używane przez żaden wątek w aplikacji.' },
       { id: 'b', text: 'Stałe enum istnieją przez cały czas życia klasy (class loader). GC nie usuwa ich dopóki ClassLoader jest osiągalny (zazwyczaj przez cały czas życia aplikacji).' },
@@ -231,7 +231,7 @@ export const ENUM_QUESTIONS: Question[] = [
   },
   {
     id: 160, categoryId: 'enum',
-    question: 'Junior developer proponuje utrwalanie wartości typu wylicznikowego poprzez bezpośredni zapis wartości zwracanej przez metodę ordinal(). Jakie architektoniczne zagrożenie wiąże się z tą praktyką?',
+    question: 'Oceniając integralność danych w bazie relacyjnej, junior developer proponuje utrwalanie wartości typu wylicznikowego poprzez bezpośredni zapis wartości zwracanej przez metodę ordinal(). Jakie architektoniczne zagrożenie wiąże się z tą powszechną, lecz niebezpieczną praktyką?',
     answers: [
       { id: 'a', text: 'Metoda ordinal() jest deprecated i nie powinna być używana w kodzie produkcyjnym.' },
       { id: 'b', text: 'Ordinal jest powiązany z kolejnością deklaracji. Dodanie/usunięcie/reorder stałych enum zmienia ordinal istniejących stałych, powodując błędne odczytanie zapisanych danych.' },

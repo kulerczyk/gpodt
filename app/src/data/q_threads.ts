@@ -243,7 +243,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 280, categoryId: 'watki',
-    question: 'Rozważmy sytuację, w której wątek będący wewnątrz bloku zsynchronizowanego wywołuje inną metodę zsynchronizowaną na tym samym obiekcie. Jaki będzie rezultat?',
+    question: 'Rozważmy sytuację, w której wątek będący wewnątrz bloku zsynchronizowanego wywołuje inną metodę zsynchronizowaną na tym samym obiekcie. Jaki będzie rezultat takiej operacji na poziomie działania monitora?',
     answers: [
       { id: 'a', text: 'Deadlock – wątek czeka na swoją własną blokadę.' },
       { id: 'b', text: 'Kod działa poprawnie – Java synchronized jest reentrant (wielowejściowy). Wątek posiadający monitor może ponownie go "wejść" bez blokowania.' },
@@ -255,7 +255,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 281, categoryId: 'watki',
-    question: 'Jaka jest fundamentalna różnica w zarządzaniu monitorem między wywołaniem Thread.sleep() a Object.wait()?',
+    question: 'Analizując mechanizmy czasowego wstrzymywania wątków, jaka jest fundamentalna różnica w zarządzaniu monitorem między wywołaniem metody usypiającej przypisanej do wątku, a metody oczekującej przypisanej do obiektu?',
     answers: [
       { id: 'a', text: 'Obie metody zwalniają monitor na czas snu/oczekiwania.' },
       { id: 'b', text: 'Thread.sleep() usypia wątek, ale NIE zwalnia posiadanych blokad/monitorów. Object.wait() zwalnia monitor i przenosi wątek do zbioru czekających na nim. To kluczowa różnica dla synchronizacji.' },
@@ -267,7 +267,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 282, categoryId: 'watki',
-    question: 'Co się stanie, gdy programista wywoła metodę wait() na obiekcie poza jakimkolwiek blokiem synchronized?',
+    question: 'Co się stanie, gdy programista spróbuje zoptymalizować kod i wywoła metodę oczekującą na obiekcie poza jakimkolwiek blokiem lub metodą zsynchronizowaną przypisaną do tego obiektu?',
     answers: [
       { id: 'a', text: 'Wątek poczeka 1 sekundę i wznowi działanie.' },
       { id: 'b', text: 'Zostanie rzucony IllegalMonitorStateException w czasie wykonania.' },
@@ -291,7 +291,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 284, categoryId: 'watki',
-    question: 'W jakiej precyzyjnej sytuacji użycie notify() (nie notifyAll()) jest uznawane za w pełni bezpieczne?',
+    question: 'Oceniając użycie metod powiadamiających, w jakiej precyzyjnej sytuacji użycie powiadomienia pojedynczego wątku jest uznawane za w pełni bezpieczne i nie prowadzi do zablokowania całego systemu?',
     answers: [
       { id: 'a', text: 'Zawsze gdy jest jeden czekający wątek.' },
       { id: 'b', text: 'Gdy wszystkie czekające wątki czekają na identyczny warunek (homogeneous waiters) I każde notify() produkuje dokładnie jeden "zasób" dla jednego wątku. Wtedy notify() jest wystarczające i bardziej efektywne.' },
@@ -303,7 +303,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 285, categoryId: 'watki',
-    question: 'Wątek pierwszy zajmuje zamek obiektu X i próbuje zająć zamek Y. Jednocześnie wątek drugi zajmuje zamek Y i próbuje zająć X. Jaki będzie ostateczny wynik?',
+    question: 'Wyobraźmy sobie scenariusz: Wątek pierwszy zajmuje zamek (monitor) obiektu X, a następnie próbuje zająć zamek obiektu Y. Jednocześnie wątek drugi zajmuje zamek Y, a następnie próbuje zająć X. Jaki będzie ostateczny wynik takiej architektury?',
     answers: [
       { id: 'a', text: 'Jeden z wątków wycofa się automatycznie.' },
       { id: 'b', text: 'Deadlock – obydwa wątki czekają w nieskończoność. Java nie ma automatycznej detekcji i odzyskiwania z deadlock.' },
@@ -315,7 +315,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 286, categoryId: 'watki',
-    question: 'Co stanie się z monitorem chroniącym blok kodu, jeśli wewnątrz tego bloku zostanie rzucony nieobsłużony wyjątek?',
+    question: 'Analizując mechanizm zwalniania zamków (monitorów), co stanie się z monitorem chroniącym blok kodu, jeśli wewnątrz tego bloku zostanie rzucony nieobsłużony wyjątek czasu wykonania, który przerwie działanie wątku?',
     answers: [
       { id: 'a', text: 'Monitor pozostaje zajęty – wątek posiadający go nie zwalnia go nawet po wyjątku.' },
       { id: 'b', text: 'Monitor jest zwalniany automatycznie – synchronized blok zapewnia zwolnienie monitora nawet przy wyjątku (analogicznie do finally).' },
@@ -327,7 +327,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 287, categoryId: 'watki',
-    question: 'Aplikacja posiada metodę statyczną oraz metodę instancyjną, obie oznaczone słowem kluczowym synchronized. Jaki będzie wynik jednoczesnego wywołania z dwóch różnych wątków na tym samym obiekcie?',
+    question: 'Aplikacja posiada metodę statyczną oraz metodę instancyjną, obie oznaczone słowem kluczowym oznaczającym synchronizację. Ewaluując dostęp do tych metod z poziomu dwóch różnych wątków na tym samym obiekcie, jaki będzie wynik?',
     answers: [
       { id: 'a', text: 'Obie metody będą blokowane wzajemnie – używają tej samej blokady.' },
       { id: 'b', text: 'Mogą być wykonywane jednocześnie – metoda instancyjna blokuje na this (instancja), statyczna na Class obiekcie klasy. To dwie różne blokady, niezależne od siebie.' },
@@ -339,7 +339,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 288, categoryId: 'watki',
-    question: 'Natrafiasz na blok synchronizujący wykonanie na stałej tekstowej zapisanej bezpośrednio w kodzie (String literal). Dlaczego jest to uznawane za krytyczny błąd projektowy?',
+    question: 'Dokonując inspekcji kodu natrafiasz na blok synchronizujący wykonanie na stałej tekstowej zapisanej bezpośrednio w kodzie. Dlaczego takie rozwiązanie architektoniczne jest uznawane za krytyczny błąd projektowy?',
     answers: [
       { id: 'a', text: 'String literals są zbyt duże jako obiekty-monitory.' },
       { id: 'b', text: 'String literals są internowane (interned) – JVM zachowuje jedną instancję dla identycznych literałów. synchronized("lock") w różnych miejscach kodu/klasach/bibliotekach używa TEN SAM obiekt jako monitor – przypadkowe współdzielenie blokady, mogące powodować deadlocki lub nieoczekiwane blokowanie niezwiązanego kodu.' },
@@ -351,7 +351,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 289, categoryId: 'watki',
-    question: 'W jakim precyzyjnie stanie znajduje się wątek bezpośrednio po odebraniu sygnału powiadamiającego (notify), ale jeszcze przed faktycznym wznowieniem wykonywania kodu?',
+    question: 'Analizując cykl życia wątku powiązanego z monitorem, w jakim precyzyjnie stanie znajduje się wątek bezpośrednio po odebraniu sygnału powiadamiającego, ale jeszcze przed faktycznym wznowieniem wykonywania kodu?',
     answers: [
       { id: 'a', text: 'W stanie RUNNING – natychmiast wznawia działanie.' },
       { id: 'b', text: 'W stanie BLOCKED – wątek próbuje odzyskać monitor. Musi poczekać aż powiadamiający wątek zwolni blokadę i wygrać rywalizację o monitor.' },
@@ -363,7 +363,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 290, categoryId: 'watki',
-    question: 'Wątek pierwszy wywołuje metodę powiadamiającą monitor, zanim wątek drugi zdąży wywołać metodę oczekującą na tym samym obiekcie. Jaki jest rezultat?',
+    question: 'Zastanów się nad scenariuszem wyścigu: wątek pierwszy wywołuje metodę powiadamiającą monitor, zanim wątek drugi zdąży wywołać metodę oczekującą na tym samym obiekcie. Jaki jest rezultat przestrzenny takiej asynchronii?',
     answers: [
       { id: 'a', text: 'notify() jest buforowane i dostarczane gdy wątek wywoła wait().' },
       { id: 'b', text: 'Sygnał notify() przepada. Wątek drugi wywoła wait() i będzie czekał w nieskończoność na sygnał który już nastąpił – "missed signal".' },
@@ -375,7 +375,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 291, categoryId: 'watki',
-    question: 'Jak wygląda kwestia sprawiedliwości przydzielania dostępu do monitora w warunkach dużej rywalizacji wielu wątków?',
+    question: 'Ewaluując cechy jakościowe wbudowanych mechanizmów synchronizacyjnych w języku Java, jak wygląda kwestia sprawiedliwości przydzielania dostępu do monitora w warunkach dużej rywalizacji wielu wątków?',
     answers: [
       { id: 'a', text: 'Java gwarantuje FIFO dostęp do monitora – najdłużej czekający wątek wygrywa.' },
       { id: 'b', text: 'Wbudowany synchronized (intrinsic lock) NIE gwarantuje sprawiedliwości – JVM może przyznać monitor dowolnemu oczekującemu wątkowi. Może prowadzić do zagłodzenia (starvation). ReentrantLock(true) oferuje fair locking (FIFO).' },
@@ -387,7 +387,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 292, categoryId: 'watki',
-    question: 'Co dokładnie zachodzi, gdy wątek znajdujący się w stanie oczekiwania wewnątrz monitora (wait()) otrzyma zewnętrzny sygnał przerywający jego działanie?',
+    question: 'Rozpatrz sytuację z punktu widzenia projektowania obsługi przerwań. Co dokładnie zachodzi, gdy wątek znajdujący się w stanie oczekiwania wewnątrz monitora otrzyma zewnętrzny sygnał przerywający jego działanie?',
     answers: [
       { id: 'a', text: 'Sygnał jest ignorowany – wątek kontynuuje wait().' },
       { id: 'b', text: 'Wątek jest budzony z wait(), przejmuje monitor, a następnie rzuca InterruptedException. Flaga interrupted jest czyszczona. Wątek musi obsłużyć przerwanie.' },
@@ -399,7 +399,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 293, categoryId: 'watki',
-    question: 'Dokonując analizy metody wait() z parametrem określającym maksymalny czas uśpienia, co musi się wydarzyć, aby wątek wznowił wykonywanie kodu tuż po upłynięciu limitu czasowego?',
+    question: 'Dokonując analizy metody oczekującej z parametrem określającym maksymalny czas uśpienia, co musi się wydarzyć, aby wątek wznowił wykonywanie kodu tuż po upłynięciu zdefiniowanego bezpiecznego limitu czasowego?',
     answers: [
       { id: 'a', text: 'Wątek automatycznie wznawia działanie po upłynięciu timeout.' },
       { id: 'b', text: 'Po upłynięciu timeout wątek próbuje odzyskać monitor. Musi czekać aż monitor stanie się dostępny – wznowienie nie jest natychmiastowe po timeout jeśli monitor jest zajęty.' },
@@ -411,7 +411,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 294, categoryId: 'watki',
-    question: 'Która z poniższych sytuacji najtrafniej opisuje kontekst powstawania zagłodzenia (starvation) wątku w obrębie monitorów?',
+    question: 'Zagłodzenie wątku to poważny błąd architektoniczny w systemach współbieżnych. Analizując mechanizmy wewnętrzne maszyny wirtualnej, która z poniższych sytuacji najtrafniej opisuje kontekst powstawania tego zjawiska w obrębie monitorów?',
     answers: [
       { id: 'a', text: 'Wątek wywołuje wait() bez warunku.' },
       { id: 'b', text: 'Wątek o niskim priorytecie lub z pechem przy wejściu nigdy nie wygrywa rywalizacji o monitor z powodu braku gwarancji fairness wbudowanych blokad Java (barging) lub dlatego że notify() zawsze budzi "innych" wątków.' },
@@ -423,7 +423,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 295, categoryId: 'watki',
-    question: 'O jakiej nadrzędnej zasadzie dotyczącej adresowania obiektów musisz pamiętać wywołując metodę oczekującą na powiadomienie (wait())?',
+    question: 'Badając zależności pomiędzy strukturą obiektową a systemem kontroli przepływu powiązanym z monitorami, o jakiej nadrzędnej zasadzie adresowania obiektów musisz pamiętać wywołując metodę oczekującą na powiadomienie?',
     answers: [
       { id: 'a', text: 'wait() musi być wywołane na obiekcie Thread.' },
       { id: 'b', text: 'wait() jest wywoływane na obiekcie będącym monitorem (lock object), na którym zsynchronizowany jest bieżący wątek. Musi to być dokładnie ten sam obiekt co w synchronized(obj) i na którym wywoła się notify().' },
@@ -435,7 +435,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 296, categoryId: 'watki',
-    question: 'Programista postanowił ponownie użyć tego samego obiektu wątku, wywołując na nim metodę startową po raz drugi po zakończeniu jego pierwotnej pracy. Jak zachowa się środowisko?',
+    question: 'Projektując mechanizm cyklicznych zadań współbieżnych programista postanowił ponownie użyć tego samego obiektu wątku, wywołując na nim metodę startową po raz drugi, po uprzednim zakończeniu jego pierwotnej pracy. Jak zachowa się środowisko?',
     answers: [
       { id: 'a', text: 'Wątek uruchomi się ponownie od początku metody run().' },
       { id: 'b', text: 'Zostanie rzucony IllegalThreadStateException – raz zakończony wątek (TERMINATED) nie może być ponownie uruchomiony przez start().' },
@@ -447,7 +447,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 297, categoryId: 'watki',
-    question: 'W jaki sposób pod spodem zaimplementowana jest popularna metoda join() zatrzymująca proces wywołujący do momentu zakończenia procesu obserwowanego?',
+    question: 'Ewaluując warstwę abstrakcji biblioteki standardowej, w jaki sposób pod spodem zaimplementowana jest popularna metoda dołączania do wątku, która zatrzymuje proces wywołujący do momentu zakończenia procesu obserwowanego?',
     answers: [
       { id: 'a', text: 'join() używa busy waiting w pętli.' },
       { id: 'b', text: 'join() jest zaimplementowane jako pętla while sprawdzająca isAlive() i wywołująca wait() na obiekcie Thread. Zakończenie wątku wywołuje notifyAll() na obiekcie Thread (wewnętrznie przez JVM), budząc czekające w join().' },
@@ -459,7 +459,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 298, categoryId: 'watki',
-    question: 'W jaki sposób funkcja Thread.yield() odnosi się do logiki zarządzania wbudowanymi monitorami synchronizacji?',
+    question: 'Porównując mechanizmy sterowania czasem procesora dla różnych wątków roboczych, w jaki sposób funkcja ustępowania czasu odnosi się bezpośrednio do logiki zarządzania wbudowanymi monitorami synchronizacji?',
     answers: [
       { id: 'a', text: 'Thread.yield() zwalnia posiadane monitory podobnie jak wait().' },
       { id: 'b', text: 'Thread.yield() NIE zwalnia żadnych monitorów – jedynie sygnalizuje schedulerowi, że bieżący wątek jest gotowy ustąpić procesora innemu wątkowi o takim samym lub wyższym priorytecie. Monitory pozostają zajęte.' },
@@ -471,7 +471,7 @@ export const THREADS_QUESTIONS: Question[] = [
   },
   {
     id: 299, categoryId: 'watki',
-    question: 'Co wynika z faktu synchronizowania wszystkich dostępnych modyfikatorów różnych i niezależnych logicznie zmiennych za pomocą słowa kluczowego synchronized na deklaracjach metod (coarse-grained locking)?',
+    question: 'Analizując granulację zamków (monitorów) w obszarze pojedynczego obiektu klasy: co wynika z faktu synchronizowania wszystkich dostępnych modyfikatorów różnych i niezależnych logicznie zmiennych za pomocą słowa kluczowego na deklaracjach metod?',
     answers: [
       { id: 'a', text: 'Zapewnia lepszą wydajność przez centralizację synchronizacji.' },
       { id: 'b', text: 'Blokada na this dla wszystkich metod powoduje nadmierną synchronizację: operacje na niezwiązanych danych wzajemnie się blokują, zmniejszając współbieżność i wydajność. Fine-grained locking (osobne obiekty blokady per zasób) jest lepsze.' },

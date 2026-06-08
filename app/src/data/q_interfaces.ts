@@ -3,7 +3,7 @@ import type { Question } from '../types';
 export const INTERFACES_QUESTIONS: Question[] = [
   {
     id: 61, categoryId: 'interfejsy',
-    question: 'Interfejs Printable definiuje metodę default print(). Interfejs Exportable też definiuje metodę default print(). Klasa Document implementuje oba interfejsy, ale nie nadpisuje print(). Co się stanie podczas kompilacji?',
+    question: 'Interfejs Printable definiuje metodę default print() z pewną implementacją. Interfejs Exportable również definiuje metodę default print() z inną implementacją. Klasa Document implementuje oba interfejsy, ale nie nadpisuje metody print(). Co się stanie podczas kompilacji?',
     answers: [
       { id: 'a', text: 'Kompilacja przejdzie; wywoływana będzie metoda z interfejsu Printable, bo jest wymieniony jako pierwszy w deklaracji.' },
       { id: 'b', text: 'Błąd kompilacji – klasa Document musi nadpisać metodę print() ze względu na konflikt metod default.' },
@@ -63,7 +63,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 66, categoryId: 'interfejsy',
-    question: 'Programista chce zapewnić, że każda klasa implementująca interfejs Shape będzie porównywalna z innymi obiektami Shape pod względem wielkości pola. Które podejście jest najbardziej idiomatyczne w Javie?',
+    question: 'Programista chce zapewnić że każda klasa implementująca interfejs Shape będzie porównywalna z innymi obiektami Shape pod względem wielkości pola. Które podejście jest najbardziej idiomatyczne w Javie?',
     answers: [
       { id: 'a', text: 'Dodać metodę default compareTo() do interfejsu Shape z domyślną implementacją porównania.' },
       { id: 'b', text: 'Zadeklarować: interface Shape extends Comparable<Shape> i wymagać implementacji compareTo().' },
@@ -75,7 +75,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 67, categoryId: 'interfejsy',
-    question: 'Które stwierdzenie poprawnie opisuje przewagę interfejsu znacznikowego (marker interface) nad adnotacją z retencją RUNTIME przy weryfikacji cech obiektów?',
+    question: 'Które stwierdzenie poprawnie opisuje przewagę interfejsu znacznikowego nad adnotacją z retencją RUNTIME przy weryfikacji cech obiektów?',
     answers: [
       { id: 'a', text: 'Interfejsy znacznikowe działają szybciej w czasie wykonania niż sprawdzanie adnotacji przez refleksję w pętli.' },
       { id: 'b', text: 'Interfejsy znacznikowe umożliwiają sprawdzenie przez instanceof w czasie kompilacji, zapewniając type safety; adnotacje wymagają refleksji w czasie wykonania.' },
@@ -99,7 +99,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 69, categoryId: 'interfejsy',
-    question: 'Klasa abstrakcyjna AbstractAnimal posiada nieabstrakcyjną metodę move(). Interfejs Swimmable definiuje metodę default move(). Klasa Duck dziedziczy po AbstractAnimal i implementuje Swimmable bez nadpisywania move(). Która wersja move() zostanie wywołana?',
+    question: 'Klasa abstrakcyjna AbstractAnimal posiada nieabstrakcyjną metodę move(). Interfejs Swimmable również definiuje metodę default move(). Klasa Duck dziedziczy po AbstractAnimal i implementuje Swimmable bez nadpisywania move(). Która wersja move() zostanie wywołana?',
     answers: [
       { id: 'a', text: 'Wersja z interfejsu Swimmable, bo interfejsy mają pierwszeństwo nad klasami abstrakcyjnymi.' },
       { id: 'b', text: 'Wersja z klasy AbstractAnimal (klasa ma pierwszeństwo nad interfejsem).' },
@@ -111,7 +111,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 70, categoryId: 'interfejsy',
-    question: 'Programista zauważa, że interfejs ma 15 metod abstrakcyjnych, a większość klas implementujących dostarcza puste implementacje dla 10 z nich. Które rozwiązanie najlepiej adresuje ten problem zgodnie z zasadami SOLID?',
+    question: 'Programista zauważa że interfejs ma 15 metod abstrakcyjnych, a większość klas implementujących dostarcza puste implementacje dla 10 z nich. Które rozwiązanie najlepiej adresuje ten problem zgodnie z zasadami SOLID?',
     answers: [
       { id: 'a', text: 'Dodać do interfejsu metody default z pustymi implementacjami, by klasy mogły dziedziczyć te puste wersje.' },
       { id: 'b', text: 'Podzielić interfejs na mniejsze, spójne interfejsy zgodnie z Interface Segregation Principle (ISP).' },
@@ -159,7 +159,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 74, categoryId: 'interfejsy',
-    question: 'Interfejs Cache definiuje metodę default put() z logiką logowania, która wewnętrznie wywołuje abstrakcyjną metodę store(). Klasa implementująca dostarcza implementację store(). Jak nazywa się ten wzorzec?',
+    question: 'Interfejs Cache definiuje metodę default put() implementującą logowanie, która wewnętrznie wywołuje abstrakcyjną metodę store(). Klasa implementująca dostarcza implementację store(). Jak nazywa się ten wzorzec i co jest jego główną korzyścią w kontekście interfejsów względem klas abstrakcyjnych?',
     answers: [
       { id: 'a', text: 'Strategy Pattern – definiuje rodzinę wymiennych algorytmów i hermetyzuje każdy z nich osobno.' },
       { id: 'b', text: 'Template Method Pattern w interfejsie – metoda default definiuje algorytm, wywołując abstrakcyjną metodę store() do konkretyzacji.' },
@@ -171,7 +171,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 75, categoryId: 'interfejsy',
-    question: 'Programista wydał bibliotekę z publicznym interfejsem API zawierającym 5 metod. Po roku chce dodać 6. metodę bez łamania istniejących implementacji klientów. Które podejście zachowuje kompatybilność?',
+    question: 'Programista wydał bibliotekę z publicznym interfejsem API zawierającym 5 metod. Po roku chce dodać 6. metodę bez łamania istniejących implementacji klientów. Które podejście zachowuje kompatybilność binarną i źródłową?',
     answers: [
       { id: 'a', text: 'Dodać nową metodę abstrakcyjną – wszystkie klasy klientów automatycznie ją zaimplementują jako pustą metodę.' },
       { id: 'b', text: 'Dodać nową metodę jako default z rozsądną domyślną implementacją lub rzucającą UnsupportedOperationException.' },
@@ -195,7 +195,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 77, categoryId: 'interfejsy',
-    question: 'Klasa implementuje Comparable<T> i dostarcza metodę compareTo() zwracającą wartości -1, 0 lub 1. Kolega twierdzi, że to błąd i należy zwracać wynik odejmowania porównywanych wartości. Kto ma rację?',
+    question: 'Klasa implementuje Comparable<T> i dostarcza metodę compareTo(). Programista zwraca z compareTo() wartości -1, 0 lub 1. Kolega twierdzi że to błąd i należy zwracać wynik odejmowania porównywanych wartości całkowitych. Kto ma rację i dlaczego?',
     answers: [
       { id: 'a', text: 'Kolega ma rację – odejmowanie jest szybsze i bardziej idiomatyczne w implementacji compareTo().' },
       { id: 'b', text: 'Programista ma rację co do bezpieczeństwa: odejmowanie może overflow dla Integer.MIN_VALUE; zwracanie {-1, 0, 1} jest zawsze bezpieczne.' },
@@ -207,7 +207,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 78, categoryId: 'interfejsy',
-    question: 'Interfejsy: Flyable z default move() → "flying" i Drivable z default move() → "driving". Klasa FlyingCar implementuje oba i nadpisuje move() wywołując Flyable.super.move() i Drivable.super.move(). Co zwróci move()?',
+    question: 'Dwa interfejsy: Flyable z default move() zwracającym "flying" i Drivable z default move() zwracającym "driving". Klasa FlyingCar implementuje oba i nadpisuje move() wywołując Flyable.super.move() oraz Drivable.super.move() i łącząc wyniki. Co zwróci move()?',
     answers: [
       { id: 'a', text: '"flying"' },
       { id: 'b', text: '"driving"' },
@@ -219,7 +219,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 79, categoryId: 'interfejsy',
-    question: 'Programista analizuje projekt gdzie interfejsy zawierają rozbudowaną logikę biznesową w metodach default. Z perspektywy zasad SOLID które naruszenie jest najbardziej bezpośrednim skutkiem?',
+    question: 'Programista analizuje projekt gdzie interfejsy zawierają rozbudowaną logikę biznesową w metodach default. Z perspektywy zasad SOLID które naruszenie jest najbardziej bezpośrednim skutkiem tego podejścia?',
     answers: [
       { id: 'a', text: 'Liskov Substitution Principle – implementacje konkretnych klas nie mogą zastąpić interfejsu.' },
       { id: 'b', text: 'Single Responsibility Principle – interfejs zaczyna mieć wiele powodów do zmiany (zarówno kontrakt jak i implementacja logiki).' },
@@ -255,7 +255,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 82, categoryId: 'interfejsy',
-    question: 'Od wersji Java 9 możliwe jest definiowanie prywatnych metod wewnątrz interfejsów. Jaki jest główny cel wprowadzenia tego rozwiązania?',
+    question: 'Od wersji Java 9 możliwe jest definiowanie prywatnych metod wewnątrz interfejsów. Jaki jest główny cel wprowadzenia tego rozwiązania architektonicznego?',
     answers: [
       { id: 'a', text: 'Umożliwienie enkapsulacji stanu instancyjnego wewnątrz interfejsów bez konieczności tworzenia klas.' },
       { id: 'b', text: 'Eliminacja duplikacji kodu między metodami default i static w interfejsie, bez ujawniania metod pomocniczych w publicznym API interfejsu.' },
@@ -327,7 +327,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 88, categoryId: 'interfejsy',
-    question: 'Java 15+ wprowadziła mechanizm interfejsów zapieczętowanych (sealed). Jaki obowiązek nakładają one na implementujące je klasy?',
+    question: 'Modernizacja specyfikacji (Java 15+) wprowadziła mechanizm interfejsów zapieczętowanych (sealed). Jaki obowiązek nakładają one na implementujące je klasy?',
     answers: [
       { id: 'a', text: 'Wszystkie implementujące klasy muszą być finalne i deklarować wszystkie metody interfejsu jako final.' },
       { id: 'b', text: 'Implementujące klasy muszą być wymienione w klauzuli permits interfejsu i każda musi zadeklarować się jako final, sealed lub non-sealed.' },
@@ -351,7 +351,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 90, categoryId: 'interfejsy',
-    question: 'Metoda z interfejsu deklaruje throws IOException. Klasa ją implementująca deklaruje w nadpisanej metodzie throws Exception. Jaki będzie wynik kompilacji?',
+    question: 'Metoda z interfejsu deklaruje zgłaszanie wyjątku IOException. Klasa ją implementująca deklaruje w nadpisanej metodzie rzucanie wyjątku Exception. Jaki będzie wynik?',
     answers: [
       { id: 'a', text: 'Kompilacja przejdzie – klasa implementująca może swobodnie rozszerzyć listę wyjątków względem interfejsu.' },
       { id: 'b', text: 'Błąd kompilacji – implementacja nie może deklarować szerszego checked exception niż interfejs.' },
@@ -375,7 +375,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 92, categoryId: 'interfejsy',
-    question: 'Czym podyktowany jest częsty wybór pustych interfejsów znacznikowych (np. Cloneable) zamiast mechanizmu adnotacji do flagowania klas?',
+    question: 'Czym podyktowany jest częsty wybór pustych interfejsów znacznikowych (np. Cloneable) zamiast mechanizmu adnotacji do flagowania klas w zaawansowanych systemach Javy?',
     answers: [
       { id: 'a', text: 'Interfejsy znacznikowe są znacznie wydajniejsze niż adnotacje przy każdym sprawdzeniu w czasie wykonania.' },
       { id: 'b', text: 'Interfejsy znacznikowe są sprawdzane przez system typów (instanceof, parametry metod) w czasie kompilacji i wykonania, zapewniając type-safety niedostępną dla adnotacji.' },
@@ -399,7 +399,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 94, categoryId: 'interfejsy',
-    question: 'Klasa implementuje dwa interfejsy posiadające metodę domyślną o tej samej sygnaturze. Jak programista może jawnie odwołać się do implementacji z wybranego interfejsu?',
+    question: 'Klasa implementuje dwa interfejsy posiadające metodę domyślną. Jak programista może jawnie odwołać się do implementacji pochodzącej bezpośrednio z wybranego interfejsu?',
     answers: [
       { id: 'a', text: 'Przez super.methodName() z nazwą interfejsu jako kwalifikator przed słowem kluczowym super.' },
       { id: 'b', text: 'Przez składnię: InterfaceName.super.methodName().' },
@@ -411,7 +411,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 95, categoryId: 'interfejsy',
-    question: 'Zgodnie ze standardem JVM, w którym precyzyjnym momencie cyklu życia programu następuje ostateczna, statyczna inicjalizacja interfejsu?',
+    question: 'Zgodnie ze standardem maszyny wirtualnej Javy (JVM), w którym precyzyjnym momencie cyklu życia programu następuje ostateczna, statyczna inicjalizacja interfejsu?',
     answers: [
       { id: 'a', text: 'Przy starcie JVM – wszystkie interfejsy są inicjalizowane jednorazowo przez ClassLoader przed uruchomieniem kodu.' },
       { id: 'b', text: 'Przy pierwszym użyciu interfejsu: dostępie do jego stałej, wywołaniu metody statycznej, lub inicjalizacji klasy/interfejsu implementującego/rozszerzającego.' },
@@ -447,7 +447,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 98, categoryId: 'interfejsy',
-    question: 'Początkujący deweloper próbuje utworzyć wewnątrz interfejsu abstrakcyjną metodę poprzedzoną modyfikatorem protected. Dlaczego próba ta kończy się niepowodzeniem?',
+    question: 'Początkujący deweloper próbuje utworzyć wewnątrz interfejsu abstrakcyjną metodę, poprzedzając ją modyfikatorem protected. Dlaczego próba ta kończy się szybkim niepowodzeniem?',
     answers: [
       { id: 'a', text: 'Interfejsy nie mogą mieć metod abstrakcyjnych – mogą jedynie definiować metody default i static.' },
       { id: 'b', text: 'Metody interfejsu są niejawnie public; protected jest niezgodne z naturą interfejsu jako kontraktu publicznego.' },
@@ -459,7 +459,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 99, categoryId: 'interfejsy',
-    question: 'Zdefiniowana w interfejsie publiczna metoda abstrakcyjna zostaje wdrożona w klasie. Programista decyduje się zmienić dostęp jej implementacji na protected. Czy kod skompiluje się poprawnie?',
+    question: 'Zdefiniowana w interfejsie publiczna metoda abstrakcyjna zostaje wdrożona w klasie. Programista decyduje się zmienić dostęp jej implementacji na chroniony. Czy kod skompiluje się poprawnie?',
     answers: [
       { id: 'a', text: 'Tak – klasa może używać dowolnego modyfikatora dostępu w swojej implementacji metody interfejsu.' },
       { id: 'b', text: 'Nie – nadpisana metoda nie może zawężać dostępu; public → protected to zawężenie. Błąd kompilacji.' },
@@ -471,7 +471,7 @@ export const INTERFACES_QUESTIONS: Question[] = [
   },
   {
     id: 100, categoryId: 'interfejsy',
-    question: 'Architekt przechowuje stałe wartości konfiguracyjne aplikacji w polach interfejsu, odczytując je z wielu wątków. Jak rozwiązana jest kwestia współbieżności?',
+    question: 'Architekt decyduje się przechowywać stałe wartości konfiguracyjne aplikacji prosto w polach interfejsu, odczytując je na przestrzeni wielu wątków. Jak rozwiązana jest kwestia współbieżności?',
     answers: [
       { id: 'a', text: 'Pola interfejsu wymagają synchronizacji, bo mogą być modyfikowane przez inne wątki w czasie działania.' },
       { id: 'b', text: 'Pola interfejsu są public static final – stałe. Stałe nie mogą być modyfikowane, więc dostęp z wielu wątków jest bezpieczny bez synchronizacji.' },
